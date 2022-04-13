@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthenticationModule } from 'src/apis/authentication/authentication.module';
 import { CommentModule } from './apis/comments/comment.module';
 import { AppController } from './app.controller';
+import { RoomsModule } from './apis/rooms/rooms.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AppController } from './app.controller';
     AuthModule,
     CommentModule,
     ChatModule,
+    RoomsModule,
   ],
   providers: [
     {
