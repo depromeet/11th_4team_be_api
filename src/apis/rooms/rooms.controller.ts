@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -17,12 +18,13 @@ export class RoomsController {
 
   @Post()
   create(@Body() createRoomDto: CreateRoomDto) {
-    return this.roomsService.create(createRoomDto);
+    return this.roomsService.createRoom(createRoomDto);
   }
 
   @Get()
-  findAll() {
-    return this.roomsService.findAll();
+  findAll(@Query('lng') lng: number, @Query('lat') lat: number) {
+    // 경도lng 위도lat
+    return this.roomsService.findRoom({ lng, lat });
   }
 
   @Get(':id')
