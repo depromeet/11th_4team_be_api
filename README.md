@@ -4,6 +4,12 @@
 
 #### - 해당 레퍼지토리는 api를 관리하는 백엔드 소스들로 구성되었습니다.
 
+# 1. git flow
+
+main (루트 브랜치)
+ㄴ dev (개발용 브랜치)
+ㄴ feature/{작업할 브랜치 명} - dev 밑에 작업할 브랜치 파서 작업 후 dev에 PR 올리기
+
 ---
 
 # 2. Getting Started
