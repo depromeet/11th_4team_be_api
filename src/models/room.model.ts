@@ -30,10 +30,12 @@ const options: SchemaOptions = {
 //   // coordinates: number[];
 // }
 
-@Schema({ useNestedStrict: true })
+@Schema({ useNestedStrict: true, _id: false })
 export class Geometry {
+  @IsArray()
   @Prop({ type: Array, required: true })
   coordinates: number[];
+  @IsString()
   @Prop({ type: String })
   type: string;
 }
