@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { RoomRepository } from 'src/repositories/room.repository';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { FindRoomDto } from './dto/find-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomsService {
-  create(createRoomDto: CreateRoomDto) {
-    return 'This action adds a new room';
+  constructor(private readonly roomRepository: RoomRepository) {}
+  async createRoom(createRoomDto: CreateRoomDto) {
+    return await this.roomRepository.createRoom(createRoomDto);
   }
 
-  findAll() {
-    return `This action returns all rooms`;
+  async findRoom(findRoomDto: FindRoomDto) {
+    return await this.roomRepository.findRoom(findRoomDto);
   }
 
   findOne(id: number) {
