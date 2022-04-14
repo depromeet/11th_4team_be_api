@@ -9,6 +9,7 @@ import { RoomRepository } from 'src/repositories/room.repository';
 import { UserRepository } from 'src/repositories/user.repository';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { FindRoomDto } from './dto/find-room.dto';
+import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
@@ -22,8 +23,10 @@ export class RoomsService {
     return await this.roomRepository.createRoom(createRoomDto);
   }
 
-  async findRoom(findRoomDto: FindRoomDto): Promise<Room[] | []> {
-    return await this.roomRepository.findRoomsByCoordinates(findRoomDto);
+  async findRoom(findRoomDto: FindRoomDto): Promise<ResFindRoomDto[] | []> {
+    const rooms = await this.roomRepository.findRoomsByCoordinates(findRoomDto);
+    const filteredRooms = rooms.map((room) => new ResFindRoomDto(room));
+    return filteredRooms;
   }
 
   async addUserToRoom(

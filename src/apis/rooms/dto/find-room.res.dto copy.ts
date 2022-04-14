@@ -1,23 +1,16 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
-
-import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
 
-export class ResFindOneRoomDto {
-  constructor(room: Room, isUserFavoriteRoom?: boolean) {
+export class ResFindRoomDto {
+  constructor(room: Room) {
     this._id = room._id;
     this.category = room.category;
     this.name = room.name;
     this.radius = room.radius;
     this.lat = room.geometry.coordinates[0];
     this.lng = room.geometry.coordinates[1];
-    if (isUserFavoriteRoom) {
-      this.userList = room.userList as UserProfileDto[];
-      this.isUserFavoriteRoom = isUserFavoriteRoom;
-    }
     this.userCount = room.userList.length;
   }
   @ApiProperty()
@@ -29,7 +22,7 @@ export class ResFindOneRoomDto {
   @ApiProperty()
   radius: number;
 
-  @ApiProperty({ enum: CATEGORY_TYPE })
+  @ApiProperty()
   category: CATEGORY_TYPE;
 
   @ApiProperty()
@@ -38,15 +31,8 @@ export class ResFindOneRoomDto {
   @ApiProperty()
   lng: number;
 
-  @ApiProperty({ type: [UserProfileDto], required: false })
-  @Expose()
-  userList?: UserProfileDto[];
-
   @ApiProperty()
   userCount: number;
-
-  @ApiProperty()
-  isUserFavoriteRoom?: boolean;
 }
 
 // '_id',

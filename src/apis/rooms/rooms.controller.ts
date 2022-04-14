@@ -28,6 +28,7 @@ import { ObjectId } from 'mongoose';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
+import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -43,6 +44,11 @@ export class RoomsController {
   }
 
   @ApiOperation({ summary: '위치정보를 토대로 내 주변 채팅방 정보를 가져옴' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ResFindRoomDto,
+  })
   @Get()
   @UsePipes()
   findAll(@Query() FindRoomDto: FindRoomDto) {
