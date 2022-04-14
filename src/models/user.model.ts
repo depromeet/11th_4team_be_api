@@ -10,19 +10,19 @@ import { Comment } from './comment.model';
 
 const options: SchemaOptions = {
   id: false,
-  collection: 'user',
+  collection: 'users',
   timestamps: true,
 };
 
 @Schema(options)
 export class User extends Document {
-  @Prop({
-    unique: true,
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  id: string;
+  // @Prop({
+  //   unique: true,
+  //   required: true,
+  // })
+  // @IsNotEmpty()
+  // @IsString()
+  // id: string;
 
   @ApiProperty({
     example: '010-2222-2222',
@@ -68,38 +68,39 @@ export class User extends Document {
   @IsString()
   FCMToken: string;
 
+  // 룸리스트 아이디 형태만 저장
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'room' }] })
-  favoriteRoomList: Room[];
+  favoriteRoomList: Room[] | mongoose.Schema.Types.ObjectId[];
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'room' })
   @IsObjectId()
   myRoom: Room;
 
-  readonly readOnlyData: {
-    id: string;
-    nickname: string;
-    profileUrl: string;
-    status: STATUS_TYPE;
-    favoriteRoomList: Room[];
-    myRoom: Room;
-  };
+  // readonly readOnlyData: {
+  //   id: string;
+  //   nickname: string;
+  //   profileUrl: string;
+  //   status: STATUS_TYPE;
+  //   favoriteRoomList: Room[];
+  //   myRoom: Room;
+  // };
 
   readonly comments: Comment[];
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);
 
-_UserSchema.virtual('readOnlyData').get(function (this: User) {
-  return {
-    id: this.id,
-    nickname: this.nickname,
-    profileUrl: this.profileUrl,
-    status: this.status,
-    favoriteRoomList: this.favoriteRoomList,
-    myRoom: this.myRoom,
-    comments: this.comments,
-  };
-});
+// _UserSchema.virtual('readOnlyData').get(function (this: User) {
+//   return {
+//     id: this.id,
+//     nickname: this.nickname,
+//     profileUrl: this.profileUrl,
+//     status: this.status,
+//     favoriteRoomList: this.favoriteRoomList,
+//     myRoom: this.myRoom,
+//     comments: this.comments,
+//   };
+// });
 
 _UserSchema.virtual('comments', {
   ref: 'comment',

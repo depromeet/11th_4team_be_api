@@ -24,6 +24,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode = exception.getStatus();
       error = exception.getResponse();
     } else {
+      console.log(exception);
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       error = 'Internal server error';
     }
