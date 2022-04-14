@@ -93,6 +93,8 @@ export class Room extends Document {
     index: '2dsphere',
   })
   geometry: Geometry;
+  // 거리정보 반환시에 타입 선언
+  distance: number;
 }
 
 const _RoomSchema = SchemaFactory.createForClass(Room);

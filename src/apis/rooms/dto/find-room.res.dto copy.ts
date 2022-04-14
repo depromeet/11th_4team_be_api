@@ -12,17 +12,18 @@ export class ResFindRoomDto {
     this.lat = room.geometry.coordinates[0];
     this.lng = room.geometry.coordinates[1];
     this.userCount = room.userList.length;
+    this.distance = room.distance;
   }
   @ApiProperty()
   _id: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: '채팅방 이름' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: '반경정보' })
   radius: number;
 
-  @ApiProperty()
+  @ApiProperty({ enum: CATEGORY_TYPE, description: '카테고리정보' })
   category: CATEGORY_TYPE;
 
   @ApiProperty()
@@ -31,8 +32,10 @@ export class ResFindRoomDto {
   @ApiProperty()
   lng: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: '채팅방내 유저숫자' })
   userCount: number;
+  @ApiProperty({ description: '거리정보' })
+  distance: number;
 }
 
 // '_id',

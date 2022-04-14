@@ -53,6 +53,7 @@ export class RoomRepository {
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
+    console.log(room);
     return room;
   }
 
