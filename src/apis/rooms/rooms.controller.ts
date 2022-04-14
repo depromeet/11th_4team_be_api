@@ -8,12 +8,24 @@ import {
   Delete,
   Query,
   UsePipes,
+  SerializeOptions,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { FindRoomDto } from './dto/find-room.dto';
+import { MongoId } from 'src/common/dtos/MongoId.dto';
+import { ObjectIdValidationPipe } from 'src/common/pipes/ObjectIdCheck.pipe';
+import { ObjectId } from 'mongoose';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -27,6 +39,7 @@ export class RoomsController {
   create(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(createRoomDto);
   }
+
   @ApiOperation({ summary: '위치정보를 토대로 내 주변 채팅방 정보를 가져옴' })
   @Get()
   @UsePipes()
@@ -36,18 +49,22 @@ export class RoomsController {
     return this.roomsService.findRoom(FindRoomDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roomsService.findOne(+id);
+  @ApiOperation({ summary: '룸의 세부정보를 볼수있음, 유저 목록과 함께' })
+  @Get(':roomId')
+  findOne(@Param() roomId: RoomIdDto) {
+    //, @Body() userId: UserIdDto
+    console.log(roomId);
+    return this.roomsService.findOneRoomById(
+      roomId,
+      new UserIdDto('624c24cae25c551b68a6645c'),
+    );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
-    return this.roomsService.update(+id, updateRoomDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.roomsService.remove(+id);
+  // TODO :  user id field 가드 통해서 받아와야함 지금은 바디로
+  @ApiOperation({ summary: '유저를 룸에 집어넣는다' })
+  @ApiBody({ type: UserIdDto })
+  @Post(':roomId/join')
+  joinRoom(@Param() roomId: RoomIdDto, @Body() userId: UserIdDto) {
+    return this.roomsService.addUserToRoom(roomId, userId);
   }
 }

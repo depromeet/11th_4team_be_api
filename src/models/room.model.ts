@@ -7,29 +7,20 @@ import {
   IsObject,
   IsString,
 } from 'class-validator';
-import {
-  Prop,
-  raw,
-  Schema,
-  SchemaFactory,
-  SchemaOptions,
-} from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { User } from './user.model';
-import * as mongoose from 'mongoose';
-import { number } from 'joi';
+import { Types, Document, Schema as MongooseSchema } from 'mongoose';
+
+import { IsObjectId } from 'class-validator-mongo-object-id';
+import { Type } from '@nestjs/common';
 
 const options: SchemaOptions = {
   // rooms default 로 s 붙여지는데 디폴트로가는게 좋을것 같아요! (이찬진)
   collection: 'rooms',
   timestamps: true,
+  skipVersioning: true,
 };
-
-// @Schema()
-// export class GeoPoint extends Document {
-//   // @Prop({ required: true })
-//   // coordinates: number[];
-// }
 
 @Schema({ useNestedStrict: true, _id: false })
 export class Geometry {
@@ -42,7 +33,7 @@ export class Geometry {
 }
 
 @Schema(options)
-export class Room {
+export class Room extends Document {
   @Prop({
     required: true,
   })
@@ -83,7 +74,12 @@ export class Room {
 
   @Prop({
     required: true,
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+  })
+  @ApiProperty({
+    type: Geometry,
+    title: 'current_location',
+    example: '{"type":"Point","coordinates":[36.612849, 126.229883]}',
   })
   @IsNotEmpty()
   @IsArray()
@@ -102,4 +98,15 @@ export class Room {
   geometry: Geometry;
 }
 
-export const RoomSchema = SchemaFactory.createForClass(Room);
+const _RoomSchema = SchemaFactory.createForClass(Room);
+// Duplicate the ID field.
+_RoomSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+// Ensure virtual fields are serialised.
+_RoomSchema.set('toJSON', {
+  virtuals: true,
+});
+
+export const RoomSchema = _RoomSchema;

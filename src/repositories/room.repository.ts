@@ -1,15 +1,19 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, HttpException } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
+import { Model, ObjectId, Types } from 'mongoose';
 import { CertificationMobileDto } from 'src/apis/authentication/dto/send-mobile.dto';
 import { Room } from 'src/models/room.model';
 import { CreateRoomDto } from 'src/apis/rooms/dto/create-room.dto';
 import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
+import { User } from 'src/models/user.model';
 
 @Injectable()
 export class RoomRepository {
   constructor(
     @InjectModel(Room.name) private readonly roomModel: Model<Room>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
   /**
@@ -28,7 +32,7 @@ export class RoomRepository {
     return await room.save();
   }
 
-  async findRoom(findRoomDto: FindRoomDto): Promise<Room[] | []> {
+  async findRoomsByCoordinates(findRoomDto: FindRoomDto): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
         $geoNear: {
@@ -52,10 +56,54 @@ export class RoomRepository {
     return room;
   }
 
-  // async findOneByPhoneNumber(phoneNumber: PhoneNumberDto) {
-  //   const room = await this.roomModel.findOne(phoneNumber);
-  //   return room;
-  // }
+  async addUserToRoom(
+    roomIdDto: RoomIdDto,
+    userIdDto: UserIdDto,
+  ): Promise<Room> {
+    const room = await this.roomModel.findOneAndUpdate(
+      {
+        _id: roomIdDto.roomId,
+      },
+      {
+        $addToSet: {
+          userList: userIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    return room;
+  }
+
+  async findOneByRoomId(roomIdDto: RoomIdDto): Promise<Room> {
+    const room = await this.roomModel
+      .findOne({
+        _id: roomIdDto.roomId,
+      })
+      .populate('userList');
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    return room;
+  }
+
+  // const comment = await Comment.findOneAndUpdate(
+  //   { content_id: content_id },
+  //   {
+  //     $addToSet: {
+  //       list: {
+  //         user: user_id,
+  //         commentString: replaceCommentString,
+  //         tagUser: tagUserIds,
+  //       },
+  //     },
+  //   },
+  //   { upsert: true, new: true }
+  // );
 
   // async findOneByNickname(nickname: NicknameDto) {
   //   const room = await this.roomModel.findOne(nickname);
