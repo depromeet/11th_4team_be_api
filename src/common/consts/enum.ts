@@ -15,13 +15,15 @@ enum STATUS_TYPE {
   FORBIDDEN,
 }
 
+//카테고리 타입 한글로
 enum CATEGORY_TYPE {
-  CONCERT = 1,
-  UNIVERSITY,
-  FITNESS,
-  EXHIBITION,
-  AMUSEMENT_PARK,
-  HAN_RIVER_PRAk,
+  UNIVERCITY = '대학교',
+  CONCERTHALL = '공연장',
+  HAN_RIVER_PRAK = '한강공원',
+  STADIUM = '경기장',
+
+  // AMUSEMENT_PARK,
+  // HAN_RIVER_PRAk,
 }
 
 enum CHAT_TYPE {
