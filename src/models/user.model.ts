@@ -76,31 +76,31 @@ export class User extends Document {
   @IsObjectId()
   myRoom: Room;
 
-  readonly readOnlyData: {
-    id: string;
-    nickname: string;
-    profileUrl: string;
-    status: STATUS_TYPE;
-    favoriteRoomList: Room[];
-    myRoom: Room;
-  };
+  // readonly readOnlyData: {
+  //   id: string;
+  //   nickname: string;
+  //   profileUrl: string;
+  //   status: STATUS_TYPE;
+  //   favoriteRoomList: Room[];
+  //   myRoom: Room;
+  // };
 
   readonly comments: Comment[];
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);
 
-_UserSchema.virtual('readOnlyData').get(function (this: User) {
-  return {
-    id: this.id,
-    nickname: this.nickname,
-    profileUrl: this.profileUrl,
-    status: this.status,
-    favoriteRoomList: this.favoriteRoomList,
-    myRoom: this.myRoom,
-    comments: this.comments,
-  };
-});
+// _UserSchema.virtual('readOnlyData').get(function (this: User) {
+//   return {
+//     id: this.id,
+//     nickname: this.nickname,
+//     profileUrl: this.profileUrl,
+//     status: this.status,
+//     favoriteRoomList: this.favoriteRoomList,
+//     myRoom: this.myRoom,
+//     comments: this.comments,
+//   };
+// });
 
 _UserSchema.virtual('comments', {
   ref: 'comment',

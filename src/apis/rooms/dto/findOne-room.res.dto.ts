@@ -34,7 +34,7 @@ export class ResFindOneRoomDto {
   @ApiProperty()
   lng: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: UserProfileDto })
   userList: UserProfileDto[];
 
   @ApiProperty()

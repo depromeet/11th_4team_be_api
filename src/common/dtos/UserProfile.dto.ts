@@ -1,9 +1,13 @@
-import { PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { string } from 'joi';
+import { Types } from 'mongoose';
 
 import { User } from 'src/models/user.model';
 
 export class UserProfileDto extends PickType(User, [
-  '_id',
   'nickname',
   'profileUrl',
-] as const) {}
+] as const) {
+  @ApiProperty({ type: string, example: '624c24cae25c551b68a6645c' })
+  _id: Types.ObjectId;
+}

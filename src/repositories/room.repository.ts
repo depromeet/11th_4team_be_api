@@ -83,7 +83,7 @@ export class RoomRepository {
       .findOne({
         _id: roomIdDto.roomId,
       })
-      .populate('userList');
+      .populate('userList', '_id nickname profileUrl');
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }

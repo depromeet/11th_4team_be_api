@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { FindRoomDto } from './dto/find-room.dto';
@@ -26,6 +27,7 @@ import { ObjectIdValidationPipe } from 'src/common/pipes/ObjectIdCheck.pipe';
 import { ObjectId } from 'mongoose';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
+import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -50,6 +52,11 @@ export class RoomsController {
   }
 
   @ApiOperation({ summary: '룸의 세부정보를 볼수있음, 유저 목록과 함께' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ResFindOneRoomDto,
+  })
   @Get(':roomId')
   findOne(@Param() roomId: RoomIdDto) {
     //, @Body() userId: UserIdDto
@@ -66,5 +73,25 @@ export class RoomsController {
   @Post(':roomId/join')
   joinRoom(@Param() roomId: RoomIdDto, @Body() userId: UserIdDto) {
     return this.roomsService.addUserToRoom(roomId, userId);
+  }
+
+  @ApiOperation({ summary: '유저가 룸을 즐겨찾기한다' })
+  @ApiBody({ type: UserIdDto })
+  @Post(':roomId/star')
+  pushRoomToUserFavoriteList(
+    @Param() roomId: RoomIdDto,
+    @Body() userId: UserIdDto,
+  ) {
+    return this.roomsService.pushRoomToUserFavoriteList(roomId, userId);
+  }
+
+  @ApiOperation({ summary: '유저가 룸을 즐겨찾기에서 뺀다' })
+  @ApiBody({ type: UserIdDto })
+  @Delete(':roomId/star')
+  pullRoomToUserFavoriteList(
+    @Param() roomId: RoomIdDto,
+    @Body() userId: UserIdDto,
+  ) {
+    return this.roomsService.pullRoomToUserFavoriteList(roomId, userId);
   }
 }

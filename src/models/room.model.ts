@@ -10,10 +10,7 @@ import {
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { User } from './user.model';
-import { Types, Document, Schema as MongooseSchema } from 'mongoose';
-
-import { IsObjectId } from 'class-validator-mongo-object-id';
-import { Type } from '@nestjs/common';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 const options: SchemaOptions = {
   // rooms default 로 s 붙여지는데 디폴트로가는게 좋을것 같아요! (이찬진)

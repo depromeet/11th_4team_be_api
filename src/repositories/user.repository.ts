@@ -53,7 +53,7 @@ export class UserRepository {
    * @param roomIdDto 룸 아이디 DTO
    * @returns
    */
-  async addRoomToFavoriteList(
+  async pushRoomToFavoriteList(
     userIdDto: UserIdDto,
     roomIdDto: RoomIdDto,
   ): Promise<User> {
@@ -63,6 +63,28 @@ export class UserRepository {
       },
       {
         $addToSet: {
+          favoriteRoomList: roomIdDto.roomId,
+        },
+      },
+      { new: true },
+    );
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user;
+  }
+
+  async pullRoomToFavoriteList(
+    userIdDto: UserIdDto,
+    roomIdDto: RoomIdDto,
+  ): Promise<User> {
+    const user = await this.userModel.findOneAndUpdate(
+      {
+        _id: userIdDto.userId,
+      },
+      {
+        $pull: {
           favoriteRoomList: roomIdDto.roomId,
         },
       },

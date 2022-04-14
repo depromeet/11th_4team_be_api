@@ -33,10 +33,12 @@ export class RoomsService {
     return await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
   }
 
-  async addRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
-    return this.userRepository.addRoomToFavoriteList(userIdDto, roomIdDto);
+  async pushRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+    return this.userRepository.pushRoomToFavoriteList(userIdDto, roomIdDto);
   }
-
+  async pullRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+    return this.userRepository.pullRoomToFavoriteList(userIdDto, roomIdDto);
+  }
   private isObjectIdArray(arg: any): arg is Types.ObjectId[] {
     return true;
   }
@@ -49,11 +51,12 @@ export class RoomsService {
     }
     const room = await this.roomRepository.findOneByRoomId(roomIdDto);
     console.log(room);
-
+    const send = new ResFindOneRoomDto(room, isUserFavoritRoom);
+    console.log(send.userList);
     //<Types.ObjectId[]>
     // const favorite = .includes(roomIdDto.roomId);
 
-    return new ResFindOneRoomDto(room, isUserFavoritRoom);
+    return send;
     // return `This action updates a #${id} room`;
   }
 }
