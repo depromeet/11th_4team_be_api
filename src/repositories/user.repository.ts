@@ -7,6 +7,7 @@ import { User } from 'src/models/user.model';
 import { CertificationMobileDto } from 'src/apis/authentication/dto/send-mobile.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { Room } from 'src/models/room.model';
 
 @Injectable()
 export class UserRepository {
@@ -49,7 +50,7 @@ export class UserRepository {
   /**
    * 4월 14일 이찬진
    * 유저가 룸을 즐겨찾기 해놓기 위한 쿼리
-   * @param _id 유저의 아이디
+   * @param userIdDto 유저의 아이디
    * @param roomIdDto 룸 아이디 DTO
    * @returns
    */
@@ -59,7 +60,7 @@ export class UserRepository {
   ): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto,
       },
       {
         $addToSet: {
@@ -74,14 +75,20 @@ export class UserRepository {
 
     return user;
   }
-
+  /**
+   * 4월 14일 이찬진
+   * 유저즐겨찾기에서 룸 없애기
+   * @param userIdDto 유저의 아이디
+   * @param roomIdDto 룸 아이디 DTO
+   * @returns
+   */
   async pullRoomToFavoriteList(
     userIdDto: UserIdDto,
     roomIdDto: RoomIdDto,
   ): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto,
       },
       {
         $pull: {
@@ -95,6 +102,122 @@ export class UserRepository {
     }
 
     return user;
+  }
+
+  /**
+   * 유저의 챗 알림을 켜기
+   * @param userIdDto
+   * @returns
+   */
+  async turnOnChatAlarm(userIdDto: UserIdDto): Promise<User> {
+    const user = await this.userModel.findOneAndUpdate(
+      {
+        _id: userIdDto,
+      },
+      {
+        $set: {
+          chatAlarm: true,
+        },
+      },
+      { new: true },
+    );
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user;
+  }
+  /**
+   * 유저의 챗 알림을 끄기
+   * @param userIdDto
+   * @returns
+   */
+  async turnOffChatAlarm(userIdDto: UserIdDto): Promise<User> {
+    const user = await this.userModel.findOneAndUpdate(
+      {
+        _id: userIdDto,
+      },
+      {
+        $set: {
+          chatAlarm: false,
+        },
+      },
+      { new: true },
+    );
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user;
+  }
+
+  async findMyFavoriteRooms(userIdDto: UserIdDto): Promise<Room[]> {
+    const user = await this.userModel.findOne({
+      _id: userIdDto,
+    });
+    // .populate("favoriteRoomList" , {});
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user.favoriteRoomList;
+  }
+
+  async setMyRoom(
+    userIdDto: UserIdDto,
+    roomId: RoomIdDto | null,
+  ): Promise<User> {
+    const user = await this.userModel.findOneAndUpdate(
+      {
+        _id: userIdDto.userId,
+      },
+      {
+        $set: {
+          // 룸에서 나간경우 Null로 설정
+          myRoom: roomId ? roomId.roomId : null,
+        },
+      },
+      { new: true },
+    );
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user;
+  }
+
+  async getMyRoom(userIdDto: UserIdDto) {
+    const roomInfo = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: userIdDto,
+        },
+      },
+      {
+        $lookup: {
+          from: 'room',
+          localField: 'myRoom',
+          foreignField: '_id',
+          as: 'myRoom',
+        },
+      },
+      {
+        $unwind: '$myRoom',
+      },
+      {
+        $replaceRoot: { newRoot: '$myRoom' },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          userCount: { $size: '$userList' },
+        },
+      },
+    ]);
+    console.log(roomInfo);
+
+    return roomInfo.length ? roomInfo[0] : null;
   }
 }
 

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { Types } from 'mongoose';
-
+import { Transform } from 'class-transformer';
 /**
  * mongoId 용 DTO
  */
@@ -19,5 +19,6 @@ export class UserIdDto {
   })
   @IsNotEmpty()
   @IsObjectId({ message: '유저 아이디가 몽고아이디 형식이 아닙니다.' })
+  @Transform(({ value }) => Types.ObjectId(value))
   userId: Types.ObjectId;
 }

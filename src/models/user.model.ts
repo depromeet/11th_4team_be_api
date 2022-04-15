@@ -75,10 +75,10 @@ export class User extends Document {
   FCMToken: string;
 
   // 룸리스트 아이디 형태만 저장
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'room' }] })
-  favoriteRoomList: Room[] | mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }] })
+  favoriteRoomList: Room[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'room' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
   @IsObjectId()
   myRoom: Room;
 

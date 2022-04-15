@@ -1,20 +1,17 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
-import { Model, ObjectId, Types } from 'mongoose';
-import { CertificationMobileDto } from 'src/apis/authentication/dto/send-mobile.dto';
+import { Model } from 'mongoose';
 import { Room } from 'src/models/room.model';
 import { CreateRoomDto } from 'src/apis/rooms/dto/create-room.dto';
-import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
-import { User } from 'src/models/user.model';
 import { CoordinatesDto } from 'src/apis/rooms/dto/coordinates.dto';
+import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
 
 @Injectable()
 export class RoomRepository {
   constructor(
     @InjectModel(Room.name) private readonly roomModel: Model<Room>,
-    @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
   /**
@@ -56,6 +53,17 @@ export class RoomRepository {
           key: 'geometry',
         },
       },
+      {
+        $project: {
+          _id: 1,
+          category: 1,
+          name: 1,
+          userCount: { $size: '$userList' },
+          radius: 1,
+          distance: 1,
+          geometry: 1,
+        },
+      },
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
@@ -64,7 +72,7 @@ export class RoomRepository {
   }
 
   async findRoomsByCoordinatesWithFilter(
-    coordinatesDto: CoordinatesDto,
+    findRoomDto: FindRoomDto,
   ): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
@@ -72,10 +80,7 @@ export class RoomRepository {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [
-              Number(coordinatesDto.lng),
-              Number(coordinatesDto.lat),
-            ],
+            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
           },
           // TODO : 4월 14일 이찬진
           //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
@@ -86,6 +91,22 @@ export class RoomRepository {
           key: 'geometry',
         },
       },
+      {
+        $match: {
+          category: findRoomDto.filter,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          category: 1,
+          name: 1,
+          userCount: { $size: '$userList' },
+          radius: 1,
+          distance: 1,
+          geometry: 1,
+        },
+      },
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
@@ -93,11 +114,11 @@ export class RoomRepository {
     return room;
   }
 
-  async findMyFavoriteRooms(userId: UserIdDto): Promise<Room[] | []> {
-    const room = 'adsf';
-    console.log(room);
-    return room;
-  }
+  // async findMyFavoriteRooms(roomId: RoomIdDto): Promise<Room> {
+  //   const room = await this.roomModel.findOne({ _id: roomId.roomId });
+  //   con
+  //   return room;
+  // }
 
   async addUserToRoom(
     roomIdDto: RoomIdDto,
@@ -105,7 +126,7 @@ export class RoomRepository {
   ): Promise<Room> {
     const room = await this.roomModel.findOneAndUpdate(
       {
-        _id: roomIdDto.roomId,
+        _id: roomIdDto,
       },
       {
         $addToSet: {
@@ -121,10 +142,32 @@ export class RoomRepository {
     return room;
   }
 
+  async pullUserFromRoom(
+    roomIdDto: RoomIdDto,
+    userIdDto: UserIdDto,
+  ): Promise<Room> {
+    const room = await this.roomModel.findOneAndUpdate(
+      {
+        _id: roomIdDto,
+      },
+      {
+        $pull: {
+          userList: userIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    return room;
+  }
+
   async findOneByRoomId(roomIdDto: RoomIdDto): Promise<Room> {
     const room = await this.roomModel
       .findOne({
-        _id: roomIdDto.roomId,
+        _id: roomIdDto,
       })
       .populate('userList', '_id nickname profileUrl');
     if (!room) {

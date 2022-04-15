@@ -7,17 +7,14 @@ import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
 
 export class ResFindOneRoomDto {
-  constructor(room: Room, isUserFavoriteRoom?: boolean) {
+  constructor(room: Room, iFavoriteRoom: boolean) {
     this._id = room._id;
     this.category = room.category;
     this.name = room.name;
     this.radius = room.radius;
     this.lat = room.geometry.coordinates[0];
     this.lng = room.geometry.coordinates[1];
-    if (isUserFavoriteRoom) {
-      this.userList = room.userList as UserProfileDto[];
-      this.isUserFavoriteRoom = isUserFavoriteRoom;
-    }
+    this.iFavoriteRoom = iFavoriteRoom;
     this.userCount = room.userList.length;
   }
   @ApiProperty()
@@ -39,14 +36,16 @@ export class ResFindOneRoomDto {
   lng: number;
 
   @ApiProperty({ type: [UserProfileDto], required: false })
-  @Expose()
-  userList?: UserProfileDto[];
+  userList: UserProfileDto[];
 
-  @ApiProperty()
+  @ApiProperty({ description: '유저 숫자' })
   userCount: number;
 
-  @ApiProperty()
-  isUserFavoriteRoom?: boolean;
+  @ApiProperty({ description: '내가 즐겨찾기 했는지' })
+  iFavoriteRoom: boolean;
+
+  @ApiProperty({ description: '내가 들어가 있는지' })
+  iJoin: boolean;
 }
 
 // '_id',
