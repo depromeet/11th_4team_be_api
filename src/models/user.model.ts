@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { getEnumToArray, STATUS_TYPE } from 'src/common/consts/enum';
@@ -75,6 +81,26 @@ export class User extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'room' })
   @IsObjectId()
   myRoom: Room;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저의 앱알림 설정 ( 앱 모든 알림 전체 )',
+  })
+  @Prop({
+    default: true,
+  })
+  @IsBoolean()
+  appAlarm: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저의 채팅알림 설정',
+  })
+  @Prop({
+    default: true,
+  })
+  @IsBoolean()
+  chatAlarm: boolean;
 
   // readonly readOnlyData: {
   //   id: string;

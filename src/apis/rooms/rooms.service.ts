@@ -24,8 +24,10 @@ export class RoomsService {
   }
 
   async findRoom(findRoomDto: FindRoomDto): Promise<ResFindRoomDto[] | []> {
-    const rooms = await this.roomRepository.findRoomsByCoordinates(findRoomDto);
-    const filteredRooms = rooms.map((room) => new ResFindRoomDto(room));
+    const rooms = await this.roomRepository.findRoomsByCoordinatesWithFilter(
+      findRoomDto,
+    );
+    const filteredRooms = rooms.map((room: Room) => new ResFindRoomDto(room));
     return filteredRooms;
   }
 

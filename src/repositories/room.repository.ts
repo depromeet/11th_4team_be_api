@@ -8,6 +8,7 @@ import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { User } from 'src/models/user.model';
+import { CoordinatesDto } from 'src/apis/rooms/dto/coordinates.dto';
 
 @Injectable()
 export class RoomRepository {
@@ -32,14 +33,19 @@ export class RoomRepository {
     return await room.save();
   }
 
-  async findRoomsByCoordinates(findRoomDto: FindRoomDto): Promise<Room[] | []> {
+  async findRoomsByCoordinates(
+    coordinatesDto: CoordinatesDto,
+  ): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
         $geoNear: {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
+            coordinates: [
+              Number(coordinatesDto.lng),
+              Number(coordinatesDto.lat),
+            ],
           },
           // TODO : 4월 14일 이찬진
           //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
@@ -53,6 +59,42 @@ export class RoomRepository {
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
+    console.log(room);
+    return room;
+  }
+
+  async findRoomsByCoordinatesWithFilter(
+    coordinatesDto: CoordinatesDto,
+  ): Promise<Room[] | []> {
+    const room = await this.roomModel.aggregate([
+      {
+        $geoNear: {
+          spherical: true,
+          near: {
+            type: 'Point',
+            coordinates: [
+              Number(coordinatesDto.lng),
+              Number(coordinatesDto.lat),
+            ],
+          },
+          // TODO : 4월 14일 이찬진
+          //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
+          // 기획안 변경되면 maxDistance 값을 조정해야함
+          maxDistance: 10000000000,
+          // 거리 자동계산해서 distance 필드로 리턴
+          distanceField: 'distance',
+          key: 'geometry',
+        },
+      },
+      // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
+      //   { $limit: 1 },
+    ]);
+    console.log(room);
+    return room;
+  }
+
+  async findMyFavoriteRooms(userId: UserIdDto): Promise<Room[] | []> {
+    const room = 'adsf';
     console.log(room);
     return room;
   }

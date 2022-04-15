@@ -31,14 +31,14 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 import { ResFindRoomDto } from './dto/find-room.res.dto copy';
-import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
+
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { User } from 'src/models/user.model';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @ApiTags('rooms')
 @Controller('rooms')
 @ApiBearerAuth()
-@UseGuards(JwtStrategy)
 // TODO : 나중에 가드오면 가드달아야함 이찬진 4월 14일
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
@@ -59,6 +59,7 @@ export class RoomsController {
     description: '요청 성공시',
     type: ResFindRoomDto,
   })
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(@Query() FindRoomDto: FindRoomDto, @ReqUser() user: User) {
     console.log(user);

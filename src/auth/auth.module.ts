@@ -7,11 +7,11 @@ import { JwtModuleConfig } from './jwt-config';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RoomsModule } from 'src/apis/rooms/rooms.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({}),
-    PassportModule,
     JwtModule.register(JwtModuleConfig),
     forwardRef(() => UserModule),
   ],
