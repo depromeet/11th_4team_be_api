@@ -4,15 +4,17 @@ import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { Room } from 'src/models/room.model';
 
 export class ResFindRoomDto {
-  constructor(room: Room) {
+  constructor(room: Room, iFavorite: boolean, iJoin: boolean) {
     this._id = room._id;
     this.category = room.category;
     this.name = room.name;
     this.radius = room.radius;
     this.lat = room.geometry.coordinates[0];
     this.lng = room.geometry.coordinates[1];
-    this.userCount = room.userList.length;
+    this.userCount = room.userCount;
     this.distance = room.distance;
+    this.iFavorite = iFavorite;
+    this.iJoin = iJoin;
   }
   @ApiProperty()
   _id: string;
@@ -34,10 +36,17 @@ export class ResFindRoomDto {
 
   @ApiProperty({ description: '채팅방내 유저숫자' })
   userCount: number;
+
   @ApiProperty({ description: '거리정보' })
   distance: number;
-}
 
+  @ApiProperty({ description: '내가 즐겨찾기 했는지' })
+  iFavorite: boolean;
+
+  @ApiProperty({ description: '내가 들어가 있는지' })
+  iJoin: boolean;
+}
+// console.log(plainToClass(User, fromPlainUser, { excludeExtraneousValues: true }));
 // '_id',
 // 'name',
 // 'radius',

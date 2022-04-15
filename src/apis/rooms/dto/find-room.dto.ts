@@ -1,16 +1,13 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, Max, Min } from 'class-validator';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { IsEnum, IsNumber, Max, Min } from 'class-validator';
+import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
+import { CoordinatesDto } from './coordinates.dto';
 
-export class FindRoomDto {
-  @ApiProperty({ example: '127', description: '경도입니다 세로선!' })
-  @IsNumber()
-  @Min(120)
-  @Max(135)
-  lng: number;
-
-  @ApiProperty({ example: '37', description: '위도입니다 가로선' })
-  @IsNumber()
-  @Min(30)
-  @Max(45)
-  lat: number;
+export class FindRoomDto extends PickType(CoordinatesDto, [
+  'lat',
+  'lng',
+] as const) {
+  @ApiProperty({ enum: FIND_ROOM_FILTER_TYPE })
+  @IsEnum(FIND_ROOM_FILTER_TYPE)
+  filter: FIND_ROOM_FILTER_TYPE;
 }

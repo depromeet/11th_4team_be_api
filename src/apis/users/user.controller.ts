@@ -26,7 +26,6 @@ import {
 } from 'src/common/decorators/response.decorator';
 import { UserService } from './user.service';
 import { PhoneNumberDto, UpdateProfileDto } from './dto/user.dto';
-import { ObjectId } from 'mongoose';
 
 @ApiTags('user')
 @Controller('user')
@@ -86,6 +85,7 @@ export class UserController {
     @Body() updateProfileData: UpdateProfileDto,
     @ReqUser() user: User,
   ): Promise<any> {
+    console.log(user);
     return await this.userService.updateProfile(user._id, updateProfileData);
   }
 }
