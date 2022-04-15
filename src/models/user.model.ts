@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { getEnumToArray, STATUS_TYPE } from 'src/common/consts/enum';
@@ -10,7 +16,7 @@ import { Comment } from './comment.model';
 
 const options: SchemaOptions = {
   id: false,
-  collection: 'users',
+  collection: 'user',
   timestamps: true,
 };
 
@@ -69,12 +75,32 @@ export class User extends Document {
   FCMToken: string;
 
   // 룸리스트 아이디 형태만 저장
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'room' }] })
-  favoriteRoomList: Room[] | mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }] })
+  favoriteRoomList: Room[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'room' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
   @IsObjectId()
   myRoom: Room;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저의 앱알림 설정 ( 앱 모든 알림 전체 )',
+  })
+  @Prop({
+    default: true,
+  })
+  @IsBoolean()
+  appAlarm: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저의 채팅알림 설정',
+  })
+  @Prop({
+    default: true,
+  })
+  @IsBoolean()
+  chatAlarm: boolean;
 
   // readonly readOnlyData: {
   //   id: string;

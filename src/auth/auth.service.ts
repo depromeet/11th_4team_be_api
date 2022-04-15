@@ -19,7 +19,7 @@ export class AuthService {
       throw new UnauthorizedException('휴대폰 번호 확인바람');
     }
 
-    const payload = { _id: user.id };
+    const payload = { _id: user._id };
 
     return {
       access_token: this.jwtService.sign(payload),

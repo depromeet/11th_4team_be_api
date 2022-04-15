@@ -14,7 +14,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 
 const options: SchemaOptions = {
   // rooms default 로 s 붙여지는데 디폴트로가는게 좋을것 같아요! (이찬진)
-  collection: 'rooms',
+  collection: 'room',
   timestamps: true,
   skipVersioning: true,
 };
@@ -52,7 +52,7 @@ export class Room extends Document {
     title: '카테고리',
     description:
       '카테고리를 나타내는 상태입니다. 기획안 따라 지속적으로 추가할 예정입니다.',
-    example: '대학교',
+    example: 'UNIVERCITY',
   })
   @IsNotEmpty()
   @IsEnum(CATEGORY_TYPE)
@@ -95,6 +95,8 @@ export class Room extends Document {
   geometry: Geometry;
   // 거리정보 반환시에 타입 선언
   distance: number;
+  // 유저숫자 타입 선언
+  userCount: number;
 }
 
 const _RoomSchema = SchemaFactory.createForClass(Room);
