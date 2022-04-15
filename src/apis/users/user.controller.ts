@@ -86,6 +86,7 @@ export class UserController {
     @Body() updateProfileData: UpdateProfileDto,
     @ReqUser() user: User,
   ): Promise<any> {
+    console.log(user);
     return await this.userService.updateProfile(user._id, updateProfileData);
   }
 }

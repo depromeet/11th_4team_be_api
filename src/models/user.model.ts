@@ -10,7 +10,7 @@ import { Comment } from './comment.model';
 
 const options: SchemaOptions = {
   id: false,
-  collection: 'users',
+  collection: 'user',
   timestamps: true,
 };
 
