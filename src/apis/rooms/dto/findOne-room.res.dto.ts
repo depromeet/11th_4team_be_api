@@ -7,7 +7,7 @@ import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
 
 export class ResFindOneRoomDto {
-  constructor(room: Room, iFavoriteRoom: boolean) {
+  constructor(room: Room, iFavoriteRoom: boolean, iAlarm: boolean) {
     this._id = room._id;
     this.category = room.category;
     this.name = room.name;
@@ -15,6 +15,7 @@ export class ResFindOneRoomDto {
     this.lat = room.geometry.coordinates[0];
     this.lng = room.geometry.coordinates[1];
     this.iFavoriteRoom = iFavoriteRoom;
+    this.iAlarm = iAlarm;
     this.userCount = room.userList.length;
   }
   @ApiProperty()
@@ -46,6 +47,9 @@ export class ResFindOneRoomDto {
 
   @ApiProperty({ description: '내가 들어가 있는지' })
   iJoin: boolean;
+
+  @ApiProperty({ description: '내가 채팅방 알림 켰는지여부' })
+  iAlarm: boolean;
 }
 
 // '_id',

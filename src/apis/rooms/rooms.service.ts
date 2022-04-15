@@ -55,7 +55,10 @@ export class RoomsService {
       rooms = await this.roomRepository.findRoomsByCoordinates(findRoomDto);
     } else if (findRoomDto.filter === FIND_ROOM_FILTER_TYPE.FAVORITE) {
       // 내가 즐겨 찾기 한경우
-      rooms = await this.userRepository.findMyFavoriteRooms(userId);
+      rooms = await this.roomRepository.findFavoirteRoomsByCoordinates(
+        findRoomDto,
+        user.favoriteRoomList,
+      );
     }
 
     //필터링 룸
@@ -84,31 +87,35 @@ export class RoomsService {
     // safe 어프로치 populate 안때려도 가상으로 데려감 몽고디비 Document 형식이면
     // console.log(typeof roomIdDto.roomId, roomIdDto.roomId, user.myRoom._id);
 
-    console.log(roomIdDto.roomId.equals(user.myRoom._id));
     if (user.myRoom) {
       if (roomIdDto.roomId.equals(user.myRoom._id)) {
         // 룸이 같을경우
         throw new BadRequestException('같은 룸 입장 시도');
       }
-      // 다른 룸일 경우
-      await this.roomRepository.pullUserFromRoom(user.myRoom._id, userIdDto);
+      // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
+      await this.roomRepository.pullUserFromRoom(
+        new RoomIdDto(user.myRoom._id),
+        userIdDto,
+      );
     }
     await this.userRepository.setMyRoom(userIdDto, roomIdDto);
+    await this.userRepository.turnOnChatAlarm(userIdDto);
     return await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
-  }
-  private async setUserMyRoomToNull(userIdDto: UserIdDto) {
-    await this.userRepository.setMyRoom(userIdDto, null);
   }
 
   async pullUserFromRoom(
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
   ): Promise<Room> {
-    this.setUserMyRoomToNull(userIdDto);
+    await this.userRepository.setMyRoom(userIdDto, null);
     return await this.roomRepository.pullUserFromRoom(roomIdDto, userIdDto);
   }
 
   async pushRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+    console.log(await this.roomRepository.isRoomExist(roomIdDto));
+    if (!(await this.roomRepository.isRoomExist(roomIdDto))) {
+      throw new BadRequestException('Room does not exist');
+    }
     return this.userRepository.pushRoomToFavoriteList(userIdDto, roomIdDto);
   }
   async pullRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
@@ -121,20 +128,18 @@ export class RoomsService {
   async findOneRoomById(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
     const user = await this.userRepository.findOneByUserId(userIdDto.userId);
     let isUserFavoritRoom = false;
+    if (!user.myRoom._id.equals(roomIdDto.roomId)) {
+      throw new BadRequestException('유저가 들어간 방이 아닙니다.');
+    }
     if (this.isObjectIdArray(user.favoriteRoomList)) {
       isUserFavoritRoom = user.favoriteRoomList.includes(roomIdDto.roomId);
     }
     const room = await this.roomRepository.findOneByRoomId(roomIdDto);
-    console.log(room);
-    const send = new ResFindOneRoomDto(room, isUserFavoritRoom);
-    console.log(send.userList);
-    //<Types.ObjectId[]>
-    // const favorite = .includes(roomIdDto.roomId);
+    const send = new ResFindOneRoomDto(room, isUserFavoritRoom, user.chatAlarm);
 
     return send;
-    // return `This action updates a #${id} room`;
   }
-  async getMyRoomInfo(userId: UserIdDto) {
+  async getMyRoomShortCutInfo(userId: UserIdDto) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
     console.log(roomInfo);
     if (!roomInfo) {
@@ -142,10 +147,19 @@ export class RoomsService {
     }
     return roomInfo;
   }
-  async getMyFavorite() {
-    return;
+  async getMyFavorite(userId: UserIdDto) {
+    return await this.userRepository.findMyFavoriteRooms(userId);
   }
+  async turnOnChatAlarm(userId: UserIdDto) {
+    return await this.userRepository.turnOnChatAlarm(userId);
+  }
+
+  async turnOffChatAlarm(userId: UserIdDto) {
+    return await this.userRepository.turnOffChatAlarm(userId);
+  }
+
   async getPopularRooms() {
-    return;
+    console.log('asdfasdfa');
+    return await this.roomRepository.getPopularRooms();
   }
 }

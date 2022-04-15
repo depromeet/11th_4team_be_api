@@ -60,7 +60,7 @@ export class UserRepository {
   ): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto,
+        _id: userIdDto.userId,
       },
       {
         $addToSet: {
@@ -88,7 +88,7 @@ export class UserRepository {
   ): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto,
+        _id: userIdDto.userId,
       },
       {
         $pull: {
@@ -112,7 +112,7 @@ export class UserRepository {
   async turnOnChatAlarm(userIdDto: UserIdDto): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto,
+        _id: userIdDto.userId,
       },
       {
         $set: {
@@ -135,7 +135,7 @@ export class UserRepository {
   async turnOffChatAlarm(userIdDto: UserIdDto): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto,
+        _id: userIdDto.userId,
       },
       {
         $set: {
@@ -152,15 +152,39 @@ export class UserRepository {
   }
 
   async findMyFavoriteRooms(userIdDto: UserIdDto): Promise<Room[]> {
-    const user = await this.userModel.findOne({
-      _id: userIdDto,
-    });
+    const myFavoriteRoomList = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: userIdDto.userId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'room',
+          localField: 'favoriteRoomList',
+          foreignField: '_id',
+          as: 'favoriteRoomList',
+        },
+      },
+      {
+        $unwind: '$favoriteRoomList',
+      },
+      {
+        $replaceRoot: { newRoot: '$favoriteRoomList' },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          category: 1,
+          userCount: { $size: '$userList' },
+        },
+      },
+      { $sort: { userCount: -1 } },
+    ]);
     // .populate("favoriteRoomList" , {});
-    if (!user) {
-      throw new BadRequestException('user does not exist');
-    }
 
-    return user.favoriteRoomList;
+    return myFavoriteRoomList;
   }
 
   async setMyRoom(
@@ -190,7 +214,7 @@ export class UserRepository {
     const roomInfo = await this.userModel.aggregate([
       {
         $match: {
-          _id: userIdDto,
+          _id: userIdDto.userId,
         },
       },
       {
@@ -211,6 +235,7 @@ export class UserRepository {
         $project: {
           _id: 1,
           name: 1,
+          category: 1,
           userCount: { $size: '$userList' },
         },
       },

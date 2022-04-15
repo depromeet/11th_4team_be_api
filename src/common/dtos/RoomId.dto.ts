@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { Types } from 'mongoose';
 
@@ -7,6 +7,9 @@ import { Types } from 'mongoose';
  * mongoId 용 DTO
  */
 export class RoomIdDto {
+  constructor(roomId: string) {
+    this.roomId = Types.ObjectId(roomId);
+  }
   @ApiProperty({
     type: String,
     title: '룸 아이디',

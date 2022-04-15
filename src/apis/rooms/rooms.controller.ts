@@ -53,7 +53,7 @@ export class RoomsController {
 
   @ApiOperation({
     summary:
-      '위치정보를 토대로 내 주변 채팅방 정보를 가져옴 , 카테고리 필터링도 가능',
+      '(지도용)위치정보를 토대로 내 주변 채팅방 정보를 가져옴 , 카테고리 필터링도 가능',
   })
   @ApiResponse({
     status: 200,
@@ -68,28 +68,58 @@ export class RoomsController {
     return this.roomsService.findRoom(FindRoomDto, new UserIdDto(user._id));
   }
 
-  @ApiOperation({ summary: '룸의 세부정보를 볼수있음, 유저 목록과 함께' })
+  @ApiOperation({ summary: '(채팅탭용)내 룸 정보 가져옴' })
+  @Get('/my/room')
+  getMyRoomShortCutInfo(@ReqUser() user: User) {
+    // console.log(FindRoomDto);
+    // 경도lng 위도lat
+    return this.roomsService.getMyRoomShortCutInfo(new UserIdDto(user._id));
+  }
+
+  @ApiOperation({ summary: '(채팅탭용)내가 즐겨찾기한 채팅방 뽑아옴' })
+  @Get('/my/favorite')
+  getMyFavorite(@ReqUser() user: User) {
+    // console.log(FindRoomDto);
+    // 경도lng 위도lat
+    return this.roomsService.getMyFavorite(new UserIdDto(user._id));
+  }
+
+  @ApiOperation({
+    summary: '(채팅탭용)인기있는 채팅방 정보 (인원순 )10개를 뽑아옴',
+  })
+  @Get('/popular')
+  getPopularRooms() {
+    console.log('asdfasdfasdf');
+    // 경도lng 위도lat
+    return this.roomsService.getPopularRooms();
+  }
+
+  @ApiOperation({
+    summary:
+      '(채팅방용)이미들어간 채팅창에 들어갈때만 사용, 룸의 세부정보를 볼수있음, 유저 목록과 함께, ',
+  })
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
     type: ResFindOneRoomDto,
   })
   @Get(':roomId')
-  findOne(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
+  getMyChatRoomInfo(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     //, @ReqUser() user: User
+    // 알람정보 리턴필요함
     console.log(roomId);
     return this.roomsService.findOneRoomById(roomId, new UserIdDto(user._id));
   }
 
   // TODO :  user id field 가드 통해서 받아와야함 지금은 바디로
-  @ApiOperation({ summary: '유저를 룸에 집어넣는다' })
+  @ApiOperation({ summary: '유저가 채팅방에 입장할 때' })
   @Post(':roomId/join')
   joinRoom(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     // 조인 룸시에 다른 룸에서 자동으로 나가져야함
     return this.roomsService.addUserToRoom(roomId, new UserIdDto(user._id));
   }
 
-  @ApiOperation({ summary: '룸에서 유저를 뺀다' })
+  @ApiOperation({ summary: '유저가 채팅방에서 아예 나가버릴때' })
   @Delete(':roomId/join')
   outRoom(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     // 조인 룸시에 다른 룸에서 자동으로 나가져야함
@@ -123,36 +153,12 @@ export class RoomsController {
   @ApiOperation({ summary: '유저가 채팅 알림을 킨다' })
   @Post(':roomId/alarm')
   turnOnChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    // return this.roomsService.pullRoomToUserFavoriteList(roomId, userId);
+    return this.roomsService.turnOnChatAlarm(new UserIdDto(user._id));
   }
 
   @ApiOperation({ summary: '유저가 채팅 알림을 끈다' })
   @Delete(':roomId/alarm')
   turnOffChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    // return this.roomsService.pullRoomToUserFavoriteList(roomId, userId);
-  }
-
-  @ApiOperation({ summary: '내 룸 정보 가져옴' })
-  @Get('/my/room')
-  getMyRoomInfo(@ReqUser() user: User) {
-    // console.log(FindRoomDto);
-    // 경도lng 위도lat
-    return this.roomsService.getMyRoomInfo(new UserIdDto(user._id));
-  }
-
-  @ApiOperation({ summary: '내가 즐겨찾기한 채팅방 뽑아옴' })
-  @Get('/my/favorite')
-  getMyFavorite() {
-    // console.log(FindRoomDto);
-    // 경도lng 위도lat
-    return this.roomsService.getMyFavorite();
-  }
-
-  @ApiOperation({ summary: '인기있는 채팅방 정보 (인원순 )10개를 뽑아옴' })
-  @Get('/popular')
-  getPopularRooms(@Query() FindRoomDto: FindRoomDto) {
-    // console.log(FindRoomDto);
-    // 경도lng 위도lat
-    return this.roomsService.getPopularRooms();
+    return this.roomsService.turnOffChatAlarm(new UserIdDto(user._id));
   }
 }
