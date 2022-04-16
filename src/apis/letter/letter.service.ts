@@ -29,7 +29,7 @@ export class LetterService {
     return;
   }
 
-  async deleteLetterRooms() {
+  async leaveLetterRooms() {
     return;
   }
 

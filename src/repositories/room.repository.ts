@@ -34,25 +34,16 @@ export class RoomRepository {
     return await room.save();
   }
 
-  async findRoomsByCoordinates(
-    coordinatesDto: CoordinatesDto,
-  ): Promise<Room[] | []> {
+  async findRoomsByCoordinates(findRoomDto: FindRoomDto): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
         $geoNear: {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [
-              Number(coordinatesDto.lng),
-              Number(coordinatesDto.lat),
-            ],
+            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
           },
-          // TODO : 4월 14일 이찬진
-          //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
-          // 기획안 변경되면 maxDistance 값을 조정해야함
-          maxDistance: 10000000000,
-          // 거리 자동계산해서 distance 필드로 리턴
+          maxDistance: findRoomDto.radius,
           distanceField: 'distance',
           key: 'geometry',
         },
@@ -86,10 +77,8 @@ export class RoomRepository {
             type: 'Point',
             coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
           },
-          // TODO : 4월 14일 이찬진
-          //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
-          // 기획안 변경되면 maxDistance 값을 조정해야함
-          maxDistance: 10000000000,
+
+          maxDistance: findRoomDto.radius,
           // 거리 자동계산해서 distance 필드로 리턴
           distanceField: 'distance',
           key: 'geometry',
@@ -130,10 +119,7 @@ export class RoomRepository {
             type: 'Point',
             coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
           },
-          // TODO : 4월 14일 이찬진
-          //지도에서 모든 룸에대한 정보를 리스트로 뿌려야함... 거리제한 조건이 없움...
-          // 기획안 변경되면 maxDistance 값을 조정해야함
-          maxDistance: 10000000000,
+          maxDistance: findRoomDto.radius,
           // 거리 자동계산해서 distance 필드로 리턴
           distanceField: 'distance',
           key: 'geometry',

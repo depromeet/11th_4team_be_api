@@ -10,6 +10,7 @@ import {
   UsePipes,
   SerializeOptions,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -35,12 +36,15 @@ import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { User } from 'src/models/user.model';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
+import { ResChatAlarmToggleDto } from './dto/chatAlarmToggle.res.dto';
+import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-// TODO : 나중에 가드오면 가드달아야함 이찬진 4월 14일
+@UseInterceptors(SuccessInterceptor)
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
@@ -93,26 +97,7 @@ export class RoomsController {
     // 경도lng 위도lat
     return this.roomsService.getPopularRooms();
   }
-
-  @ApiOperation({
-    summary:
-      '(채팅방용)이미들어간 채팅창에 들어갈때만 사용, 룸의 세부정보를 볼수있음, 유저 목록과 함께, ',
-  })
-  @ApiResponse({
-    status: 200,
-    description: '요청 성공시',
-    type: ResFindOneRoomDto,
-  })
-  @Get(':roomId')
-  getMyChatRoomInfo(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    //, @ReqUser() user: User
-    // 알람정보 리턴필요함
-    console.log(roomId);
-    return this.roomsService.findOneRoomById(roomId, new UserIdDto(user._id));
-  }
-
-  // TODO :  user id field 가드 통해서 받아와야함 지금은 바디로
-  @ApiOperation({ summary: '유저가 채팅방에 입장할 때' })
+  @ApiOperation({ summary: '유저가 채팅방에 입장할 때 ( 모든 경우 사용)' })
   @Post(':roomId/join')
   joinRoom(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     // 조인 룸시에 다른 룸에서 자동으로 나가져야함
@@ -126,39 +111,37 @@ export class RoomsController {
     return this.roomsService.pullUserFromRoom(roomId, new UserIdDto(user._id));
   }
 
-  @ApiOperation({ summary: '유저가 룸을 즐겨찾기한다' })
-  @Post(':roomId/favorite')
-  pushRoomToUserFavoriteList(
+  @ApiOperation({ summary: '유저가 룸을 즐겨찾기에서 빼고넣는다' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ResFavoriteToggleDto,
+  })
+  @Patch(':roomId/favorite')
+  toggleRoomToUserFavoriteList(
     @Param() roomId: RoomIdDto,
     @ReqUser() user: User,
   ) {
-    return this.roomsService.pushRoomToUserFavoriteList(
+    return this.roomsService.toggleRoomToUserFavoriteList(
       roomId,
       new UserIdDto(user._id),
     );
   }
 
-  @ApiOperation({ summary: '유저가 룸을 즐겨찾기에서 뺀다' })
-  @Delete(':roomId/favorite')
-  pullRoomToUserFavoriteList(
-    @Param() roomId: RoomIdDto,
-    @ReqUser() user: User,
-  ) {
-    return this.roomsService.pullRoomToUserFavoriteList(
-      roomId,
-      new UserIdDto(user._id),
-    );
-  }
-
-  @ApiOperation({ summary: '유저가 채팅 알림을 킨다' })
-  @Post(':roomId/alarm')
+  @ApiOperation({ summary: '유저가 채팅 알림을 키고 끈다' })
+  @Patch(':roomId/alarm')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ResChatAlarmToggleDto,
+  })
   turnOnChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    return this.roomsService.turnOnChatAlarm(new UserIdDto(user._id));
+    return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
   }
 
-  @ApiOperation({ summary: '유저가 채팅 알림을 끈다' })
-  @Delete(':roomId/alarm')
-  turnOffChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    return this.roomsService.turnOffChatAlarm(new UserIdDto(user._id));
-  }
+  // @ApiOperation({ summary: '유저가 채팅 알림을 끈다' })
+  // @Delete(':roomId/alarm')
+  // turnOffChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
+  //   return this.roomsService.turnOffChatAlarm(new UserIdDto(user._id));
+  // }
 }

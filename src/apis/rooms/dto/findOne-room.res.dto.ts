@@ -1,5 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, plainToClass, plainToInstance } from 'class-transformer';
 import { Types } from 'mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 
@@ -17,6 +17,7 @@ export class ResFindOneRoomDto {
     this.iFavoriteRoom = iFavoriteRoom;
     this.iAlarm = iAlarm;
     this.userCount = room.userList.length;
+    this.userList = room.userList;
   }
   @ApiProperty()
   _id: string;
