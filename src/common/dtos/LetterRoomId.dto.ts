@@ -6,9 +6,9 @@ import { Transform } from 'class-transformer';
 /**
  * mongoId 용 DTO
  */
-export class LetterRoomId {
-  constructor(letterRoom: string) {
-    this.letterRoom = Types.ObjectId(letterRoom);
+export class LetterRoomIdDto {
+  constructor(letterRoomId: string) {
+    this.letterRoomId = Types.ObjectId(letterRoomId);
   }
 
   @ApiProperty({
@@ -20,5 +20,5 @@ export class LetterRoomId {
   @IsNotEmpty()
   @IsObjectId({ message: '쪽지방 아이디가 몽고아이디 형식이 아닙니다.' })
   @Transform(({ value }) => Types.ObjectId(value))
-  letterRoom: Types.ObjectId;
+  letterRoomId: Types.ObjectId;
 }

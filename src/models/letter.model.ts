@@ -23,7 +23,7 @@ export class Letter extends Document {
   @IsObjectId()
   sender: User;
 
-  @Prop({ required: true, type: Boolean, default: true })
+  @Prop({ type: Boolean, default: true })
   @IsBoolean()
   visible: boolean;
 

@@ -57,7 +57,7 @@ export class UserRepository {
   async pushRoomToFavoriteList(
     userIdDto: UserIdDto,
     roomIdDto: RoomIdDto,
-  ): Promise<User> {
+  ): Promise<boolean> {
     const user = await this.userModel.findOneAndUpdate(
       {
         _id: userIdDto.userId,
@@ -73,7 +73,7 @@ export class UserRepository {
       throw new BadRequestException('user does not exist');
     }
 
-    return user;
+    return true;
   }
   /**
    * 4월 14일 이찬진
@@ -85,7 +85,7 @@ export class UserRepository {
   async pullRoomToFavoriteList(
     userIdDto: UserIdDto,
     roomIdDto: RoomIdDto,
-  ): Promise<User> {
+  ): Promise<boolean> {
     const user = await this.userModel.findOneAndUpdate(
       {
         _id: userIdDto.userId,
@@ -101,11 +101,29 @@ export class UserRepository {
       throw new BadRequestException('user does not exist');
     }
 
-    return user;
+    return false;
   }
 
   /**
    * 유저의 챗 알림을 켜기
+   * @param userIdDto
+   * @returns
+   */
+  async toggleChatAlarm(userIdDto: UserIdDto): Promise<boolean> {
+    const user = await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      [{ $set: { chatAlarm: { $eq: [false, '$chatAlarm'] } } }],
+      { new: true },
+    );
+
+    if (!user) {
+      throw new BadRequestException('user does not exist');
+    }
+
+    return user.chatAlarm;
+  }
+  /**
+   * 유저의 챗 알림을 끄기
    * @param userIdDto
    * @returns
    */
@@ -117,29 +135,6 @@ export class UserRepository {
       {
         $set: {
           chatAlarm: true,
-        },
-      },
-      { new: true },
-    );
-    if (!user) {
-      throw new BadRequestException('user does not exist');
-    }
-
-    return user;
-  }
-  /**
-   * 유저의 챗 알림을 끄기
-   * @param userIdDto
-   * @returns
-   */
-  async turnOffChatAlarm(userIdDto: UserIdDto): Promise<User> {
-    const user = await this.userModel.findOneAndUpdate(
-      {
-        _id: userIdDto.userId,
-      },
-      {
-        $set: {
-          chatAlarm: false,
         },
       },
       { new: true },
