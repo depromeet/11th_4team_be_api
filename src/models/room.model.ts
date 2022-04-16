@@ -73,11 +73,6 @@ export class Room extends Document {
     required: true,
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
   })
-  @ApiProperty({
-    type: Geometry,
-    title: 'current_location',
-    example: '{"type":"Point","coordinates":[36.612849, 126.229883]}',
-  })
   @IsNotEmpty()
   @IsArray()
   userList: User[];

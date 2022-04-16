@@ -1,4 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 import { string } from 'joi';
 import { Types } from 'mongoose';
 
@@ -9,5 +10,6 @@ export class UserProfileDto extends PickType(User, [
   'profileUrl',
 ] as const) {
   @ApiProperty({ type: string, example: '624c24cae25c551b68a6645c' })
-  _id: Types.ObjectId;
+  @Expose()
+  _id?: Types.ObjectId;
 }

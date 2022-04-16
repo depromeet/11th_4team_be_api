@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Type } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
 import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
 import { MongoId } from 'src/common/dtos/MongoId.dto';
@@ -8,7 +9,9 @@ import { Room } from 'src/models/room.model';
 import { User } from 'src/models/user.model';
 import { RoomRepository } from 'src/repositories/room.repository';
 import { UserRepository } from 'src/repositories/user.repository';
+import { ResChatAlarmToggleDto } from './dto/chatAlarmToggle.res.dto';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { FindRoomDto } from './dto/find-room.dto';
 import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
@@ -80,7 +83,7 @@ export class RoomsService {
   async addUserToRoom(
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
-  ): Promise<Room> {
+  ): Promise<ResFindOneRoomDto> {
     // 이전 룸에서 빼주는 로직 추가해야함
     const user = await this.userRepository.findOneByUserId(userIdDto.userId);
     // 유저가현재 들어가있는 방이있으면
@@ -88,19 +91,29 @@ export class RoomsService {
     // console.log(typeof roomIdDto.roomId, roomIdDto.roomId, user.myRoom._id);
 
     if (user.myRoom) {
+      // 유저가 들어간 채팅방이 있을경우
       if (roomIdDto.roomId.equals(user.myRoom._id)) {
-        // 룸이 같을경우
-        throw new BadRequestException('같은 룸 입장 시도');
+        // 룸이 같을경우 룸의 정보를 리턴
+        const isFavoritRoom = user.favoriteRoomList.includes(user.myRoom._id);
+        const room = await this.roomRepository.findOneByRoomId(roomIdDto);
+        return new ResFindOneRoomDto(room, isFavoritRoom, user.chatAlarm);
+      } else {
+        // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
+        await this.roomRepository.pullUserFromRoom(
+          new RoomIdDto(user.myRoom._id),
+          userIdDto,
+        );
       }
-      // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
-      await this.roomRepository.pullUserFromRoom(
-        new RoomIdDto(user.myRoom._id),
-        userIdDto,
-      );
     }
+    // 룸에 새로 들어갈때,,,?
     await this.userRepository.setMyRoom(userIdDto, roomIdDto);
     await this.userRepository.turnOnChatAlarm(userIdDto);
-    return await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
+    const room = await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
+    //check
+    const isFavoritRoom = user.favoriteRoomList.includes(room._id);
+    console.log('new room', isFavoritRoom);
+
+    return new ResFindOneRoomDto(room, isFavoritRoom, true);
   }
 
   async pullUserFromRoom(
@@ -111,34 +124,58 @@ export class RoomsService {
     return await this.roomRepository.pullUserFromRoom(roomIdDto, userIdDto);
   }
 
-  async pushRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
-    console.log(await this.roomRepository.isRoomExist(roomIdDto));
-    if (!(await this.roomRepository.isRoomExist(roomIdDto))) {
-      throw new BadRequestException('Room does not exist');
-    }
-    return this.userRepository.pushRoomToFavoriteList(userIdDto, roomIdDto);
-  }
-  async pullRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
-    return this.userRepository.pullRoomToFavoriteList(userIdDto, roomIdDto);
-  }
-  private isObjectIdArray(arg: any): arg is Types.ObjectId[] {
-    return true;
-  }
+  // async pushRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+  //   console.log(await this.roomRepository.isRoomExist(roomIdDto));
+  // }
+  // async pullRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+  //   return this.userRepository.pullRoomToFavoriteList(userIdDto, roomIdDto);
+  // }
 
-  async findOneRoomById(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+  async toggleRoomToUserFavoriteList(
+    roomIdDto: RoomIdDto,
+    userIdDto: UserIdDto,
+  ): Promise<ResFavoriteToggleDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto.userId);
-    let isUserFavoritRoom = false;
-    if (!user.myRoom._id.equals(roomIdDto.roomId)) {
-      throw new BadRequestException('유저가 들어간 방이 아닙니다.');
+    const isFavoritRoom = user.favoriteRoomList.find((room) =>
+      roomIdDto.roomId.equals(room._id),
+    );
+    console.log('asdfasdf', isFavoritRoom);
+    let iFavoritRoom: boolean;
+    if (isFavoritRoom) {
+      //내가 이미 즐겨찾기해놨으면
+      iFavoritRoom = await this.userRepository.pullRoomToFavoriteList(
+        userIdDto,
+        roomIdDto,
+      );
+    } else {
+      // 즐겨찾기 안해놨으면
+      if (!(await this.roomRepository.isRoomExist(roomIdDto))) {
+        throw new BadRequestException('Room does not exist');
+      }
+      iFavoritRoom = await this.userRepository.pushRoomToFavoriteList(
+        userIdDto,
+        roomIdDto,
+      );
     }
-    if (this.isObjectIdArray(user.favoriteRoomList)) {
-      isUserFavoritRoom = user.favoriteRoomList.includes(roomIdDto.roomId);
-    }
-    const room = await this.roomRepository.findOneByRoomId(roomIdDto);
-    const send = new ResFindOneRoomDto(room, isUserFavoritRoom, user.chatAlarm);
-
-    return send;
+    return plainToInstance(ResFavoriteToggleDto, {
+      iFavoritRoom: iFavoritRoom,
+    });
   }
+
+  // async findOneRoomById(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
+  //   const user = await this.userRepository.findOneByUserId(userIdDto.userId);
+  //   let isUserFavoritRoom = false;
+  //   if (!user.myRoom._id.equals(roomIdDto.roomId)) {
+  //     throw new BadRequestException('유저가 들어간 방이 아닙니다.');
+  //   }
+  //   if (this.isObjectIdArray(user.favoriteRoomList)) {
+  //     isUserFavoritRoom = user.favoriteRoomList.includes(roomIdDto.roomId);
+  //   }
+  //   const room = await this.roomRepository.findOneByRoomId(roomIdDto);
+  //   const send = new ResFindOneRoomDto(room, isUserFavoritRoom, user.chatAlarm);
+
+  //   return send;
+  // }
   async getMyRoomShortCutInfo(userId: UserIdDto) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
     console.log(roomInfo);
@@ -150,12 +187,12 @@ export class RoomsService {
   async getMyFavorite(userId: UserIdDto) {
     return await this.userRepository.findMyFavoriteRooms(userId);
   }
-  async turnOnChatAlarm(userId: UserIdDto) {
-    return await this.userRepository.turnOnChatAlarm(userId);
-  }
+  async toggleChatAlarm(userId: UserIdDto): Promise<ResChatAlarmToggleDto> {
+    const isChatAlarmOn = await this.userRepository.toggleChatAlarm(userId);
 
-  async turnOffChatAlarm(userId: UserIdDto) {
-    return await this.userRepository.turnOffChatAlarm(userId);
+    return plainToInstance(ResChatAlarmToggleDto, {
+      isChatAlarmOn: isChatAlarmOn,
+    });
   }
 
   async getPopularRooms() {

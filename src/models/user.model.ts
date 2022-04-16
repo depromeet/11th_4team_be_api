@@ -2,6 +2,8 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
+  IsObject,
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
@@ -13,12 +15,32 @@ import * as mongoose from 'mongoose';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment } from './comment.model';
+import { Expose } from 'class-transformer';
 
 const options: SchemaOptions = {
   id: false,
   collection: 'user',
   timestamps: true,
 };
+
+@Schema({ useNestedStrict: true, _id: false })
+export class Profile {
+  @ApiProperty({
+    example: '#122345',
+    description: '회원 프로필 뒷배경',
+  })
+  @IsString()
+  @Prop({ type: String, default: '' })
+  color: string;
+
+  @ApiProperty({
+    example: 0,
+    description: '회원 프로필 캐릭터',
+  })
+  @IsNumber()
+  @Prop({ type: Number, default: 0 })
+  type: number;
+}
 
 @Schema(options)
 export class User extends Document {
@@ -46,6 +68,7 @@ export class User extends Document {
     default: '',
   })
   @IsString()
+  @Expose()
   nickname: string;
 
   @ApiProperty({
@@ -56,7 +79,20 @@ export class User extends Document {
     default: '',
   })
   @IsString()
+  @Expose()
   profileUrl: string;
+
+  @ApiProperty({
+    description: '회원 프로필',
+    type: Profile,
+  })
+  @Prop({
+    default: '',
+    type: Profile,
+  })
+  @IsObject()
+  @Expose()
+  profile: Profile;
 
   @ApiProperty({
     example: STATUS_TYPE.NORMAL,
