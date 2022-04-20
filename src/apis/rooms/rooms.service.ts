@@ -179,9 +179,9 @@ export class RoomsService {
   async getMyRoomShortCutInfo(userId: UserIdDto) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
     console.log(roomInfo);
-    if (!roomInfo) {
-      throw new BadRequestException('MyRoom does not exist');
-    }
+    // if (!roomInfo) {
+    //   throw new BadRequestException('MyRoom does not exist');
+    // }
     return roomInfo;
   }
   async getMyFavorite(userId: UserIdDto) {
