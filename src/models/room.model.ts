@@ -16,10 +16,9 @@ const options: SchemaOptions = {
   // rooms default 로 s 붙여지는데 디폴트로가는게 좋을것 같아요! (이찬진)
   collection: 'room',
   timestamps: true,
-  skipVersioning: true,
 };
 
-@Schema({ useNestedStrict: true, _id: false })
+@Schema({ _id: false })
 export class Geometry {
   @IsArray()
   @Prop({ type: Array, required: true })

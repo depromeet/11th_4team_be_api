@@ -2,9 +2,13 @@ import { Types } from 'mongoose';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 export class TwoUserListDto {
-  constructor(user1: UserIdDto, user2: UserIdDto) {
-    this.userList.push(user1.userId);
-    this.userList.push(user2.userId);
+  constructor(recevier: UserIdDto, sender: UserIdDto) {
+    this.userList.push(recevier.userId);
+    this.userList.push(sender.userId);
+    this.recevier = recevier.userId;
+    this.sender = sender.userId;
   }
-  userList: Types.ObjectId[];
+  userList: Types.ObjectId[] = [];
+  recevier: Types.ObjectId;
+  sender: Types.ObjectId;
 }

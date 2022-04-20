@@ -14,7 +14,7 @@ export class RoomRepository {
     @InjectModel(Room.name) private readonly roomModel: Model<Room>,
   ) {}
 
-  async isRoomExist(roomIdDto: RoomIdDto): Promise<boolean> {
+  async isRoomExist(roomIdDto: RoomIdDto): Promise<any> {
     return this.roomModel.exists({ _id: roomIdDto.roomId });
   }
 
