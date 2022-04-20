@@ -19,12 +19,7 @@ import { LetterModule } from './apis/letter/letter.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    }),
+    MongooseModule.forRoot(process.env.MONGO_URI, {}),
     UserModule,
     AuthenticationModule,
     AuthModule,

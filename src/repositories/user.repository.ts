@@ -2,18 +2,29 @@ import { NicknameDto, UpdateProfileDto } from '../apis/users/dto/user.dto';
 import { PhoneNumberDto } from '../apis/users/dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
-import { Model, ObjectId, Types } from 'mongoose';
-import { User } from 'src/models/user.model';
-import { CertificationMobileDto } from 'src/apis/authentication/dto/send-mobile.dto';
+import { Model, Types } from 'mongoose';
+import { User, Profile } from 'src/models/user.model';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
+import { CreateUserDto } from 'src/apis/users/dto/create-user.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-  ) {}
+    @InjectModel(Profile.name) private readonly profileModel: Model<Profile>,
+  ) { }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const profile = await this.profileModel.create(createUserDto.profile)
+    // createUserDto.profile = new Types.ObjectId(profile._id)
+
+    let user = await this.userModel.create({ ...createUserDto })
+    // user = await user.populate({ path: 'profile', select: 'type color -_id' })
+    user = await user.populate('profile')
+    return user
+  }
 
   async findOneByUserId(userId: string | Types.ObjectId): Promise<User | null> {
     const user = await this.userModel.findOne({ _id: userId });
@@ -30,17 +41,13 @@ export class UserRepository {
     return user;
   }
 
-  async existByNickName(nickname: string): Promise<boolean> {
+  async existByNickName(nickname: string): Promise<any> {
     try {
       const result = await this.userModel.exists({ nickname });
       return result;
     } catch (error) {
       throw new HttpException('db error', 400);
     }
-  }
-
-  async create(phoneNumber: PhoneNumberDto): Promise<any> {
-    return await this.userModel.create(phoneNumber);
   }
 
   async updateProfile(profileData: UpdateProfileDto): Promise<any> {
