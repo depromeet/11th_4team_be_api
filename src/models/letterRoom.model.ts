@@ -45,6 +45,7 @@ export class LetterRoom extends Document {
     description: '쪽지 모음',
   })
   readonly letters: Letter[];
+  updatedAt: Date;
 }
 
 export const _LetterRoomSchema = SchemaFactory.createForClass(LetterRoom);

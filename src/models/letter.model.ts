@@ -28,12 +28,12 @@ export class Letter extends Document {
   // 보일 수 있는 유저.. 채팅방 나가면 없애버리는거임
   @Prop({ required: true, type: [MongooseSchema.Types.ObjectId], ref: 'User' })
   @IsArray()
-  visibleUser: User[];
+  visibleUser: Types.ObjectId[];
 
   // 받은 사람이 읽었냐?
   @Prop({ required: true, type: [MongooseSchema.Types.ObjectId], ref: 'User' })
   @IsBoolean()
-  notWatchUser: User[];
+  notWatchUser: Types.ObjectId[];
 
   @ApiProperty({
     type: String,

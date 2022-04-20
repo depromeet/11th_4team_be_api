@@ -41,6 +41,7 @@
     "express-basic-auth": "^1.2.1",
     "hbs": "^4.1.2",
     "joi": "^17.4.2",
+    "moment-timezone": "^0.5.34",
     "mongoose": "^6.3.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

@@ -24,12 +24,15 @@ export class LetterRepository {
     const myLetterRooms = await this.letterRoomModel
       .find({
         joinUserList: { $elemMatch: { $eq: userIdDto.userId } },
+        leftUserList: { $ne: userIdDto.userId },
       })
       .populate({
         path: 'letters',
         options: {
-          limit: 1,
+          perDocumentLimit: 1,
+          sort: { _id: -1 },
         },
+
         select: {
           message: 1,
           createdAt: 1,
@@ -40,11 +43,23 @@ export class LetterRepository {
       .populate({
         path: 'joinUserList',
         select: UserProfileSelect,
-      });
+      })
+      .sort({ updatedAt: -1 });
     return myLetterRooms;
   }
 
-  async getMyLettersByRoomId(letterRoomId: LetterRoomIdDto): Promise<Letter[]> {
+  async getRoomByRoomId(
+    letterRoomId: LetterRoomIdDto,
+  ): Promise<LetterRoom | null> {
+    return await this.letterRoomModel.findOne({
+      _id: letterRoomId.letterRoomId,
+    });
+  }
+
+  async getMyLettersByRoomId(
+    letterRoomId: LetterRoomIdDto,
+    userIdDto: UserIdDto,
+  ): Promise<Letter[]> {
     // 내가 속한 방에서 편지 하나 lookup 한뒤에 리턴
     // match LeftUserList에는 속하면 안됨.
 
@@ -52,8 +67,10 @@ export class LetterRepository {
     const letters = await this.letterModel
       .find({
         letterRoom: letterRoomId.letterRoomId,
+        visibleUser: { $elemMatch: { $eq: userIdDto.userId } },
       })
-      .populate('sender', UserProfileSelect);
+      .populate('sender', UserProfileSelect)
+      .sort({ createdAt: -1 });
     return letters;
   }
 
@@ -65,7 +82,7 @@ export class LetterRepository {
     // match LeftUserList에는 속하면 안됨.
 
     //룸아이디로 세부정보봤으면 그뒤에 모든 아이디들은 본걸로 쳐야함.
-    const letterRoom = await this.letterModel.updateMany(
+    await this.letterModel.updateMany(
       {
         letterRoom: letterRoomId.letterRoomId,
       },
@@ -75,17 +92,43 @@ export class LetterRepository {
         },
       },
     );
-    return letterRoom;
+    return;
   }
 
-  async leaveRoomByRoomId(letterRoomId: LetterRoomIdDto, userId: UserIdDto) {
+  async updateLetterspullUserFromVisibleUser(
+    letterRoomId: LetterRoomIdDto,
+    userIdDto: UserIdDto,
+  ) {
     // 내가 속한 방에서 편지 하나 lookup 한뒤에 리턴
     // match LeftUserList에는 속하면 안됨.
-    const letterRoom = await this.letterModel
-      .find({
+
+    //룸아이디로 세부정보봤으면 그뒤에 모든 아이디들은 본걸로 쳐야함.
+    await this.letterModel.updateMany(
+      {
         letterRoom: letterRoomId.letterRoomId,
-      })
-      .populate('sender', UserProfileSelect);
+      },
+      {
+        $pull: {
+          visibleUser: userIdDto.userId,
+        },
+      },
+    );
+    return;
+  }
+
+  async leaveRoomByRoomId(letterRoomId: LetterRoomIdDto, userIdDto: UserIdDto) {
+    // 내가 속한 방에서 편지 하나 lookup 한뒤에 리턴
+    // match LeftUserList에는 속하면 안됨.
+    const letterRoom = await this.letterRoomModel.findOneAndUpdate(
+      {
+        _id: letterRoomId.letterRoomId,
+      },
+      {
+        $addToSet: { leftUserList: userIdDto.userId },
+      },
+      { new: true },
+    );
+    console.log(letterRoom);
     return letterRoom;
   }
 
@@ -104,7 +147,12 @@ export class LetterRepository {
       notWatchUser: twoUserList.recevier,
     });
 
-    return await letter.save();
+    const newLetter = await letter.save();
+    const returnletter = await newLetter.populate({
+      path: 'sender',
+      select: UserProfileSelect,
+    });
+    return returnletter;
   }
 
   async upsertUserListToLetterRoom(
@@ -129,5 +177,15 @@ export class LetterRepository {
     );
     console.log(letterRoom);
     return letterRoom;
+  }
+
+  async deleteRoom(letterRoomIdDto: LetterRoomIdDto) {
+    await this.letterRoomModel.deleteOne({ _id: letterRoomIdDto.letterRoomId });
+  }
+
+  async deleteLetters(letterRoomIdDto: LetterRoomIdDto) {
+    await this.letterModel.deleteMany({
+      letterRoom: letterRoomIdDto.letterRoomId,
+    });
   }
 }

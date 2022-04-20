@@ -1,17 +1,24 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
-import { string } from 'joi';
-import { Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Transform } from 'class-transformer';
 
-import { User } from 'src/models/user.model';
-
-export class UserProfileDto extends PickType(User, [
-  'nickname',
-  'profileUrl',
-] as const) {
-  @ApiProperty({ type: string, example: '624c24cae25c551b68a6645c' })
+export class UserProfileDto {
+  constructor(user) {
+    this._id = user._id;
+    this.nickname = user.nickname;
+    this.profileUrl = user.profileUrl;
+  }
+  @ApiProperty({ type: String, example: '624c24cae25c551b68a6645c' })
   @Expose()
-  _id?: Types.ObjectId;
+  @Transform(({ value }) => String(value))
+  _id?: string;
+
+  @ApiProperty({ type: String, example: 'nickname' })
+  @Expose()
+  nickname: string;
+
+  @ApiProperty({ type: String, example: 'profile' })
+  @Expose()
+  profileUrl: string;
 }
 
 export const UserProfileSelect = { _id: 1, nickname: 1, profileUrl: 1 };
