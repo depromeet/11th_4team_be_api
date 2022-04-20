@@ -40,7 +40,7 @@
     "express-basic-auth": "^1.2.1",
     "hbs": "^4.1.2",
     "joi": "^17.4.2",
-    "mongoose": "^5.13.5",
+    "mongoose": "^6.3.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

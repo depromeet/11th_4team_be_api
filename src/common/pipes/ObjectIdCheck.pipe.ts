@@ -18,6 +18,6 @@ export class ObjectIdValidationPipe implements PipeTransform {
       );
     }
 
-    return mongoose.Types.ObjectId(value);
+    return new mongoose.Types.ObjectId(value);
   }
 }
