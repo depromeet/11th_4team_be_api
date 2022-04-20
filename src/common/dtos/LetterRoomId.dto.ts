@@ -8,7 +8,7 @@ import { Transform } from 'class-transformer';
  */
 export class LetterRoomIdDto {
   constructor(letterRoomId: string) {
-    this.letterRoomId = Types.ObjectId(letterRoomId);
+    this.letterRoomId = new Types.ObjectId(letterRoomId);
   }
 
   @ApiProperty({
@@ -19,6 +19,6 @@ export class LetterRoomIdDto {
   })
   @IsNotEmpty()
   @IsObjectId({ message: '쪽지방 아이디가 몽고아이디 형식이 아닙니다.' })
-  @Transform(({ value }) => Types.ObjectId(value))
+  @Transform(({ value }) => new Types.ObjectId(value))
   letterRoomId: Types.ObjectId;
 }

@@ -16,6 +16,7 @@ import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment } from './comment.model';
 import { Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 const options: SchemaOptions = {
   id: false,
@@ -23,7 +24,7 @@ const options: SchemaOptions = {
   timestamps: true,
 };
 
-@Schema({ useNestedStrict: true, _id: false })
+@Schema()
 export class Profile {
   @ApiProperty({
     example: '#122345',
@@ -41,6 +42,7 @@ export class Profile {
   @Prop({ type: Number, default: 0 })
   type: number;
 }
+export const ProfileSchema = SchemaFactory.createForClass(Profile);
 
 @Schema(options)
 export class User extends Document {
@@ -71,28 +73,10 @@ export class User extends Document {
   @Expose()
   nickname: string;
 
-  @ApiProperty({
-    example: 'www.profileUrl.com',
-    description: '회원 프로필 주소',
-  })
-  @Prop({
-    default: '',
-  })
-  @IsString()
-  @Expose()
   profileUrl: string;
 
-  @ApiProperty({
-    description: '회원 프로필',
-    type: Profile,
-  })
-  @Prop({
-    default: '',
-    type: Profile,
-  })
-  @IsObject()
-  @Expose()
-  profile: Profile;
+  @Prop({ type: Types.ObjectId, ref: 'Profile' })
+  profile: Types.ObjectId;
 
   @ApiProperty({
     example: STATUS_TYPE.NORMAL,

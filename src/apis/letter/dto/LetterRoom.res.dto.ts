@@ -20,11 +20,8 @@ function toTimeZone(time) {
   return time1.format();
 }
 
-export class LetterRoomDto extends PickType(LetterRoom, [
-  'joinUserList',
-] as const) {
+export class LetterRoomDto {
   constructor(letterRoom: LetterRoom, myUserId: UserIdDto) {
-    super();
     console.log(letterRoom.joinUserList);
     this.receiver = letterRoom.joinUserList.filter((user) => {
       return !myUserId.userId.equals(user._id);

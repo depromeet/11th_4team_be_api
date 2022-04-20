@@ -75,7 +75,7 @@ export class LetterController {
       new UserIdDto(user._id),
     );
     console.log(list[0].latestTime);
-    return { lits: list };
+    return list[0];
   }
 
   @ApiOperation({ summary: '쪽지룸을 떠남' })
