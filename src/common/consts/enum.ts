@@ -27,7 +27,7 @@ enum CATEGORY_TYPE {
   // AMUSEMENT_PARK,
   // HAN_RIVER_PRAk,
 }
-
+//TODO : 카테고리 정보 추가
 enum FIND_ROOM_FILTER_TYPE {
   UNIVERCITY = 'UNIVERCITY', //대학교
   CONCERTHALL = 'CONCERTHALL', //공연장

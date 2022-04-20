@@ -13,3 +13,5 @@ export class UserProfileDto extends PickType(User, [
   @Expose()
   _id?: Types.ObjectId;
 }
+
+export const UserProfileSelect = { _id: 1, nickname: 1, profileUrl: 1 };

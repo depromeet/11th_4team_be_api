@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@js-joda/core": "^5.2.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.0",
@@ -40,6 +41,8 @@
     "express-basic-auth": "^1.2.1",
     "hbs": "^4.1.2",
     "joi": "^17.4.2",
+    "moment": "^2.29.3",
+    "moment-timezone": "^0.5.34",
     "mongoose": "^5.13.5",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
