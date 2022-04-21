@@ -44,6 +44,30 @@ export class Profile {
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
 
+// 클래스
+// @Schema({ useNestedStrict: true, _id: false })
+// export class Profile {
+//   @IsString()
+//   @Prop({ type: String, default: '' })
+//   color: string;
+//   @IsNumber()
+//   @Prop({ type: Number, default: 0 })
+//   type: number;
+// }
+
+// 밑에 정보
+// @ApiProperty({
+//   description: '회원 프로필',
+//   type: Profile,
+// })
+// @Prop({
+//   default: '',
+//   type: Profile,
+// })
+// @IsObject()
+// @Expose()
+// profile: Profile;
+
 @Schema(options)
 export class User extends Document {
   // @Prop({
