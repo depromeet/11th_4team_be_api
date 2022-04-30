@@ -1,16 +1,13 @@
 import { ExtractJwt } from 'passport-jwt';
 
-const jwtConstants = {
-  secret: 'secretKey',
-};
-
+console.log(process.env.JWT_SECRET);
 export const JwtStrategyConfig = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   ignoreExpiration: false,
-  secretOrKey: jwtConstants.secret,
+  secretOrKey: process.env.JWT_SECRET,
 };
 
 export const JwtModuleConfig = {
-  secret: jwtConstants.secret,
+  secret: process.env.JWT_SECRET,
   signOptions: { expiresIn: '12h' },
 };
