@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
+import { Profile } from 'src/models/user.model';
 
 export class UserProfileDto {
   constructor(user) {
     this._id = user._id;
     this.nickname = user.nickname;
-    this.profileUrl = user.profileUrl;
+    this.profile = user.profile;
   }
   @ApiProperty({ type: String, example: '624c24cae25c551b68a6645c' })
   @Expose()
@@ -17,8 +18,9 @@ export class UserProfileDto {
   nickname: string;
 
   @ApiProperty({ type: String, example: 'profile' })
+  @Type(() => Profile)
   @Expose()
-  profileUrl: string;
+  profile: Profile;
 }
 
-export const UserProfileSelect = { _id: 1, nickname: 1, profileUrl: 1 };
+export const UserProfileSelect = { _id: 1, nickname: 1, profile: 1 };

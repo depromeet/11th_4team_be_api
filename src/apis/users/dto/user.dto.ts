@@ -6,6 +6,6 @@ export class NicknameDto extends PickType(User, ['nickname'] as const) {}
 
 export class UpdateProfileDto extends PickType(User, [
   'nickname',
-  'profileUrl',
+  'profile',
   'status',
 ] as const) {}

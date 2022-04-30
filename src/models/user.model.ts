@@ -24,16 +24,8 @@ const options: SchemaOptions = {
   timestamps: true,
 };
 
-@Schema()
+@Schema({ _id: false })
 export class Profile {
-  @ApiProperty({
-    example: '#122345',
-    description: '회원 프로필 뒷배경',
-  })
-  @IsString()
-  @Prop({ type: String, default: '' })
-  color: string;
-
   @ApiProperty({
     example: 0,
     description: '회원 프로필 캐릭터',
@@ -97,10 +89,8 @@ export class User extends Document {
   @Expose()
   nickname: string;
 
-  profileUrl: string;
-
-  @Prop({ type: Types.ObjectId, ref: 'Profile' })
-  profile: Types.ObjectId;
+  @Prop({ type: Profile, ref: 'Profile' })
+  profile: Profile;
 
   @ApiProperty({
     example: STATUS_TYPE.NORMAL,
