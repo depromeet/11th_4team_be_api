@@ -7,6 +7,7 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { CoordinatesDto } from 'src/apis/rooms/dto/coordinates.dto';
 import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
+import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 
 @Injectable()
 export class RoomRepository {
@@ -164,7 +165,10 @@ export class RoomRepository {
         },
         { new: true },
       )
-      .populate('userList', '_id nickname profileUrl');
+      .populate({
+        path: 'userList',
+        select: UserProfileSelect,
+      });
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
@@ -200,7 +204,10 @@ export class RoomRepository {
       .findOne({
         _id: roomIdDto.roomId,
       })
-      .populate('userList', '_id nickname profileUrl');
+      .populate({
+        path: 'userList',
+        select: UserProfileSelect,
+      });
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
