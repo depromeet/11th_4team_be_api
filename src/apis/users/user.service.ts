@@ -6,7 +6,7 @@ import { User } from 'src/models/user.model';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) { }
+  constructor(private userRepository: UserRepository) {}
 
   async checkDuplicatePhoneNumber(phoneNumber: PhoneNumberDto) {
     const user = await this.userRepository.findOneByPhoneNumber(phoneNumber);
@@ -36,8 +36,8 @@ export class UserService {
     }
   }
 
-  // 
+  //
   async createUser(createUser: CreateUserDto): Promise<User> {
-    return await this.userRepository.create(createUser)
+    return await this.userRepository.create(createUser);
   }
 }

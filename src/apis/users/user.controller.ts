@@ -1,7 +1,7 @@
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { User } from 'src/models/user.model';
-import { AuthenticationService } from '../authentication/authentication.service';
+
 import {
   Body,
   Controller,
@@ -10,6 +10,8 @@ import {
   Put,
   UseGuards,
   Get,
+  Patch,
+  Delete,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,6 +20,7 @@ import {
   ApiParam,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import {
@@ -27,82 +30,108 @@ import {
 import { UserService } from './user.service';
 import { PhoneNumberDto, UpdateProfileDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(
     private readonly authService: AuthService,
-    private readonly authenticationService: AuthenticationService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
-  @ApiOperation({ summary: '휴대폰 번호 중복여부' })
-  @Post('phoneNumber/duplicate')
-  async checkDuplicatePhoneNumber(
-    @Body() data: PhoneNumberDto,
-  ): Promise<boolean> {
-    return await this.userService.checkDuplicatePhoneNumber(data);
-  }
-
-  // @ApiOperation({ summary: '유저 가입' })
-  // @ResponseSignUp()
-  // @ApiBody({ type: PhoneNumberDto, description: '나중에 payload의 id로 대체' })
-  // @Post('signUp/:inputNumber')
-  // async signUp(
-  //   @Body() data: PhoneNumberDto,
-  //   @Param('inputNumber') inputNumber: string,
-  // ): Promise<User> {
-  //   const isAuthPass = await this.authenticationService.certificationMobile(
-  //     inputNumber,
-  //   );
-  //   if (isAuthPass) {
-  //     return await this.userService.signUp(data);
-  //   }
-  // }
-
-  @ApiOperation({ summary: '로그인 - 인증번호(현재는 번호)' })
-  @ApiUnauthorizedResponse({
-    description: `
-    code - 
-    0: 휴대폰 번호가 없을 경우
-    1: 인증번호가 일치하지 않을 경우
-    2: 계정이 잠겼을 경우,
-    3: 계정이 비활성화된 경우`,
-  })
-  @ResponseSignIn()
-  @ApiBody({ type: PhoneNumberDto })
-  @Post('signIn')
-  async login(@Body() data: PhoneNumberDto) {
-    return await this.authService.signUp(data);
+  @ApiOperation({ summary: '내 정보를 가져온다.' })
+  @Get('')
+  async getMyUserInfo(@Body() createUserDto: CreateUserDto) {
+    // return await this.userService.createUser(createUserDto);
+    return '';
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiBody({ type: UpdateProfileDto })
-  @Put('profile')
+  @Patch('')
   async updateProfile(
     @Body() updateProfileData: UpdateProfileDto,
     @ReqUser() user: User,
   ): Promise<any> {
     console.log(user);
-    return await this.userService.updateProfile(user._id, updateProfileData);
+    // await this.userService.updateProfile(user._id, updateProfileData);
+    return '';
   }
-  // 
-
-  @Post('/')
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
-  ): Promise<User> {
-    return await this.userService.createUser(createUserDto)
+  //
+  @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
+  @Get(':userId')
+  async getUserInfo(@Body() createUserDto: CreateUserDto) {
+    // return await this.userService.createUser(createUserDto);
+    return '';
   }
 
-  // @Put('/')
-  // async updateUser(
-  //   @Body() data: object,
-  // ): Promise<User> {
-  //   return await this.userService.updateUser(data)
-  // }
+  @ApiOperation({ summary: '상대방 유저를 차단한다' })
+  @Post(':userId/block')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '요청 성공시',
+  //   type: ResChatAlarmToggleDto,
+  // })
+  blockUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
+    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return '';
+  }
+
+  @ApiOperation({ summary: '상대방 유저를 차단해지한다' })
+  @Delete(':userId/block')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '요청 성공시',
+  //   type: ResChatAlarmToggleDto,
+  // })
+  unblockUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
+    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return '';
+  }
+
+  @ApiOperation({ summary: '상대방 유저를 신고한다.' })
+  @Post(':userId/report')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '요청 성공시',
+  //   type: ResChatAlarmToggleDto,
+  // })
+  reportUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
+    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return '';
+  }
+
+  @ApiOperation({
+    summary: '닉네임이 유효한지 , 내가 들어가있는 방정보가 있는지 확인한다.',
+  })
+  @Post('valid/nickname')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '요청 성공시',
+  //   type: ResChatAlarmToggleDto,
+  // })
+  checkNicknameAndChangePossible(
+    @Param() userId: UserIdDto,
+    @ReqUser() user: User,
+  ) {
+    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return '';
+  }
+
+  @ApiOperation({
+    summary: '알림 토글 ( 최신 상태를 리턴 )',
+  })
+  @Patch('alarm')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '요청 성공시',
+  //   type: ResChatAlarmToggleDto,
+  // })
+  toggleAlarmState(@Param() userId: UserIdDto, @ReqUser() user: User) {
+    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return '';
+  }
 }
-

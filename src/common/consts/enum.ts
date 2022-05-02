@@ -111,7 +111,15 @@ enum NOTIFICATION_POST_TYPE {
   OPERATOR_WEB_MAIN,
 }
 
+//카테고리 타입 한글로
+enum QUESTION_FIND_FILTER_TYPE {
+  NOTANSWERED = 'NOTANSWERED', //대학교
+  OLDORDER = 'OLDORDER', //공연장
+  NEWORDER = 'NEWORDER', //한강공원
+}
+
 export {
+  QUESTION_FIND_FILTER_TYPE,
   getEnumToArray,
   getEnumTypeValues,
   SEX_TYPE,

@@ -8,11 +8,9 @@ import { ChatModule } from 'src/socket/chats/chats.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from 'src/common/exceptions/http-exception.filter';
 import { AuthModule } from './auth/auth.module';
-import { AuthenticationModule } from 'src/apis/authentication/authentication.module';
-import { CommentModule } from './apis/comments/comment.module';
-import { AppController } from './app.controller';
 import { RoomsModule } from './apis/rooms/rooms.module';
 import { LetterModule } from './apis/letter/letter.module';
+import { QuestionsModule } from './apis/questions/questions.module';
 
 @Module({
   imports: [
@@ -21,12 +19,11 @@ import { LetterModule } from './apis/letter/letter.module';
     }),
     MongooseModule.forRoot(process.env.MONGO_URI, {}),
     UserModule,
-    AuthenticationModule,
     AuthModule,
-    CommentModule,
     ChatModule,
     RoomsModule,
     LetterModule,
+    QuestionsModule,
   ],
   providers: [
     {
@@ -34,7 +31,6 @@ import { LetterModule } from './apis/letter/letter.module';
       useClass: AllExceptionsFilter,
     },
   ],
-  controllers: [AppController],
 })
 export class AppModule implements NestModule {
   private readonly isDev: boolean = process.env.MODE === 'dev' ? true : false;
