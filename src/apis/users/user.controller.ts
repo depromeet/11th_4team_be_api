@@ -12,6 +12,8 @@ import {
   Get,
   Patch,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -21,18 +23,18 @@ import {
   ApiBearerAuth,
   ApiUnauthorizedResponse,
   ApiResponse,
+  ApiBasicAuth,
 } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
-import {
-  ResponseSignIn,
-  ResponseSignUp,
-} from 'src/common/decorators/response.decorator';
 import { UserService } from './user.service';
-import { PhoneNumberDto, UpdateProfileDto } from './dto/user.dto';
+import { UpdateProfileDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 @ApiTags('user')
+@ApiBasicAuth()
+@UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(
