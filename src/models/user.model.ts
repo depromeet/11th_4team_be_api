@@ -15,16 +15,19 @@ import * as mongoose from 'mongoose';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment } from './comment.model';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 
 const options: SchemaOptions = {
   id: false,
   collection: 'user',
   timestamps: true,
 };
+
+export type CatDocument = User & Document;
 
 @Schema({ _id: false })
 export class Profile {
@@ -33,12 +36,20 @@ export class Profile {
     description: '회원 프로필 캐릭터',
   })
   @IsNumber()
+  @Expose()
   @Prop({ type: Number, default: 0 })
   type: number;
 }
 
 @Schema(options)
-export class User extends Document {
+export class User {
+  @ApiProperty({
+    description: '유저의 고유아이디',
+  })
+  @Transform(({ value }) => value.toString())
+  @Expose()
+  _id: Types.ObjectId;
+
   @ApiProperty({
     example: '010-2222-2222',
     description: '유저 휴대폰번호',
@@ -57,10 +68,13 @@ export class User extends Document {
     required: true,
   })
   @IsString()
+  @Expose()
   nickname: string;
 
   @ApiProperty({ type: () => Profile })
   @Prop({ type: Profile, ref: 'Profile' })
+  @Type(() => Profile)
+  @Expose()
   profile: Profile;
 
   @ApiProperty({
@@ -72,12 +86,14 @@ export class User extends Document {
     default: STATUS_TYPE.NORMAL,
   })
   @IsEnum(STATUS_TYPE)
+  @Expose()
   status: STATUS_TYPE;
 
   @Prop({
     default: '',
   })
   @IsString()
+  @Expose()
   FCMToken: string;
 
   // 룸리스트 아이디 형태만 저장
@@ -96,6 +112,7 @@ export class User extends Document {
     default: true,
   })
   @IsBoolean()
+  @Expose()
   appAlarm: boolean;
 
   @ApiProperty({
@@ -106,6 +123,7 @@ export class User extends Document {
     default: true,
   })
   @IsBoolean()
+  @Expose()
   chatAlarm: boolean;
 
   @ApiProperty({
@@ -115,19 +133,34 @@ export class User extends Document {
   })
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   @IsObjectId()
+  @Exclude()
   blockedUsers: User[];
 
   @ApiProperty({
     type: [UserProfileDto],
     description: '내가 차단한 유저들.  정보탭에서 보여지는 부분들',
   })
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
+  })
   @IsObjectId()
-  iBlockUsers: User[];
+  @Type(() => UserProfileDto)
+  @Expose()
+  iBlockUsers: UserProfileDto[];
+
+  // @Transform(({ value }) => value || [], { toClassOnly: true })
 
   // only for 내부용
   @Exclude()
   userIdDto: UserIdDto;
+
+  @ApiProperty({
+    type: String,
+    description: '한국시간으로 보정된 시간값',
+  })
+  @Transform(({ value }) => toKRTimeZone(value))
+  @Expose()
+  createdAt: Date;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);

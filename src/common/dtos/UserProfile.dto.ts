@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { Profile } from 'src/models/user.model';
+import { Types } from 'mongoose';
 
 export class UserProfileDto {
   constructor(user) {
@@ -10,8 +11,8 @@ export class UserProfileDto {
   }
   @ApiProperty({ type: String, example: '624c24cae25c551b68a6645c' })
   @Expose()
-  @Transform(({ value }) => String(value))
-  _id?: string;
+  @Transform(({ value }) => value.toString())
+  _id: Types.ObjectId;
 
   @ApiProperty({ type: String, example: 'nickname' })
   @Expose()

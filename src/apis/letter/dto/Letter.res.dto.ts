@@ -3,18 +3,12 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { LetterRoom } from 'src/models/letterRoom.model';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
-import { tz } from 'moment-timezone';
 import { Letter } from 'src/models/letter.model';
-
-function toTimeZone(time) {
-  const time1 = tz(time, 'Asia/Seoul');
-  console.log(time1);
-  return time1.format();
-}
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 
 export class ResLetterDto {
   constructor(letter: Letter, myUserId: UserIdDto) {
-    this.sender = letter.sender.toObject();
+    this.sender = letter.sender;
     this._id = letter._id;
     this._createdAt = letter.createdAt;
     this.message = letter.message;
@@ -41,7 +35,7 @@ export class ResLetterDto {
   @ApiProperty()
   @Expose()
   get createdAt(): string {
-    return toTimeZone(this._createdAt.toISOString());
+    return toKRTimeZone(this._createdAt);
   }
 
   @ApiProperty()

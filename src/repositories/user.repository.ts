@@ -1,13 +1,20 @@
 import { NicknameDto, UpdateProfileDto } from '../apis/users/dto/user.dto';
 import { PhoneNumberDto } from '../apis/users/dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Injectable, HttpException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  BadRequestException,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { User, Profile } from 'src/models/user.model';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
+import { ReturnToClass } from 'src/common/decorators/a.decorator';
+import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 
 @Injectable()
 export class UserRepository {
@@ -15,8 +22,12 @@ export class UserRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
+  @UseInterceptors(LoggingInterceptor)
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
-    const user = await this.userModel.findOne({ _id: userIdDto.userId });
+    const user = await this.userModel
+      .findOne({ _id: userIdDto.userId })
+      .lean<User>({ defaults: true });
+    console.log('asdfasdfasdfasdfasdfa', user.iBlockUsers);
     return user;
   }
 

@@ -6,7 +6,7 @@ export const ReqUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     console.log('asdfasdfasd');
 
-    const userObj = request.user.toObject();
+    const userObj = request.user;
     userObj.userIdDto = new UserIdDto(userObj._id);
     console.log(userObj);
 

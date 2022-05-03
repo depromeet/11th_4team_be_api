@@ -1,11 +1,16 @@
 import { UserRepository } from 'src/repositories/user.repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UseInterceptors,
+} from '@nestjs/common';
 
 import { User } from 'src/models/user.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { ReportRepository } from 'src/repositories/report.repository';
 import { NicknameDto } from './dto/user.dto';
+import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 
 @Injectable()
 export class UserService {

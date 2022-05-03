@@ -44,7 +44,8 @@ export class LetterRepository {
         path: 'joinUserList',
         select: UserProfileSelect,
       })
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean<LetterRoom[]>();
     return myLetterRooms;
   }
 
@@ -70,7 +71,8 @@ export class LetterRepository {
         visibleUser: { $elemMatch: { $eq: userIdDto.userId } },
       })
       .populate('sender', UserProfileSelect)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean<Letter[]>();
     return letters;
   }
 

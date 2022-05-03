@@ -13,11 +13,9 @@ function toTimeZone(time) {
 
 export class LetterRoomDto {
   constructor(letterRoom: LetterRoom, myUserId: UserIdDto) {
-    this.receiver = letterRoom.joinUserList
-      .filter((user) => {
-        return !myUserId.userId.equals(user._id);
-      })[0]
-      .toObject();
+    this.receiver = letterRoom.joinUserList.filter((user) => {
+      return !myUserId.userId.equals(user._id);
+    })[0];
     this._id = letterRoom._id;
     this._latestTime = letterRoom.updatedAt;
     this.latestMessage = letterRoom.letters[0].message;

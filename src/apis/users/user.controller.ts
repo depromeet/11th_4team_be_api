@@ -31,20 +31,20 @@ import { NicknameDto, UpdateProfileDto } from './dto/user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
+import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mongooseClassSerializer.interceptor';
+import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 
 @ApiTags('user')
-@ApiBasicAuth()
-@UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(JwtAuthGuard)
-@UseInterceptors(SuccessInterceptor)
 @Controller('user')
+@ApiBearerAuth('accessToken')
+@UseInterceptors(SuccessInterceptor)
+// @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtAuthGuard)
 export class UserController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '내 정보를 가져온다.' })
+  @MongooseClassSerializerInterceptor(User)
   @Get('')
   async getMyUserInfo(@ReqUser() user: User) {
     // findOneByUserId
@@ -52,7 +52,6 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
-  @ApiBearerAuth()
   @ApiBody({ type: UpdateProfileReqDto })
   @Patch('')
   async updateProfile(
@@ -84,11 +83,11 @@ export class UserController {
 
   @ApiOperation({ summary: '상대방 유저를 차단해지한다' })
   @Delete(':userId/block')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '요청 성공시',
-  //   type: ResChatAlarmToggleDto,
-  // })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: null,
+  })
   unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
     return this.userService.upBlockUser(user.userIdDto, otherUSerIdDto);
   }

@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBasicAuth,
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiResponse,
@@ -25,10 +26,10 @@ import { User } from 'src/models/user.model';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
 
 @ApiTags('questions')
-@ApiBasicAuth()
+@Controller('questions')
+@ApiBearerAuth('accessToken')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard)
-@Controller('questions')
 export class QuestionsController {
   @ApiOperation({
     summary: '질문의 목록을 뽑아온다',
