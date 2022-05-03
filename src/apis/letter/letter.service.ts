@@ -32,7 +32,7 @@ export class LetterService {
       throw new BadRequestException('유저 아이디가 같음');
     }
     const receiverExist = await this.userRepository.findOneByUserId(
-      twoUserList.recevier,
+      new UserIdDto(twoUserList.recevier),
     );
     if (!receiverExist) {
       throw new BadRequestException('수신자가 존재하지 않음');

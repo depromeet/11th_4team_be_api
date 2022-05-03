@@ -7,32 +7,16 @@ import { User, Profile } from 'src/models/user.model';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
-import { CreateUserDto } from 'src/apis/users/dto/create-user.dto';
+import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(Profile.name) private readonly profileModel: Model<Profile>,
-  ) { }
+  ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const profile = await this.profileModel.create(createUserDto.profile)
-    // createUserDto.profile = new Types.ObjectId(profile._id)
-
-    let user = await this.userModel.create({ ...createUserDto })
-    // user = await user.populate({ path: 'profile', select: 'type color -_id' })
-    user = await user.populate('profile')
-    return user
-  }
-
-  async findOneByUserId(userId: string | Types.ObjectId): Promise<User | null> {
-    const user = await this.userModel.findOne({ _id: userId });
-    return user;
-  }
-
-  async findOneByPhoneNumber(phoneNumber: PhoneNumberDto) {
-    const user = await this.userModel.findOne(phoneNumber);
+  async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
+    const user = await this.userModel.findOne({ _id: userIdDto.userId });
     return user;
   }
 
@@ -50,8 +34,77 @@ export class UserRepository {
     }
   }
 
-  async updateProfile(profileData: UpdateProfileDto): Promise<any> {
-    return await this.userModel.updateOne(profileData);
+  async updateProfile(
+    userIdDto: UserIdDto,
+    updateProfileDto: UpdateProfileReqDto,
+  ): Promise<User> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      updateProfileDto,
+      { new: true },
+    );
+  }
+
+  async blockUser(
+    myUserIdDto: UserIdDto,
+    otherUserIdDto: UserIdDto,
+  ): Promise<User> {
+    // 상대방은 보여지면 안되는 부분에서 나를 추가
+    await this.userModel.findOneAndUpdate(
+      { _id: otherUserIdDto.userId },
+      {
+        $addToSet: {
+          blockedUsers: myUserIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+    // 내부분은 보여지면 안되는 부분 , 내 차단목록에 추가
+    return await this.userModel.findOneAndUpdate(
+      { _id: myUserIdDto.userId },
+      {
+        $addToSet: {
+          blockedUsers: otherUserIdDto.userId,
+          iBlockUsers: otherUserIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+  }
+
+  async unBlockUser(
+    myUserIdDto: UserIdDto,
+    otherUserIdDto: UserIdDto,
+  ): Promise<User> {
+    await this.userModel.findOneAndUpdate(
+      { _id: otherUserIdDto.userId },
+      {
+        $pull: {
+          blockedUsers: myUserIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+    return await this.userModel.findOneAndUpdate(
+      { _id: myUserIdDto.userId },
+      {
+        $pull: {
+          blockedUsers: otherUserIdDto.userId,
+          iBlockUsers: otherUserIdDto.userId,
+        },
+      },
+      { new: true },
+    );
+  }
+
+  // app 전채의 알람을 끄고 킬 수 있음
+  async toggleApptAlarm(userIdDto: UserIdDto): Promise<boolean> {
+    const user = await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      [{ $set: { appAlarm: { $eq: [false, '$chatAlarm'] } } }],
+      { new: true },
+    );
+    return user.chatAlarm;
   }
 
   /**
@@ -247,26 +300,3 @@ export class UserRepository {
     return roomInfo.length ? roomInfo[0] : null;
   }
 }
-
-// /**
-//  * 4월 14일 이찬진
-//  * 유저가 룸을 즐겨찾기했는지에 대한 여부 조사
-//  * @param _id 유저의 아이디
-//  * @param roomIdDto 룸 아이디 DTO
-//  * @returns
-//  */
-// async IsUserFavoriteRoom(
-//   userIdDto: UserIdDto,
-//   roomIdDto: RoomIdDto,
-// ): Promise<boolean> {
-//   const user = await this.userModel
-//     .findOne({
-//       _id: userIdDto.userId,
-//     })
-//     .select('favoriteRoomList');
-//   if (!user) {
-//     throw new BadRequestException('user does not exist');
-//   }
-
-//   return user.favoriteRoomList.includes(roomIdDto.roomId);
-// }

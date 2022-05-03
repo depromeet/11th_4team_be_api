@@ -28,13 +28,15 @@ import {
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
 import { UpdateProfileDto } from './dto/user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
+import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 
 @ApiTags('user')
 @ApiBasicAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(SuccessInterceptor)
 @Controller('user')
 export class UserController {
   constructor(
@@ -44,7 +46,8 @@ export class UserController {
 
   @ApiOperation({ summary: '내 정보를 가져온다.' })
   @Get('')
-  async getMyUserInfo(@Body() createUserDto: CreateUserDto) {
+  async getMyUserInfo() {
+    // findOneByUserId
     // return await this.userService.createUser(createUserDto);
     return '';
   }
@@ -52,20 +55,22 @@ export class UserController {
   @ApiOperation({ summary: '유저 정보 수정' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: UpdateProfileDto })
+  @ApiBody({ type: UpdateProfileReqDto })
   @Patch('')
   async updateProfile(
-    @Body() updateProfileData: UpdateProfileDto,
+    @Body() updateProfileReqDto: UpdateProfileReqDto,
     @ReqUser() user: User,
   ): Promise<any> {
     console.log(user);
+    // updateProfile
     // await this.userService.updateProfile(user._id, updateProfileData);
     return '';
   }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
   @Get(':userId')
-  async getUserInfo(@Body() createUserDto: CreateUserDto) {
+  async getUserInfo() {
+    // findOneByUserId
     // return await this.userService.createUser(createUserDto);
     return '';
   }
@@ -94,6 +99,8 @@ export class UserController {
     return '';
   }
 
+  //완료
+
   @ApiOperation({ summary: '상대방 유저를 신고한다.' })
   @Post(':userId/report')
   // @ApiResponse({
@@ -119,6 +126,8 @@ export class UserController {
     @Param() userId: UserIdDto,
     @ReqUser() user: User,
   ) {
+    //findOneBy nickname
+    //my room exist
     // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
     return '';
   }

@@ -15,8 +15,9 @@ import * as mongoose from 'mongoose';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment } from './comment.model';
-import { Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Types } from 'mongoose';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 
 const options: SchemaOptions = {
   id: false,
@@ -34,67 +35,37 @@ export class Profile {
   @Prop({ type: Number, default: 0 })
   type: number;
 }
-export const ProfileSchema = SchemaFactory.createForClass(Profile);
-
-// 클래스
-// @Schema({ useNestedStrict: true, _id: false })
-// export class Profile {
-//   @IsString()
-//   @Prop({ type: String, default: '' })
-//   color: string;
-//   @IsNumber()
-//   @Prop({ type: Number, default: 0 })
-//   type: number;
-// }
-
-// 밑에 정보
-// @ApiProperty({
-//   description: '회원 프로필',
-//   type: Profile,
-// })
-// @Prop({
-//   default: '',
-//   type: Profile,
-// })
-// @IsObject()
-// @Expose()
-// profile: Profile;
 
 @Schema(options)
 export class User extends Document {
-  // @Prop({
-  //   unique: true,
-  //   required: true,
-  // })
-  // @IsNotEmpty()
-  // @IsString()
-  // id: string;
-
   @ApiProperty({
     example: '010-2222-2222',
     description: '유저 휴대폰번호',
   })
   @Prop({
     required: true,
+    unique: true,
   })
   @IsPhoneNumber('KR')
   @IsNotEmpty()
+  @Exclude()
   phoneNumber: string;
 
   @ApiProperty({ example: '백엔드개발자', description: '회원 닉네임' })
   @Prop({
-    default: '',
+    required: true,
   })
   @IsString()
-  @Expose()
   nickname: string;
 
+  @ApiProperty({ type: () => Profile })
   @Prop({ type: Profile, ref: 'Profile' })
   profile: Profile;
 
   @ApiProperty({
     example: STATUS_TYPE.NORMAL,
     description: `${JSON.stringify(getEnumToArray(STATUS_TYPE))}`,
+    enum: STATUS_TYPE,
   })
   @Prop({
     default: STATUS_TYPE.NORMAL,
@@ -136,37 +107,25 @@ export class User extends Document {
   @IsBoolean()
   chatAlarm: boolean;
 
-  // readonly readOnlyData: {
-  //   id: string;
-  //   nickname: string;
-  //   profileUrl: string;
-  //   status: STATUS_TYPE;
-  //   favoriteRoomList: Room[];
-  //   myRoom: Room;
-  // };
+  @ApiProperty({
+    type: [UserProfileDto],
+    description:
+      '차단 기능시 안보여저야 하는 유저 목록 ( 내가 차단 , 차단당한 유저 등 아이디 포함 )',
+  })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
+  @IsObjectId()
+  blockedUsers: User[];
 
-  readonly comments: Comment[];
+  @ApiProperty({
+    type: [UserProfileDto],
+    description: '내가 차단한 유저들.  정보탭에서 보여지는 부분들',
+  })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
+  @IsObjectId()
+  iBlockUsers: User[];
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);
-
-// _UserSchema.virtual('readOnlyData').get(function (this: User) {
-//   return {
-//     id: this.id,
-//     nickname: this.nickname,
-//     profileUrl: this.profileUrl,
-//     status: this.status,
-//     favoriteRoomList: this.favoriteRoomList,
-//     myRoom: this.myRoom,
-//     comments: this.comments,
-//   };
-// });
-
-_UserSchema.virtual('comments', {
-  ref: 'comment',
-  localField: '_id',
-  foreignField: 'info',
-});
 
 _UserSchema.set('toObject', { virtuals: true });
 _UserSchema.set('toJSON', { virtuals: true });

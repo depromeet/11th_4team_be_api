@@ -11,8 +11,8 @@ function getEnumTypeValues(enumType) {
 }
 
 enum STATUS_TYPE {
-  NORMAL = 1,
-  FORBIDDEN,
+  NORMAL = 'NORMAL',
+  FORBIDDEN = 'FORBIDDEN',
 }
 
 //카테고리 타입 한글로
