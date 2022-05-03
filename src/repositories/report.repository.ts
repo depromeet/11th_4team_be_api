@@ -31,7 +31,7 @@ export class ReportRepository {
   async checkMyReportToOther(
     reporter: UserIdDto,
     reportedUser: UserIdDto,
-  ): Promise<Report | null> {
+  ): Promise<null | Report> {
     return await this.reportModel.findOne({
       reporter: reporter.userId,
       reportedUser: reportedUser.userId,

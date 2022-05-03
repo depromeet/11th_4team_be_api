@@ -18,6 +18,7 @@ import { Comment } from './comment.model';
 import { Exclude, Expose } from 'class-transformer';
 import { Types } from 'mongoose';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 const options: SchemaOptions = {
   id: false,
@@ -123,6 +124,10 @@ export class User extends Document {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   @IsObjectId()
   iBlockUsers: User[];
+
+  // only for 내부용
+  @Exclude()
+  userIdDto: UserIdDto;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);

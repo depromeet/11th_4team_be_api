@@ -27,7 +27,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
-import { UpdateProfileDto } from './dto/user.dto';
+import { NicknameDto, UpdateProfileDto } from './dto/user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
@@ -46,15 +46,13 @@ export class UserController {
 
   @ApiOperation({ summary: '내 정보를 가져온다.' })
   @Get('')
-  async getMyUserInfo() {
+  async getMyUserInfo(@ReqUser() user: User) {
     // findOneByUserId
-    // return await this.userService.createUser(createUserDto);
-    return '';
+    return await this.userService.getUserInfo(user.userIdDto);
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: UpdateProfileReqDto })
   @Patch('')
   async updateProfile(
@@ -62,17 +60,15 @@ export class UserController {
     @ReqUser() user: User,
   ): Promise<any> {
     console.log(user);
-    // updateProfile
-    // await this.userService.updateProfile(user._id, updateProfileData);
-    return '';
+
+    await this.userService.updateProfile(user.userIdDto, updateProfileReqDto);
   }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
   @Get(':userId')
-  async getUserInfo() {
+  async getUserInfo(@Param() UserIdDto: UserIdDto) {
     // findOneByUserId
-    // return await this.userService.createUser(createUserDto);
-    return '';
+    return await this.userService.getUserInfo(UserIdDto);
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단한다' })
@@ -82,9 +78,8 @@ export class UserController {
   //   description: '요청 성공시',
   //   type: ResChatAlarmToggleDto,
   // })
-  blockUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
-    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
-    return '';
+  blockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
+    return this.userService.blockUser(user.userIdDto, otherUSerIdDto);
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단해지한다' })
@@ -94,9 +89,8 @@ export class UserController {
   //   description: '요청 성공시',
   //   type: ResChatAlarmToggleDto,
   // })
-  unblockUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
-    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
-    return '';
+  unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
+    return this.userService.upBlockUser(user.userIdDto, otherUSerIdDto);
   }
 
   //완료
@@ -108,28 +102,28 @@ export class UserController {
   //   description: '요청 성공시',
   //   type: ResChatAlarmToggleDto,
   // })
-  reportUser(@Param() userId: UserIdDto, @ReqUser() user: User) {
-    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
-    return '';
+  // 리턴 타입 정제 필요
+  reportUser(@Param() reportedIdDto: UserIdDto, @ReqUser() user: User) {
+    return this.userService.reportUser(user.userIdDto, reportedIdDto);
   }
 
   @ApiOperation({
     summary: '닉네임이 유효한지 , 내가 들어가있는 방정보가 있는지 확인한다.',
   })
-  @Post('valid/nickname')
+  @Get('canChange/:nickname')
   // @ApiResponse({
   //   status: 200,
   //   description: '요청 성공시',
   //   type: ResChatAlarmToggleDto,
   // })
   checkNicknameAndChangePossible(
-    @Param() userId: UserIdDto,
+    @Param() nicknameDto: NicknameDto,
     @ReqUser() user: User,
   ) {
-    //findOneBy nickname
-    //my room exist
-    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
-    return '';
+    return this.userService.checkNicknameAndChangePossible(
+      user.userIdDto,
+      nicknameDto,
+    );
   }
 
   @ApiOperation({
@@ -141,8 +135,7 @@ export class UserController {
   //   description: '요청 성공시',
   //   type: ResChatAlarmToggleDto,
   // })
-  toggleAlarmState(@Param() userId: UserIdDto, @ReqUser() user: User) {
-    // return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
-    return '';
+  toggleAppAlarm(@ReqUser() user: User) {
+    return this.userService.toggleAlarmAlarm(user.userIdDto);
   }
 }
