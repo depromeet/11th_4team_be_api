@@ -14,7 +14,6 @@ import { Room } from './room.model';
 import * as mongoose from 'mongoose';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
-import { Comment } from './comment.model';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
