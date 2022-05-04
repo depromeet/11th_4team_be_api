@@ -46,7 +46,7 @@ export class RoomsService {
     const isCATEGORY_TYPE = Object.values<string>(CATEGORY_TYPE).includes(
       findRoomDto.filter,
     );
-    const user = await this.userRepository.findOneByUserId(userId.userId);
+    const user = await this.userRepository.findOneByUserId(userId);
     let rooms = [];
     if (isCATEGORY_TYPE) {
       // 카테고리 타입인 경우
@@ -85,7 +85,7 @@ export class RoomsService {
     userIdDto: UserIdDto,
   ): Promise<ResFindOneRoomDto> {
     // 이전 룸에서 빼주는 로직 추가해야함
-    const user = await this.userRepository.findOneByUserId(userIdDto.userId);
+    const user = await this.userRepository.findOneByUserId(userIdDto);
     // 유저가현재 들어가있는 방이있으면
     // safe 어프로치 populate 안때려도 가상으로 데려감 몽고디비 Document 형식이면
     // console.log(typeof roomIdDto.roomId, roomIdDto.roomId, user.myRoom._id);
@@ -135,7 +135,7 @@ export class RoomsService {
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
   ): Promise<ResFavoriteToggleDto> {
-    const user = await this.userRepository.findOneByUserId(userIdDto.userId);
+    const user = await this.userRepository.findOneByUserId(userIdDto);
     const isFavoritRoom = user.favoriteRoomList.find((room) =>
       roomIdDto.roomId.equals(room._id),
     );

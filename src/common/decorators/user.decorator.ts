@@ -1,9 +1,15 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { UserIdDto } from '../dtos/UserId.dto';
 
 export const ReqUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    console.log(request.user);
-    return request.user;
+    console.log('asdfasdfasd');
+
+    const userObj = request.user;
+    userObj.userIdDto = new UserIdDto(userObj._id);
+    console.log(userObj);
+
+    return userObj;
   },
 );

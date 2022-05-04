@@ -1,17 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { Profile } from 'src/models/user.model';
+import { Types } from 'mongoose';
+import { TransformObjectIdToString } from '../decorators/Expose.decorator';
 
 export class UserProfileDto {
   constructor(user) {
-    this._id = user._id;
-    this.nickname = user.nickname;
-    this.profile = user.profile;
+    if (user) {
+      this._id = user._id;
+      this.nickname = user.nickname;
+      this.profile = user.profile;
+    }
   }
-  @ApiProperty({ type: String, example: '624c24cae25c551b68a6645c' })
+  @ApiProperty({ type: String, example: '626cf238b51596721c21289b' })
   @Expose()
-  @Transform(({ value }) => String(value))
-  _id?: string;
+  @TransformObjectIdToString()
+  _id: Types.ObjectId;
 
   @ApiProperty({ type: String, example: 'nickname' })
   @Expose()

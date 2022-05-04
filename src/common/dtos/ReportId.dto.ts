@@ -6,19 +6,19 @@ import { Transform } from 'class-transformer';
 /**
  * mongoId 용 DTO
  */
-export class UserIdDto {
-  constructor(userId: string | Types.ObjectId) {
-    this.userId = new Types.ObjectId(userId);
+export class ReportIdDto {
+  constructor(reportId: string | Types.ObjectId) {
+    this.reportId = new Types.ObjectId(reportId);
   }
 
   @ApiProperty({
     type: String,
     title: '유저 아이디',
-    description: '몽고아이디 형식입니다. (개발자) ',
+    description: '몽고아이디 형식입니다. (백엔드 개발자 닉네임 예시)',
     example: '626cf238b51596721c21289b',
   })
   @IsNotEmpty()
   @IsObjectId({ message: '유저 아이디가 몽고아이디 형식이 아닙니다.' })
   @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
-  userId: Types.ObjectId;
+  reportId: Types.ObjectId;
 }
