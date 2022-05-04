@@ -19,6 +19,6 @@ export class QuestionIdDto {
   })
   @IsNotEmpty()
   @IsObjectId({ message: '질문 아이디가 몽고아이디 형식이 아닙니다.' })
-  @Transform(({ value }) => new Types.ObjectId(value))
+  @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
   questionId: Types.ObjectId;
 }

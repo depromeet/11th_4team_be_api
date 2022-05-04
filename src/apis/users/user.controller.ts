@@ -33,6 +33,8 @@ import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mongooseClassSerializer.interceptor';
 import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -44,6 +46,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '내 정보를 가져온다.' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: User,
+  })
   @MongooseClassSerializerInterceptor(User)
   @Get('')
   async getMyUserInfo(@ReqUser() user: User) {
@@ -53,17 +60,32 @@ export class UserController {
 
   @ApiOperation({ summary: '유저 정보 수정' })
   @ApiBody({ type: UpdateProfileReqDto })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: User,
+  })
+  @MongooseClassSerializerInterceptor(User)
   @Patch('')
   async updateProfile(
     @Body() updateProfileReqDto: UpdateProfileReqDto,
     @ReqUser() user: User,
-  ): Promise<any> {
+  ): Promise<User> {
     console.log(user);
 
-    await this.userService.updateProfile(user.userIdDto, updateProfileReqDto);
+    return await this.userService.updateProfile(
+      user.userIdDto,
+      updateProfileReqDto,
+    );
   }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: UserProfileDto,
+  })
+  @MongooseClassSerializerInterceptor(UserProfileDto)
   @Get(':userId')
   async getUserInfo(@Param() UserIdDto: UserIdDto) {
     // findOneByUserId
@@ -72,22 +94,24 @@ export class UserController {
 
   @ApiOperation({ summary: '상대방 유저를 차단한다' })
   @Post(':userId/block')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '요청 성공시',
-  //   type: ResChatAlarmToggleDto,
-  // })
+  @MongooseClassSerializerInterceptor(User)
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: User,
+  })
   blockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
     return this.userService.blockUser(user.userIdDto, otherUSerIdDto);
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단해지한다' })
-  @Delete(':userId/block')
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
-    type: null,
+    type: User,
   })
+  @MongooseClassSerializerInterceptor(User)
+  @Delete(':userId/block')
   unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
     return this.userService.upBlockUser(user.userIdDto, otherUSerIdDto);
   }
@@ -96,14 +120,16 @@ export class UserController {
 
   @ApiOperation({ summary: '상대방 유저를 신고한다.' })
   @Post(':userId/report')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '요청 성공시',
-  //   type: ResChatAlarmToggleDto,
-  // })
-  // 리턴 타입 정제 필요
+  @MongooseClassSerializerInterceptor(ReportResultDtoResDto)
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ReportResultDtoResDto,
+  })
   reportUser(@Param() reportedIdDto: UserIdDto, @ReqUser() user: User) {
-    return this.userService.reportUser(user.userIdDto, reportedIdDto);
+    const result = this.userService.reportUser(user.userIdDto, reportedIdDto);
+    console.log(typeof result);
+    return result;
   }
 
   @ApiOperation({

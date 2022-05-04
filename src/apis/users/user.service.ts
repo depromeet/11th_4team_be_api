@@ -11,6 +11,7 @@ import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { ReportRepository } from 'src/repositories/report.repository';
 import { NicknameDto } from './dto/user.dto';
 import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
+import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 
 @Injectable()
 export class UserService {
@@ -39,8 +40,27 @@ export class UserService {
     myUserIdDto: UserIdDto,
     otherUserIdDto: UserIdDto,
   ): Promise<User> {
+    if (myUserIdDto.userId.equals(otherUserIdDto.userId)) {
+      throw new BadRequestException('내 자신 차단');
+    }
+    console.log(
+      myUserIdDto.userId.equals(otherUserIdDto.userId),
+      otherUserIdDto.userId,
+      myUserIdDto.userId,
+    );
+
+    const checkUserExist = this.userRepository.findOneByUserId(otherUserIdDto);
+    if (!checkUserExist) {
+      throw new BadRequestException('유저 없음');
+    }
+    console.log(checkUserExist);
+    const returnUser = await this.userRepository.blockUser(
+      myUserIdDto,
+      otherUserIdDto,
+    );
+    console.log('asdfasdfasdfasdfasdf', returnUser);
     // auto 시리얼 라이징
-    return await this.userRepository.blockUser(myUserIdDto, otherUserIdDto);
+    return returnUser;
   }
 
   async upBlockUser(
@@ -51,7 +71,10 @@ export class UserService {
     return await this.userRepository.unBlockUser(myUserIdDto, otherUserIdDto);
   }
 
-  async reportUser(reporterIdDto: UserIdDto, reportedIdDto: UserIdDto) {
+  async reportUser(
+    reporterIdDto: UserIdDto,
+    reportedIdDto: UserIdDto,
+  ): Promise<ReportResultDtoResDto> {
     //  신고당한 유저의 신고 갯수가 10개를 넘어가면 정지처리를 당해야함..
 
     //TODO : 테스트 끝나면 밑에 로직 넣기.
@@ -73,11 +96,16 @@ export class UserService {
       console.log('유저 신고 갯수가 10회를 넘겼습니다.');
     }
 
-    // auto 시리얼 라이징
-    return await this.reportRepository.createReport(
+    const report = await this.reportRepository.createReport(
       reporterIdDto,
       reportedIdDto,
     );
+    if (!report) {
+      return new ReportResultDtoResDto(false);
+    }
+
+    // auto 시리얼 라이징
+    return new ReportResultDtoResDto(true);
   }
 
   async checkNicknameAndChangePossible(

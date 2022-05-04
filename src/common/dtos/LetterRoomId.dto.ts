@@ -19,6 +19,6 @@ export class LetterRoomIdDto {
   })
   @IsNotEmpty()
   @IsObjectId({ message: '쪽지방 아이디가 몽고아이디 형식이 아닙니다.' })
-  @Transform(({ value }) => new Types.ObjectId(value))
+  @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
   letterRoomId: Types.ObjectId;
 }

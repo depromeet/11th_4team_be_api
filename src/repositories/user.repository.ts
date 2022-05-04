@@ -15,6 +15,7 @@ import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 import { ReturnToClass } from 'src/common/decorators/a.decorator';
 import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
+import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 
 @Injectable()
 export class UserRepository {
@@ -22,12 +23,14 @@ export class UserRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  @UseInterceptors(LoggingInterceptor)
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
     const user = await this.userModel
       .findOne({ _id: userIdDto.userId })
+      .populate({
+        path: 'iBlockUsers',
+        select: UserProfileSelect,
+      })
       .lean<User>({ defaults: true });
-    console.log('asdfasdfasdfasdfasdfa', user.iBlockUsers);
     return user;
   }
 
@@ -52,7 +55,9 @@ export class UserRepository {
     return await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       updateProfileDto,
-      { new: true },
+      {
+        new: true,
+      },
     );
   }
 
@@ -71,16 +76,21 @@ export class UserRepository {
       { new: true },
     );
     // 내부분은 보여지면 안되는 부분 , 내 차단목록에 추가
-    return await this.userModel.findOneAndUpdate(
-      { _id: myUserIdDto.userId },
-      {
-        $addToSet: {
-          blockedUsers: otherUserIdDto.userId,
-          iBlockUsers: otherUserIdDto.userId,
+    return await this.userModel
+      .findOneAndUpdate(
+        { _id: myUserIdDto.userId },
+        {
+          $addToSet: {
+            blockedUsers: otherUserIdDto.userId,
+            iBlockUsers: otherUserIdDto.userId,
+          },
         },
-      },
-      { new: true },
-    );
+        { new: true },
+      )
+      .populate({
+        path: 'iBlockUsers',
+        select: UserProfileSelect,
+      });
   }
 
   async unBlockUser(
@@ -96,16 +106,21 @@ export class UserRepository {
       },
       { new: true },
     );
-    return await this.userModel.findOneAndUpdate(
-      { _id: myUserIdDto.userId },
-      {
-        $pull: {
-          blockedUsers: otherUserIdDto.userId,
-          iBlockUsers: otherUserIdDto.userId,
+    return await this.userModel
+      .findOneAndUpdate(
+        { _id: myUserIdDto.userId },
+        {
+          $pull: {
+            blockedUsers: otherUserIdDto.userId,
+            iBlockUsers: otherUserIdDto.userId,
+          },
         },
-      },
-      { new: true },
-    );
+        { new: true },
+      )
+      .populate({
+        path: 'iBlockUsers',
+        select: UserProfileSelect,
+      });
   }
 
   // app 전채의 알람을 끄고 킬 수 있음

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { LetterRoom } from 'src/models/letterRoom.model';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
@@ -24,7 +24,8 @@ export class ResLetterDto {
   private readonly _createdAt: Date;
   // 상대방 정보
   @ApiProperty()
-  @Transform(({ value }) => new UserProfileDto(value))
+  @Type(() => UserProfileDto)
+  // @Transform(({ value }) => new UserProfileDto(value))
   sender: UserProfileDto;
 
   // letterRoomId

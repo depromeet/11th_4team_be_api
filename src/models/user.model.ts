@@ -20,6 +20,7 @@ import { Types } from 'mongoose';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 
 const options: SchemaOptions = {
   id: false,
@@ -45,8 +46,11 @@ export class Profile {
 export class User {
   @ApiProperty({
     description: '유저의 고유아이디',
+    type: String,
   })
-  @Transform(({ value }) => value.toString())
+  // 시리얼 라이제이션 할때 사용
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Type(() => Types.ObjectId)
   @Expose()
   _id: Types.ObjectId;
 
@@ -77,16 +81,16 @@ export class User {
   @Expose()
   profile: Profile;
 
-  @ApiProperty({
-    example: STATUS_TYPE.NORMAL,
-    description: `${JSON.stringify(getEnumToArray(STATUS_TYPE))}`,
-    enum: STATUS_TYPE,
-  })
+  // @ApiProperty({
+  //   example: STATUS_TYPE.NORMAL,
+  //   description: `${JSON.stringify(getEnumToArray(STATUS_TYPE))}`,
+  //   enum: STATUS_TYPE,
+  // })
   @Prop({
     default: STATUS_TYPE.NORMAL,
   })
   @IsEnum(STATUS_TYPE)
-  @Expose()
+  @Exclude()
   status: STATUS_TYPE;
 
   @Prop({
@@ -126,13 +130,9 @@ export class User {
   @Expose()
   chatAlarm: boolean;
 
-  @ApiProperty({
-    type: [UserProfileDto],
-    description:
-      '차단 기능시 안보여저야 하는 유저 목록 ( 내가 차단 , 차단당한 유저 등 아이디 포함 )',
-  })
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
   @IsObjectId()
+  @Type(() => UserProfileDto)
   @Exclude()
   blockedUsers: User[];
 
