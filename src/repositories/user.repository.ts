@@ -7,14 +7,12 @@ import {
   BadRequestException,
   UseInterceptors,
 } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
-import { User, Profile } from 'src/models/user.model';
+import { Model } from 'mongoose';
+import { User } from 'src/models/user.model';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
-import { ReturnToClass } from 'src/common/decorators/a.decorator';
-import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 
 @Injectable()
@@ -23,6 +21,7 @@ export class UserRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
+  // @TestDecorator(User)
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
     const user = await this.userModel
       .findOne({ _id: userIdDto.userId })
@@ -35,7 +34,9 @@ export class UserRepository {
   }
 
   async findOneByNickname(nickname: NicknameDto) {
-    const user = await this.userModel.findOne(nickname);
+    const user = await this.userModel
+      .findOne(nickname)
+      .lean<User>({ defaults: true });
     return user;
   }
 
@@ -52,13 +53,15 @@ export class UserRepository {
     userIdDto: UserIdDto,
     updateProfileDto: UpdateProfileReqDto,
   ): Promise<User> {
-    return await this.userModel.findOneAndUpdate(
-      { _id: userIdDto.userId },
-      updateProfileDto,
-      {
+    return await this.userModel
+      .findOneAndUpdate({ _id: userIdDto.userId }, updateProfileDto, {
         new: true,
-      },
-    );
+      })
+      .populate({
+        path: 'iBlockUsers',
+        select: UserProfileSelect,
+      })
+      .lean<User>({ defaults: true });
   }
 
   async blockUser(
@@ -90,7 +93,8 @@ export class UserRepository {
       .populate({
         path: 'iBlockUsers',
         select: UserProfileSelect,
-      });
+      })
+      .lean<User>({ defaults: true });
   }
 
   async unBlockUser(
@@ -120,17 +124,18 @@ export class UserRepository {
       .populate({
         path: 'iBlockUsers',
         select: UserProfileSelect,
-      });
+      })
+      .lean<User>({ defaults: true });
   }
 
   // app 전채의 알람을 끄고 킬 수 있음
   async toggleApptAlarm(userIdDto: UserIdDto): Promise<boolean> {
     const user = await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
-      [{ $set: { appAlarm: { $eq: [false, '$chatAlarm'] } } }],
+      [{ $set: { appAlarm: { $eq: [false, '$appAlarm'] } } }],
       { new: true },
     );
-    return user.chatAlarm;
+    return user.appAlarm;
   }
 
   /**

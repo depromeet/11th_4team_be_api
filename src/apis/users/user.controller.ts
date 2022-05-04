@@ -35,6 +35,8 @@ import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mong
 import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
+import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
+import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -136,11 +138,12 @@ export class UserController {
     summary: '닉네임이 유효한지 , 내가 들어가있는 방정보가 있는지 확인한다.',
   })
   @Get('canChange/:nickname')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '요청 성공시',
-  //   type: ResChatAlarmToggleDto,
-  // })
+  @MongooseClassSerializerInterceptor(CanChangeNicknameResDto)
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: CanChangeNicknameResDto,
+  })
   checkNicknameAndChangePossible(
     @Param() nicknameDto: NicknameDto,
     @ReqUser() user: User,
@@ -154,12 +157,13 @@ export class UserController {
   @ApiOperation({
     summary: '알림 토글 ( 최신 상태를 리턴 )',
   })
+  @MongooseClassSerializerInterceptor(NewAlarmStateResDto)
   @Patch('alarm')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: '요청 성공시',
-  //   type: ResChatAlarmToggleDto,
-  // })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: NewAlarmStateResDto,
+  })
   toggleAppAlarm(@ReqUser() user: User) {
     return this.userService.toggleAlarmAlarm(user.userIdDto);
   }

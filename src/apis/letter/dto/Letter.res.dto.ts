@@ -25,7 +25,7 @@ export class ResLetterDto {
   // 상대방 정보
   @ApiProperty()
   @Type(() => UserProfileDto)
-  // @Transform(({ value }) => new UserProfileDto(value))
+  @Transform(({ value }) => new UserProfileDto())
   sender: UserProfileDto;
 
   // letterRoomId

@@ -1,17 +1,15 @@
 import { UserRepository } from 'src/repositories/user.repository';
-import {
-  BadRequestException,
-  Injectable,
-  UseInterceptors,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { User } from 'src/models/user.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { ReportRepository } from 'src/repositories/report.repository';
 import { NicknameDto } from './dto/user.dto';
-import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
+import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
+import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
+import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 
 @Injectable()
 export class UserService {
@@ -108,38 +106,27 @@ export class UserService {
     return new ReportResultDtoResDto(true);
   }
 
+  @returnValueToDto(CanChangeNicknameResDto)
   async checkNicknameAndChangePossible(
     myUserIdDto: UserIdDto,
     nicknameDto: NicknameDto,
-  ) {
+  ): Promise<CanChangeNicknameResDto> {
     const checkNickNameExist = await this.userRepository.findOneByNickname(
       nicknameDto,
     );
 
     const myRoomExist = await this.userRepository.getMyRoom(myUserIdDto);
-    if (myRoomExist) {
-      // 룸이 존재하면은 둘다 못바꿈
-      return {
-        myRoomExist: true,
-        canChange: false,
-      };
-    }
-
-    if (checkNickNameExist) {
-      return {
-        myRoomExist: false,
-        canChange: false,
-      };
-    }
 
     return {
-      myRoomExist: false,
-      canChange: true,
+      myRoomExist: myRoomExist ? true : false,
+      nicknameExist: checkNickNameExist ? true : false,
+      canChange: !myRoomExist && !checkNickNameExist ? true : false,
     };
   }
 
-  async toggleAlarmAlarm(myUserIdDto: UserIdDto): Promise<boolean> {
-    const newAlarmState = this.userRepository.toggleApptAlarm(myUserIdDto);
-    return true;
+  @returnValueToDto(NewAlarmStateResDto)
+  async toggleAlarmAlarm(myUserIdDto: UserIdDto): Promise<NewAlarmStateResDto> {
+    const appAlarm = await this.userRepository.toggleApptAlarm(myUserIdDto);
+    return { appAlarm: appAlarm };
   }
 }
