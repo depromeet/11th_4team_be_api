@@ -12,7 +12,7 @@ export class SuccessInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    console.log('Before...');
+    // console.log('Before...');
     const now = Date.now();
     return next.handle().pipe(map((data) => ({ success: true, data })));
   }

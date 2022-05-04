@@ -44,7 +44,7 @@ import { ResShortCutRoomDto } from './dto/shortCutRoomInfo.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
-@ApiBearerAuth()
+@ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(SuccessInterceptor)
 export class RoomsController {
@@ -52,6 +52,11 @@ export class RoomsController {
 
   @ApiOperation({ summary: '룸을 생성할수 있음' })
   @ApiBody({ type: CreateRoomDto })
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: Room,
+  })
   @Post()
   create(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.createRoom(createRoomDto);
@@ -107,6 +112,11 @@ export class RoomsController {
 
   @ApiOperation({
     summary: '(채팅탭용)인기있는 채팅방 정보 (인원순 )10개를 뽑아옴',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: [Room],
   })
   @Get('/popular')
   getPopularRooms() {

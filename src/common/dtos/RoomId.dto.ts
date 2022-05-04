@@ -18,6 +18,6 @@ export class RoomIdDto {
   })
   @IsObjectId({ message: '룸 아이디 값이 몽고아이디 형식이 아닙니다.' })
   // transform 자동으로 해줌 . main.ts 참고
-  @Transform(({ value }) => new Types.ObjectId(value))
+  @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
   roomId: Types.ObjectId;
 }

@@ -1,7 +1,7 @@
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { User } from 'src/models/user.model';
-import { AuthenticationService } from '../authentication/authentication.service';
+
 import {
   Body,
   Controller,
@@ -10,6 +10,10 @@ import {
   Put,
   UseGuards,
   Get,
+  Patch,
+  Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -18,91 +22,149 @@ import {
   ApiParam,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiResponse,
+  ApiBasicAuth,
 } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
-import {
-  ResponseSignIn,
-  ResponseSignUp,
-} from 'src/common/decorators/response.decorator';
 import { UserService } from './user.service';
-import { PhoneNumberDto, UpdateProfileDto } from './dto/user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
+import { NicknameDto, UpdateProfileDto } from './dto/user.dto';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
+import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
+import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mongooseClassSerializer.interceptor';
+import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
+import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
+import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 
 @ApiTags('user')
 @Controller('user')
+@ApiBearerAuth('accessToken')
+@UseInterceptors(SuccessInterceptor)
+// @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(JwtAuthGuard)
 export class UserController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly authenticationService: AuthenticationService,
-    private readonly userService: UserService,
-  ) { }
+  constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: '휴대폰 번호 중복여부' })
-  @Post('phoneNumber/duplicate')
-  async checkDuplicatePhoneNumber(
-    @Body() data: PhoneNumberDto,
-  ): Promise<boolean> {
-    return await this.userService.checkDuplicatePhoneNumber(data);
-  }
-
-  // @ApiOperation({ summary: '유저 가입' })
-  // @ResponseSignUp()
-  // @ApiBody({ type: PhoneNumberDto, description: '나중에 payload의 id로 대체' })
-  // @Post('signUp/:inputNumber')
-  // async signUp(
-  //   @Body() data: PhoneNumberDto,
-  //   @Param('inputNumber') inputNumber: string,
-  // ): Promise<User> {
-  //   const isAuthPass = await this.authenticationService.certificationMobile(
-  //     inputNumber,
-  //   );
-  //   if (isAuthPass) {
-  //     return await this.userService.signUp(data);
-  //   }
-  // }
-
-  @ApiOperation({ summary: '로그인 - 인증번호(현재는 번호)' })
-  @ApiUnauthorizedResponse({
-    description: `
-    code - 
-    0: 휴대폰 번호가 없을 경우
-    1: 인증번호가 일치하지 않을 경우
-    2: 계정이 잠겼을 경우,
-    3: 계정이 비활성화된 경우`,
+  @ApiOperation({ summary: '내 정보를 가져온다.' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: User,
   })
-  @ResponseSignIn()
-  @ApiBody({ type: PhoneNumberDto })
-  @Post('signIn')
-  async login(@Body() data: PhoneNumberDto) {
-    return await this.authService.signUp(data);
+  @MongooseClassSerializerInterceptor(User)
+  @Get('')
+  async getMyUserInfo(@ReqUser() user: User) {
+    // findOneByUserId
+    return await this.userService.getUserInfo(user.userIdDto);
   }
 
   @ApiOperation({ summary: '유저 정보 수정' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiBody({ type: UpdateProfileDto })
-  @Put('profile')
+  @ApiBody({ type: UpdateProfileReqDto })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: User,
+  })
+  @MongooseClassSerializerInterceptor(User)
+  @Patch('')
   async updateProfile(
-    @Body() updateProfileData: UpdateProfileDto,
+    @Body() updateProfileReqDto: UpdateProfileReqDto,
     @ReqUser() user: User,
-  ): Promise<any> {
-    console.log(user);
-    return await this.userService.updateProfile(user._id, updateProfileData);
-  }
-  // 
-
-  @Post('/')
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
   ): Promise<User> {
-    return await this.userService.createUser(createUserDto)
+    console.log(user);
+
+    return await this.userService.updateProfile(
+      user.userIdDto,
+      updateProfileReqDto,
+    );
+  }
+  //
+  @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: UserProfileDto,
+  })
+  @MongooseClassSerializerInterceptor(UserProfileDto)
+  @Get(':userId')
+  async getUserInfo(@Param() UserIdDto: UserIdDto) {
+    // findOneByUserId
+    return await this.userService.getUserInfo(UserIdDto);
   }
 
-  // @Put('/')
-  // async updateUser(
-  //   @Body() data: object,
-  // ): Promise<User> {
-  //   return await this.userService.updateUser(data)
-  // }
-}
+  @ApiOperation({ summary: '상대방 유저를 차단한다' })
+  @Post(':userId/block')
+  @MongooseClassSerializerInterceptor(User)
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: User,
+  })
+  blockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
+    return this.userService.blockUser(user.userIdDto, otherUSerIdDto);
+  }
 
+  @ApiOperation({ summary: '상대방 유저를 차단해지한다' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: User,
+  })
+  @MongooseClassSerializerInterceptor(User)
+  @Delete(':userId/block')
+  unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
+    return this.userService.upBlockUser(user.userIdDto, otherUSerIdDto);
+  }
+
+  //완료
+
+  @ApiOperation({ summary: '상대방 유저를 신고한다.' })
+  @Post(':userId/report')
+  @MongooseClassSerializerInterceptor(ReportResultDtoResDto)
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: ReportResultDtoResDto,
+  })
+  reportUser(@Param() reportedIdDto: UserIdDto, @ReqUser() user: User) {
+    const result = this.userService.reportUser(user.userIdDto, reportedIdDto);
+    console.log(typeof result);
+    return result;
+  }
+
+  @ApiOperation({
+    summary: '닉네임이 유효한지 , 내가 들어가있는 방정보가 있는지 확인한다.',
+  })
+  @Get('canChange/:nickname')
+  @MongooseClassSerializerInterceptor(CanChangeNicknameResDto)
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: CanChangeNicknameResDto,
+  })
+  checkNicknameAndChangePossible(
+    @Param() nicknameDto: NicknameDto,
+    @ReqUser() user: User,
+  ) {
+    return this.userService.checkNicknameAndChangePossible(
+      user.userIdDto,
+      nicknameDto,
+    );
+  }
+
+  @ApiOperation({
+    summary: '알림 토글 ( 최신 상태를 리턴 )',
+  })
+  @MongooseClassSerializerInterceptor(NewAlarmStateResDto)
+  @Patch('alarm')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: NewAlarmStateResDto,
+  })
+  toggleAppAlarm(@ReqUser() user: User) {
+    return this.userService.toggleAlarmAlarm(user.userIdDto);
+  }
+}

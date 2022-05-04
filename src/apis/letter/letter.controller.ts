@@ -40,7 +40,7 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 
 @ApiTags('letters')
 @Controller('letters')
-@ApiBearerAuth()
+@ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(SuccessInterceptor)
 export class LetterController {
