@@ -155,7 +155,7 @@ export class LetterRepository {
       select: UserProfileSelect,
     });
 
-    return returnletter;
+    return returnletter.toObject<Letter>();
   }
 
   async upsertUserListToLetterRoom(
