@@ -25,7 +25,7 @@ export class QuestionRepository {
         path: 'user',
         select: UserProfileSelect,
       })
-      .lean<Question[]>();
+      .lean<Question[]>({ defaults: true });
   }
 
   async getQuestionsByRoomIdNewOrder(
@@ -38,23 +38,23 @@ export class QuestionRepository {
         path: 'user',
         select: UserProfileSelect,
       })
-      .lean<Question[]>();
+      .lean<Question[]>({ defaults: true });
   }
 
   async getQuestionsByRoomIdNotAnswerd(
     roomIdDto: RoomIdDto,
   ): Promise<Question[]> {
     return await this.questionModel
-      .find({ room: roomIdDto.roomId, comments: { $size: 0 } })
+      .find({ room: roomIdDto.roomId, commentList: { $size: 0 } })
       .sort({ createdAt: -1 })
       .populate({
         path: 'user',
         select: UserProfileSelect,
       })
-      .lean<Question[]>();
+      .lean<Question[]>({ defaults: true });
   }
 
-  async getQuestionsByQuestionId(
+  async getQuestionByQuestionId(
     questionIdDto: QuestionIdDto,
   ): Promise<Question | null> {
     return await this.questionModel
@@ -64,10 +64,10 @@ export class QuestionRepository {
         select: UserProfileSelect,
       })
       .populate({
-        path: 'comments.user',
+        path: 'commentList.user',
         select: UserProfileSelect,
       })
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 
   async deleteQuestionsByQuestionId(
@@ -75,7 +75,7 @@ export class QuestionRepository {
   ): Promise<Question | null> {
     return await this.questionModel
       .deleteOne({ _id: questionIdDto.questionId })
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 
   // in service layer return ilike : true
@@ -95,7 +95,7 @@ export class QuestionRepository {
         },
         { new: true },
       )
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 
   // in service layer return ilike : false
@@ -115,7 +115,7 @@ export class QuestionRepository {
         },
         { new: true },
       )
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 
   // 댓글 목록을보내주자.
@@ -135,16 +135,16 @@ export class QuestionRepository {
         },
         {
           $push: {
-            comments: comment,
+            commentList: comment,
           },
         },
         { new: true },
       )
       .populate({
-        path: 'comments.user',
+        path: 'commentList.user',
         select: UserProfileSelect,
       })
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 
   // 서비스 레이어에서 댓글 목록을 리턴
@@ -159,15 +159,15 @@ export class QuestionRepository {
         },
         {
           $pull: {
-            comments: { _id: commentIdDto.commentId },
+            commentList: { _id: commentIdDto.commentId },
           },
         },
         { new: true },
       )
       .populate({
-        path: 'comments.user',
+        path: 'commentList.user',
         select: UserProfileSelect,
       })
-      .lean<Question>();
+      .lean<Question>({ defaults: true });
   }
 }

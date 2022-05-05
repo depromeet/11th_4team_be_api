@@ -14,7 +14,7 @@ export class UserProfileDto {
   }
   @ApiProperty({ type: String, example: '626cf238b51596721c21289b' })
   @Expose()
-  @TransformObjectIdToString()
+  @TransformObjectIdToString({ toPlainOnly: true })
   _id: Types.ObjectId;
 
   @ApiProperty({ type: String, example: 'nickname' })

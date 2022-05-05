@@ -10,6 +10,7 @@ import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { truncate } from 'fs';
 
 const options: SchemaOptions = {
   collection: 'question',
@@ -56,7 +57,7 @@ export class Comment {
     type: String,
     description: '한국시간으로 보정된 시간값 (댓글 단 시간)',
   })
-  @Transform(({ value }) => toKRTimeZone(value))
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
   @Expose()
   createdAt: Date;
 }
@@ -70,6 +71,7 @@ export class Question {
   })
   // 시리얼 라이제이션 할때 사용
   @TransformObjectIdToString({ toClassOnly: true })
+  // @Transform(({ value }) => value.toString(), { toPlainOnly: true })
   @Type(() => Types.ObjectId)
   @Expose()
   _id: Types.ObjectId;
@@ -99,6 +101,7 @@ export class Question {
   })
   @Prop({ type: String, required: true })
   @IsString()
+  @Expose()
   content: string;
 
   @Prop({
@@ -120,28 +123,30 @@ export class Question {
   })
   @Type(() => Comment)
   @Expose()
-  comments: Comment[];
+  commentList: Comment[];
 
-  @ApiProperty({
-    type: [UserProfileDto],
-    description: '좋아요 누른사람',
-  })
   @Prop({
     default: [],
     type: [Types.ObjectId],
     ref: User.name,
   })
-  @Type(() => UserProfileDto)
-  @Expose()
-  likes: User[];
+  @Exclude({ toPlainOnly: true })
+  @Transform((value) => value.obj.likes, { toClassOnly: true })
+  @Expose({ toClassOnly: true })
+  likes: Types.ObjectId[];
 
   @ApiProperty({
     type: String,
     description: '한국시간으로 보정된 시간값',
   })
-  @Transform(({ value }) => toKRTimeZone(value))
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
   @Expose()
   createdAt: Date;
+
+  @Exclude({ toPlainOnly: true })
+  @Expose({ toClassOnly: true })
+  @Transform((value) => value.obj.myUserId, { toClassOnly: true })
+  myUserId: Types.ObjectId;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

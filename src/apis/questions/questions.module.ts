@@ -1,6 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Question, QuestionSchema } from 'src/models/question.model';
+import {
+  Comment,
+  CommentSchema,
+  Question,
+  QuestionSchema,
+} from 'src/models/question.model';
 import { QuestionRepository } from 'src/repositories/question.repository';
 import { UserModule } from '../users/user.module';
 import { QuestionsController } from './questions.controller';
