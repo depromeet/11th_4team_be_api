@@ -6,7 +6,7 @@ import { Comment, Question } from 'src/models/question.model';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
-import { CommentStringDto } from 'src/apis/questions/dto/commentString.dto';
+import { CommentStringDto } from 'src/apis/questions/dto/CommentString.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 
 @Injectable()
