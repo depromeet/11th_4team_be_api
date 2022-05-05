@@ -20,6 +20,7 @@ import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
+import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 
 const options: SchemaOptions = {
   id: false,
@@ -103,8 +104,16 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }] })
   favoriteRoomList: Room[];
 
+  @ApiProperty({
+    nullable: true,
+    default: 'null',
+    type: ResShortCutRoomDto,
+    description: '유저의 앱알림 설정 ( 앱 모든 알림 전체 )',
+  })
+  @Type(() => ResShortCutRoomDto)
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
   @IsObjectId()
+  @Expose()
   myRoom: Room;
 
   @ApiProperty({
