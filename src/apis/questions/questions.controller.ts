@@ -21,7 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { ReqUser } from 'src/common/decorators/user.decorator';
+import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
+import { ObjectIdValidationPipe } from 'src/common/pipes/ObjectIdCheck.pipe';
 import { User } from 'src/models/user.model';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
 
@@ -51,17 +53,17 @@ export class QuestionsController {
     return '';
   }
 
-  @ApiOperation({ summary: '더미 질문 생성' })
-  //   @ApiBody({ type: UpdateProfileDto })
-  @Post('')
-  async createQuestion(
-    // @Body() updateProfileData: UpdateProfileDto,
-    @ReqUser() user: User,
-  ): Promise<any> {
-    console.log(user);
-    // await this.userService.updateProfile(user._id, updateProfileData);
-    return '';
-  }
+  // @ApiOperation({ summary: '더미 질문 생성' })
+  // //   @ApiBody({ type: UpdateProfileDto })
+  // @Post('')
+  // async createQuestion(
+  //   // @Body() updateProfileData: UpdateProfileDto,
+  //   @ReqUser() user: User,
+  // ): Promise<any> {
+  //   console.log(user);
+  //   // await this.userService.updateProfile(user._id, updateProfileData);
+  //   return '';
+  // }
 
   @ApiOperation({ summary: '질문의 세부정보를 가져온다. 댓글 목록 포함' })
   //   @ApiBody({ type: UpdateProfileDto })
@@ -93,7 +95,7 @@ export class QuestionsController {
     summary: '질문의 좋아요를 토글한다. 최신의 상태를 리턴해준다',
   })
   //   @ApiBody({ type: UpdateProfileDto })
-  @Patch(':questionId/like')
+  @Patch(':questionId/likes')
   async toggleQuestionLike(
     @Param() questionIdDto: QuestionIdDto,
     // @Body() updateProfileData: UpdateProfileDto,
@@ -108,7 +110,7 @@ export class QuestionsController {
     summary: '질문에 댓글을 단다',
   })
   //   @ApiBody({ type: UpdateProfileDto })
-  @Post(':questionId/comment')
+  @Post(':questionId/comments')
   async createCommentToQuestion(
     @Param() questionIdDto: QuestionIdDto,
     // @Body() updateProfileData: UpdateProfileDto,
@@ -123,13 +125,16 @@ export class QuestionsController {
     summary: '질문의 댓글을 삭제한다.',
   })
   //   @ApiBody({ type: UpdateProfileDto })
-  @Delete(':questionId/comment')
+  @Delete(':questionId/comments/:commentId')
   async deletCommentToQuestion(
-    @Param() questionIdDto: QuestionIdDto,
-    // @Body() updateProfileData: UpdateProfileDto,
+    @Param('questionId', new ObjectIdValidationPipe('questionId'))
+    questionIdDto: string,
+    @Param('commentId', new ObjectIdValidationPipe('commentId'))
+    commentIdDto: string,
+
     @ReqUser() user: User,
   ): Promise<any> {
-    console.log(user);
+    console.log(questionIdDto, commentIdDto);
     // await this.userService.updateProfile(user._id, updateProfileData);
     return '';
   }

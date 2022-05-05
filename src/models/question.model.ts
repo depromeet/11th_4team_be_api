@@ -20,6 +20,16 @@ const options: SchemaOptions = {
 @Schema({ timestamps: true })
 export class Comment {
   @ApiProperty({
+    description: '댓글의 고유 아이디',
+    type: String,
+  })
+  // 시리얼 라이제이션 할때 사용
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Type(() => Types.ObjectId)
+  @Expose()
+  _id: Types.ObjectId;
+
+  @ApiProperty({
     description: '댓글내용',
     type: String,
   })
@@ -41,6 +51,14 @@ export class Comment {
   @Type(() => UserProfileDto)
   @Expose()
   user: User;
+
+  @ApiProperty({
+    type: String,
+    description: '한국시간으로 보정된 시간값 (댓글 단 시간)',
+  })
+  @Transform(({ value }) => toKRTimeZone(value))
+  @Expose()
+  createdAt: Date;
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);
 
@@ -60,6 +78,20 @@ export class Question {
   @IsObjectId()
   @Exclude()
   room: Room;
+
+  @ApiProperty({
+    description: '질문 작성자',
+    type: UserProfileDto,
+  })
+  @Prop({
+    required: true,
+    type: Types.ObjectId,
+    ref: User.name,
+  })
+  @IsObjectId()
+  @Type(() => UserProfileDto)
+  @Expose()
+  user: User;
 
   @ApiProperty({
     description: '질문의 내용 ( 채팅 메시지 복사본 )',
