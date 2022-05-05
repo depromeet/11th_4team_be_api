@@ -28,7 +28,7 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { ObjectIdValidationPipe } from 'src/common/pipes/ObjectIdCheck.pipe';
 import { Comment, Question } from 'src/models/question.model';
 import { User } from 'src/models/user.model';
-import { CommentStringDto } from './dto/commentString.dto';
+import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';

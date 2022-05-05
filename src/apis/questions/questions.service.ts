@@ -9,7 +9,7 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Comment, Question } from 'src/models/question.model';
 import { QuestionRepository } from 'src/repositories/question.repository';
 import { UserRepository } from 'src/repositories/user.repository';
-import { CommentStringDto } from './dto/commentString.dto';
+import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
