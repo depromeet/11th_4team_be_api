@@ -14,6 +14,7 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
+import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 
 @Injectable()
 export class UserRepository {
@@ -28,6 +29,15 @@ export class UserRepository {
       .populate({
         path: 'iBlockUsers',
         select: UserProfileSelect,
+      })
+      .populate({
+        path: 'myRoom',
+        select: {
+          _id: 1,
+          name: 1,
+          category: 1,
+          userCount: { $size: '$userList' },
+        },
       })
       .lean<User>({ defaults: true });
     return user;
@@ -296,7 +306,7 @@ export class UserRepository {
     return user;
   }
 
-  async getMyRoom(userIdDto: UserIdDto) {
+  async getMyRoom(userIdDto: UserIdDto): Promise<ResShortCutRoomDto | null> {
     const roomInfo = await this.userModel.aggregate([
       {
         $match: {

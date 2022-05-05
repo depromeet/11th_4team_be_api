@@ -16,10 +16,7 @@ export const returnValueToDto =
       // call the function
       // const r = JSON.stringify(result);
       // console.log(`Call: ${key}(${a}) => ${r}`);
-      console.log(plainToInstance(dto, result));
-      return plainToInstance(dto, result, {
-        excludeExtraneousValues: true,
-      });
+      return plainToInstance(dto, result, { excludeExtraneousValues: true });
     };
 
     return descriptor;

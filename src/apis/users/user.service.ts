@@ -90,7 +90,7 @@ export class UserService {
     );
 
     if (reportedUserReportCount.length >= 10) {
-      //TODO : 정지처리관련 인증서버로 요청보내기
+      //TODO : 정지처리관련 인증서버로 요청보내기 or 유저 스테이트 변화 및 ttl 금지유저 레포 만들기
       console.log('유저 신고 갯수가 10회를 넘겼습니다.');
     }
 

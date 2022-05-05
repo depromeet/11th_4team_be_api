@@ -40,7 +40,7 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { ResChatAlarmToggleDto } from './dto/chatAlarmToggle.res.dto';
 import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { Room } from 'src/models/room.model';
-import { ResShortCutRoomDto } from './dto/shortCutRoomInfo.res.dto';
+import { ResShortCutRoomDto } from '../../common/dtos/shortCutRoomInfo.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -116,7 +116,7 @@ export class RoomsController {
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
-    type: [Room],
+    type: [ResShortCutRoomDto],
   })
   @Get('/popular')
   getPopularRooms() {
