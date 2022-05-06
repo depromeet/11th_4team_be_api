@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsPhoneNumber,
   IsString,
+  Length,
   Matches,
 } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
@@ -73,6 +74,7 @@ export class User {
   })
   @IsString()
   @Matches(/^[가-힣]+$/)
+  @Length(1, 10)
   @Expose()
   nickname: string;
 
@@ -89,6 +91,7 @@ export class User {
   // })
   @Prop({
     default: STATUS_TYPE.NORMAL,
+    enum: STATUS_TYPE,
   })
   @IsEnum(STATUS_TYPE)
   @Exclude()

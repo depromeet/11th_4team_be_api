@@ -1,5 +1,10 @@
 import { UserRepository } from 'src/repositories/user.repository';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 
 import { User } from 'src/models/user.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
@@ -12,12 +17,15 @@ import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private userRepository: UserRepository,
     private reportRepository: ReportRepository,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -114,6 +122,12 @@ export class UserService {
     if (reportedUserReportCount.length >= 10) {
       //TODO : 정지처리관련 인증서버로 요청보내기 or 유저 스테이트 변화 및 ttl 금지유저 레포 만들기
       console.log('유저 신고 갯수가 10회를 넘겼습니다.');
+      const checkAlreadyBan = await this.authService.findOneForbiddenByUserId(
+        reportedIdDto,
+      );
+      if (!checkAlreadyBan) {
+        await this.authService.createForbidden(reportedIdDto);
+      }
     }
 
     const report = await this.reportRepository.createReport(
@@ -126,6 +140,13 @@ export class UserService {
 
     // auto 시리얼 라이징
     return new ReportResultDtoResDto(true);
+  }
+
+  async banUser(userIdDto: UserIdDto) {
+    return await this.userRepository.banUser(userIdDto);
+  }
+  async unBanUser(userIdDto: UserIdDto) {
+    return await this.userRepository.unBanuser(userIdDto);
   }
 
   @returnValueToDto(CanChangeNicknameResDto)

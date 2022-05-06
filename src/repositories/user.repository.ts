@@ -15,12 +15,27 @@ import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
+import { STATUS_TYPE } from 'src/common/consts/enum';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
+
+  async banUser(userIdDto: UserIdDto) {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      { status: STATUS_TYPE.FORBIDDEN },
+    );
+  }
+
+  async unBanuser(userIdDto: UserIdDto) {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      { status: STATUS_TYPE.NORMAL },
+    );
+  }
 
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
     const user = await this.userModel
