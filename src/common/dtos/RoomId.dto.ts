@@ -7,8 +7,12 @@ import { Types } from 'mongoose';
  * mongoId 용 DTO
  */
 export class RoomIdDto {
-  constructor(roomId: string) {
-    this.roomId = new Types.ObjectId(roomId);
+  constructor(roomId: string | Types.ObjectId) {
+    if (roomId instanceof Types.ObjectId) {
+      this.roomId = roomId;
+    } else {
+      this.roomId = new Types.ObjectId(roomId);
+    }
   }
   @ApiProperty({
     type: String,

@@ -12,6 +12,7 @@ import { UserRepository } from 'src/repositories/user.repository';
 import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
+import { QuestionListShowDto } from './dto/QuestionList.res.dto';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
 
 @Injectable()
@@ -30,11 +31,11 @@ export class QuestionsService {
     return new RoomIdDto(user.myRoom._id);
   }
 
-  @returnValueToDto(QuestionShowDto)
+  @returnValueToDto(QuestionListShowDto)
   async findQuestions(
     userIdDto: UserIdDto,
     questionFindRequestDto: QuestionFindRequestDto,
-  ): Promise<QuestionShowDto[]> {
+  ): Promise<QuestionListShowDto[]> {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const myRoomIdDto = await this.checkMyRoom(userIdDto);
     let result = [];

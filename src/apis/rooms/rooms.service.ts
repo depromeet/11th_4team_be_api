@@ -2,8 +2,10 @@ import { BadRequestException, Injectable, Type } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
 import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
+import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
 import { MongoId } from 'src/common/dtos/MongoId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
+import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Room } from 'src/models/room.model';
 import { User } from 'src/models/user.model';
@@ -15,6 +17,7 @@ import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { FindRoomDto } from './dto/find-room.dto';
 import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
+import { LeftRoomResultResDto } from './dto/leftRoomResult.res.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
@@ -29,6 +32,7 @@ export class RoomsService {
    * @param createRoomDto
    * @returns room
    */
+  @returnValueToDto(Room)
   async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
     return await this.roomRepository.createRoom(createRoomDto);
   }
@@ -38,6 +42,7 @@ export class RoomsService {
    * @param createRoomDto
    * @returns room
    */
+  // @returnValueToDto(ResFindRoomDto)
   async findRoom(
     findRoomDto: FindRoomDto,
     userId: UserIdDto,
@@ -64,13 +69,24 @@ export class RoomsService {
       );
     }
 
-    //필터링 룸
-    const filteredRooms = rooms.map((room: Room) => {
-      const iFavorite = user.favoriteRoomList.includes(room._id);
-      const iJoin = room._id.equals(user.myRoom);
-      return new ResFindRoomDto(room, iFavorite, iJoin);
+    const result = rooms.map((element: Room) => {
+      const iFavorite = user.favoriteRoomList.find((room) =>
+        room._id.equals(element._id),
+      )
+        ? true
+        : false;
+      const iJoin = element._id.equals(user.myRoom._id);
+      return { ...element, iFavorite, iJoin };
     });
-    return filteredRooms;
+    //필터링 룸
+    // const filteredRooms = rooms.map((room: Room) => {
+    //   const iFavorite = user.favoriteRoomList.includes(room._id);
+    //   const iJoin = room._id.equals(user.myRoom);
+    //   return new ResFindRoomDto(room, iFavorite, iJoin);
+    // });
+    return plainToInstance(ResFindRoomDto, result, {
+      excludeExtraneousValues: true,
+    });
   }
 
   /**
@@ -94,9 +110,18 @@ export class RoomsService {
       // 유저가 들어간 채팅방이 있을경우
       if (roomIdDto.roomId.equals(user.myRoom._id)) {
         // 룸이 같을경우 룸의 정보를 리턴
-        const isFavoritRoom = user.favoriteRoomList.includes(user.myRoom._id);
+        const iFavorite = user.favoriteRoomList.find((room) =>
+          room._id.equals(user.myRoom._id),
+        )
+          ? true
+          : false;
+        // const isFavoritRoom = user.favoriteRoomList.includes(user.myRoom._id);
         const room = await this.roomRepository.findOneByRoomId(roomIdDto);
-        return new ResFindOneRoomDto(room, isFavoritRoom, user.chatAlarm);
+        const result = { ...room, iFavorite, iAlarm: user.chatAlarm };
+
+        return plainToInstance(ResFindOneRoomDto, result, {
+          excludeExtraneousValues: true,
+        });
       } else {
         // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
         await this.roomRepository.pullUserFromRoom(
@@ -110,18 +135,30 @@ export class RoomsService {
     await this.userRepository.turnOnChatAlarm(userIdDto);
     const room = await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
     //check
-    const isFavoritRoom = user.favoriteRoomList.includes(room._id);
-    console.log('new room', isFavoritRoom);
+    const iFavorite = user.favoriteRoomList.find((room) =>
+      room._id.equals(roomIdDto.roomId),
+    )
+      ? true
+      : false;
 
-    return new ResFindOneRoomDto(room, isFavoritRoom, true);
+    const result = { ...room, iFavorite, iAlarm: true };
+    // console.log(result);
+    return plainToInstance(ResFindOneRoomDto, result, {
+      excludeExtraneousValues: true,
+    });
   }
 
+  @returnValueToDto(LeftRoomResultResDto)
   async pullUserFromRoom(
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
-  ): Promise<Room> {
+  ): Promise<LeftRoomResultResDto> {
     await this.userRepository.setMyRoom(userIdDto, null);
-    return await this.roomRepository.pullUserFromRoom(roomIdDto, userIdDto);
+    const result = await this.roomRepository.pullUserFromRoom(
+      roomIdDto,
+      userIdDto,
+    );
+    return { leftSuccess: result ? true : false };
   }
 
   // async pushRoomToUserFavoriteList(roomIdDto: RoomIdDto, userIdDto: UserIdDto) {
@@ -176,6 +213,7 @@ export class RoomsService {
 
   //   return send;
   // }
+  @returnValueToDto(ResShortCutRoomDto)
   async getMyRoomShortCutInfo(userId: UserIdDto) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
     console.log(roomInfo);
@@ -184,9 +222,11 @@ export class RoomsService {
     // }
     return roomInfo;
   }
+  @returnValueToDto(ResShortCutRoomDto)
   async getMyFavorite(userId: UserIdDto) {
     return await this.userRepository.findMyFavoriteRooms(userId);
   }
+
   async toggleChatAlarm(userId: UserIdDto): Promise<ResChatAlarmToggleDto> {
     const isChatAlarmOn = await this.userRepository.toggleChatAlarm(userId);
 
@@ -195,6 +235,7 @@ export class RoomsService {
     });
   }
 
+  @returnValueToDto(ResShortCutRoomDto)
   async getPopularRooms() {
     console.log('asdfasdfa');
     return await this.roomRepository.getPopularRooms();

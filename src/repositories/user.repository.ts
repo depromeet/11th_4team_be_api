@@ -22,7 +22,6 @@ export class UserRepository {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  // @TestDecorator(User)
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
     const user = await this.userModel
       .findOne({ _id: userIdDto.userId })
@@ -71,6 +70,15 @@ export class UserRepository {
         path: 'iBlockUsers',
         select: UserProfileSelect,
       })
+      .populate({
+        path: 'myRoom',
+        select: {
+          _id: 1,
+          name: 1,
+          category: 1,
+          userCount: { $size: '$userList' },
+        },
+      })
       .lean<User>({ defaults: true });
   }
 
@@ -104,6 +112,15 @@ export class UserRepository {
         path: 'iBlockUsers',
         select: UserProfileSelect,
       })
+      .populate({
+        path: 'myRoom',
+        select: {
+          _id: 1,
+          name: 1,
+          category: 1,
+          userCount: { $size: '$userList' },
+        },
+      })
       .lean<User>({ defaults: true });
   }
 
@@ -134,6 +151,15 @@ export class UserRepository {
       .populate({
         path: 'iBlockUsers',
         select: UserProfileSelect,
+      })
+      .populate({
+        path: 'myRoom',
+        select: {
+          _id: 1,
+          name: 1,
+          category: 1,
+          userCount: { $size: '$userList' },
+        },
       })
       .lean<User>({ defaults: true });
   }
@@ -247,7 +273,9 @@ export class UserRepository {
     return user;
   }
 
-  async findMyFavoriteRooms(userIdDto: UserIdDto): Promise<Room[]> {
+  async findMyFavoriteRooms(
+    userIdDto: UserIdDto,
+  ): Promise<ResShortCutRoomDto[]> {
     const myFavoriteRoomList = await this.userModel.aggregate([
       {
         $match: {

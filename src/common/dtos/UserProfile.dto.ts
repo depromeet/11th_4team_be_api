@@ -14,6 +14,7 @@ export class UserProfileDto {
   }
   @ApiProperty({ type: String, example: '626cf238b51596721c21289b' })
   @Expose()
+  @Transform((value) => value.obj._id, { toClassOnly: true })
   @TransformObjectIdToString({ toPlainOnly: true })
   _id: Types.ObjectId;
 
