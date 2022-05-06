@@ -37,6 +37,7 @@ import { LetterRoomDto } from './dto/LetterRoom.res.dto';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 import { ResLetterDto } from './dto/Letter.res.dto';
 import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 
 @ApiTags('letters')
 @Controller('letters')
@@ -51,6 +52,10 @@ export class LetterController {
     description: '요청 성공시',
     type: ResLetterDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: '차단된 유저 ,또는 없는 유저일경우',
+  })
   @Post(':userId')
   sendLetterToReciever(
     @Query() receiver: UserIdDto,
@@ -61,6 +66,7 @@ export class LetterController {
     return this.letterService.sendLetterToReciever(
       twoUserList,
       messageStringDto,
+      user.blockedUserDto,
     );
   }
 
@@ -78,7 +84,7 @@ export class LetterController {
   ) {
     return this.letterService.getLettersByRoomId(
       letterRoomIdDto,
-      new UserIdDto(user._id),
+      user.userIdDto,
     );
   }
 
@@ -91,9 +97,10 @@ export class LetterController {
   @Get('')
   async getLetterRooms(@ReqUser() user: User) {
     const list = await this.letterService.getRoomsByMyUserId(
-      new UserIdDto(user._id),
+      user.userIdDto,
+      user.blockedUserDto,
     );
-    console.log(instanceToPlain(list[0]));
+
     return list;
   }
 
@@ -110,7 +117,8 @@ export class LetterController {
   ) {
     return this.letterService.leaveLetterRoomByRoomId(
       letterRoomIdDto,
-      new UserIdDto(user._id),
+      user.userIdDto,
+      user.blockedUserDto,
     );
   }
 }

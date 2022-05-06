@@ -8,6 +8,7 @@ import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import { CommentStringDto } from 'src/apis/questions/dto/CommentString.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 
 @Injectable()
 export class QuestionRepository {
@@ -18,9 +19,13 @@ export class QuestionRepository {
   // 질문의 목록을 가져온다. 방정보를 토대로.
   async getQuestionsByRoomIdOldOrder(
     roomIdDto: RoomIdDto,
+    blockUserListDto: BlockedUserDto,
   ): Promise<Question[]> {
     return await this.questionModel
-      .find({ room: roomIdDto.roomId })
+      .find({
+        room: roomIdDto.roomId,
+        user: { $nin: blockUserListDto.blockedUsers },
+      })
       .populate({
         path: 'user',
         select: UserProfileSelect,
@@ -30,9 +35,13 @@ export class QuestionRepository {
 
   async getQuestionsByRoomIdNewOrder(
     roomIdDto: RoomIdDto,
+    blockUserListDto: BlockedUserDto,
   ): Promise<Question[]> {
     return await this.questionModel
-      .find({ room: roomIdDto.roomId })
+      .find({
+        room: roomIdDto.roomId,
+        user: { $nin: blockUserListDto.blockedUsers },
+      })
       .sort({ createdAt: -1 })
       .populate({
         path: 'user',
@@ -43,9 +52,14 @@ export class QuestionRepository {
 
   async getQuestionsByRoomIdNotAnswerd(
     roomIdDto: RoomIdDto,
+    blockUserListDto: BlockedUserDto,
   ): Promise<Question[]> {
     return await this.questionModel
-      .find({ room: roomIdDto.roomId, commentList: { $size: 0 } })
+      .find({
+        room: roomIdDto.roomId,
+        user: { $nin: blockUserListDto.blockedUsers },
+        commentList: { $size: 0 },
+      })
       .sort({ createdAt: -1 })
       .populate({
         path: 'user',

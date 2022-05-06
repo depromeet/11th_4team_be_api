@@ -11,6 +11,7 @@ import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorat
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 
 @Injectable()
 export class UserService {
@@ -19,6 +20,13 @@ export class UserService {
     private reportRepository: ReportRepository,
   ) {}
 
+  private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
+    // console.log('asdfasdfasdfasdfasdf', userIdDto.userId);
+    if (blockedUserDto.blockedUsers.find((id) => id.equals(userIdDto.userId))) {
+      throw new BadRequestException('차단된 유저입니다.');
+    }
+  }
+
   @returnValueToDto(User)
   async getUserInfo(userIdDto: UserIdDto): Promise<User> {
     // auto 시리얼 라이징
@@ -26,7 +34,11 @@ export class UserService {
   }
 
   @returnValueToDto(UserProfileDto)
-  async getOtherUserInfo(userIdDto: UserIdDto): Promise<UserProfileDto> {
+  async getOtherUserInfo(
+    userIdDto: UserIdDto,
+    blockedUserDto: BlockedUserDto,
+  ): Promise<UserProfileDto> {
+    this.checkBlocked(userIdDto, blockedUserDto);
     // auto 시리얼 라이징
     return await this.userRepository.findOneByUserId(userIdDto);
   }

@@ -19,6 +19,7 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 
 const options: SchemaOptions = {
   id: false,
@@ -138,9 +139,8 @@ export class User {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
   @IsObjectId()
-  @Type(() => UserProfileDto)
   @Exclude()
-  blockedUsers: User[];
+  blockedUsers: Types.ObjectId[];
 
   @ApiProperty({
     type: [UserProfileDto],
@@ -159,6 +159,8 @@ export class User {
   // only for 내부용
   @Exclude()
   userIdDto: UserIdDto;
+  @Exclude()
+  blockedUserDto: BlockedUserDto;
 
   @ApiProperty({
     type: String,
