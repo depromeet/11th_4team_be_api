@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { Types } from 'mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { Room } from 'src/models/room.model';
@@ -10,6 +10,7 @@ export class ResShortCutRoomDto {
     description: '방의 고유 아이디',
     type: String,
   })
+  @Transform((value) => value.obj._id, { toClassOnly: true })
   @TransformObjectIdToString({ toClassOnly: true })
   @Expose()
   _id: string;

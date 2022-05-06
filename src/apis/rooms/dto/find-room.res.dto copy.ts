@@ -1,50 +1,40 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Types } from 'mongoose';
-import { CATEGORY_TYPE } from 'src/common/consts/enum';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
 
-export class ResFindRoomDto {
-  constructor(room: Room, iFavorite: boolean, iJoin: boolean) {
-    this._id = room._id;
-    this.category = room.category;
-    this.name = room.name;
-    this.radius = room.radius;
-    this.lat = room.geometry.coordinates[0];
-    this.lng = room.geometry.coordinates[1];
-    this.userCount = room.userCount;
-    this.distance = room.distance;
-    this.iFavorite = iFavorite;
-    this.iJoin = iJoin;
-  }
-  @ApiProperty()
-  _id: string;
+export class ResFindRoomDto extends PickType(Room, [
+  '_id',
+  'name',
+  'category',
+  'radius',
+  'userList',
+  'geometry',
+  'userCount',
+] as const) {
+  @Expose({ toClassOnly: true })
+  @Exclude({ toPlainOnly: true })
+  userList: UserProfileDto[];
 
-  @ApiProperty({ description: '채팅방 이름' })
-  name: string;
-
-  @ApiProperty({ description: '반경정보' })
-  radius: number;
-
-  @ApiProperty({ enum: CATEGORY_TYPE, description: '카테고리정보' })
-  category: CATEGORY_TYPE;
-
-  @ApiProperty()
-  lat: number;
-
-  @ApiProperty()
-  lng: number;
-
-  @ApiProperty({ description: '채팅방내 유저숫자' })
-  userCount: number;
-
-  @ApiProperty({ description: '거리정보' })
-  distance: number;
-
-  @ApiProperty({ description: '내가 즐겨찾기 했는지' })
+  @ApiProperty({ description: '내가 즐겨찾기 했는지', type: Boolean })
+  @Expose()
   iFavorite: boolean;
 
-  @ApiProperty({ description: '내가 들어가 있는지' })
+  @ApiProperty({ description: '내가 들어가 있는지', type: Boolean })
+  @Expose()
   iJoin: boolean;
+
+  @ApiProperty({ description: '위도 가로선', type: Number })
+  @Expose()
+  get lat(): number {
+    return this.geometry.coordinates[0];
+  }
+
+  @ApiProperty({ description: '경도 세로선', type: Number })
+  @Expose()
+  get lng(): number {
+    return this.geometry.coordinates[1];
+  }
 }
 // console.log(plainToClass(User, fromPlainUser, { excludeExtraneousValues: true }));
 // '_id',

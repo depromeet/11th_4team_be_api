@@ -1,98 +1,91 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { Expose, plainToClass, plainToInstance } from 'class-transformer';
-import { Types } from 'mongoose';
-import { CATEGORY_TYPE } from 'src/common/consts/enum';
-
-import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Expose, Transform } from 'class-transformer';
 
-export class ResFindOneRoomDto {
-  constructor(room: Room, iFavoriteRoom: boolean, iAlarm: boolean) {
-    this._id = room._id;
-    this.category = room.category;
-    this.name = room.name;
-    this.radius = room.radius;
-    this.lat = room.geometry.coordinates[0];
-    this.lng = room.geometry.coordinates[1];
-    this.iFavoriteRoom = iFavoriteRoom;
-    this.iAlarm = iAlarm;
-    this.userCount = room.userList.length;
-    this.userList = room.userList;
-  }
-  @ApiProperty()
-  _id: string;
+export class ResFindOneRoomDto extends PickType(Room, [
+  '_id',
+  'name',
+  'category',
+  'radius',
+  'userList',
+  'geometry',
+  'userCount',
+] as const) {
+  @ApiProperty({ description: '내가 즐겨찾기 했는지', type: Boolean })
+  @Expose()
+  iFavorite: boolean;
 
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  radius: number;
-
-  @ApiProperty({ enum: CATEGORY_TYPE })
-  category: CATEGORY_TYPE;
-
-  @ApiProperty()
-  lat: number;
-
-  @ApiProperty()
-  lng: number;
-
-  @ApiProperty({ type: [UserProfileDto], required: false })
-  userList: UserProfileDto[];
-
-  @ApiProperty({ description: '유저 숫자' })
-  userCount: number;
-
-  @ApiProperty({ description: '내가 즐겨찾기 했는지' })
-  iFavoriteRoom: boolean;
-
-  @ApiProperty({ description: '내가 들어가 있는지' })
+  @ApiProperty({ description: '내가 들어가 있는지', type: Boolean })
+  @Expose()
   iJoin: boolean;
 
+  @ApiProperty({ description: '위도 가로선', type: Number })
+  @Expose()
+  get lat(): number {
+    return this.geometry.coordinates[0];
+  }
+
+  @ApiProperty({ description: '경도 세로선', type: Number })
+  @Expose()
+  get lng(): number {
+    return this.geometry.coordinates[1];
+  }
+
   @ApiProperty({ description: '내가 채팅방 알림 켰는지여부' })
+  @Expose()
   iAlarm: boolean;
+
+  @ApiProperty({ description: '유저명수' })
+  @Transform((value) => value.obj.userList.length, { toPlainOnly: true })
+  @Expose()
+  userCount: number;
+  // get userCount(): number {
+  //   return 0;
+  // }
 }
-
-// '_id',
-// 'name',
-// 'radius',
-// 'category',
-
-// export class UserShowDto {
-//     // (1)
-//     @Exclude() private readonly _id: number;
-//     @Exclude() private readonly _firstName: string;
-//     @Exclude() private readonly _lastName: string;
-//     @Exclude() private readonly _orderDateTime: LocalDateTime;
-
-//     constructor(user: User) {
-//       this._id = user.id;
-//       this._firstName = user.firstName;
-//       this._lastName = user.lastName;
-//       this._orderDateTime = user.orderDateTime.plusDays(1); // (2)
-//     }
-
-//     @ApiProperty()
-//     @Expose() // (3)
-//     get id(): number {
-//       return this._id;
-//     }
-
-//     @ApiProperty()
-//     @Expose()
-//     get firstName(): string {
-//       return this._firstName;
-//     }
-
-//     @ApiProperty()
-//     @Expose()
-//     get lastName(): string {
-//       return this._lastName;
-//     }
-
-//     @ApiProperty()
-//     @Expose()
-//     get orderDateTime(): string {
-//       return DateTimeUtil.toString(this._orderDateTime); // (4)
-//     }
+// export class ResFindOneRoomDto {
+//   constructor(room: Room, iFavoriteRoom: boolean, iAlarm: boolean) {
+//     this._id = room._id;
+//     this.category = room.category;
+//     this.name = room.name;
+//     this.radius = room.radius;
+//     this.lat = room.geometry.coordinates[0];
+//     this.lng = room.geometry.coordinates[1];
+//     this.iFavoriteRoom = iFavoriteRoom;
+//     this.iAlarm = iAlarm;
+//     this.userCount = room.userList.length;
+//     this.userList = room.userList;
 //   }
+//   @ApiProperty()
+//   _id: string;
+
+//   @ApiProperty()
+//   name: string;
+
+//   @ApiProperty()
+//   radius: number;
+
+//   @ApiProperty({ enum: CATEGORY_TYPE })
+//   category: CATEGORY_TYPE;
+
+//   @ApiProperty()
+//   lat: number;
+
+//   @ApiProperty()
+//   lng: number;
+
+//   @ApiProperty({ type: [UserProfileDto], required: false })
+//   userList: UserProfileDto[];
+
+//   @ApiProperty({ description: '유저 숫자' })
+//   userCount: number;
+
+//   @ApiProperty({ description: '내가 즐겨찾기 했는지' })
+//   iFavoriteRoom: boolean;
+
+//   @ApiProperty({ description: '내가 들어가 있는지' })
+//   iJoin: boolean;
+
+//   @ApiProperty({ description: '내가 채팅방 알림 켰는지여부' })
+//   iAlarm: boolean;
+// }

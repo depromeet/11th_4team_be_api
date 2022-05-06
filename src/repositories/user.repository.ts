@@ -273,7 +273,9 @@ export class UserRepository {
     return user;
   }
 
-  async findMyFavoriteRooms(userIdDto: UserIdDto): Promise<Room[]> {
+  async findMyFavoriteRooms(
+    userIdDto: UserIdDto,
+  ): Promise<ResShortCutRoomDto[]> {
     const myFavoriteRoomList = await this.userModel.aggregate([
       {
         $match: {
