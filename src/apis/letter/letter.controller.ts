@@ -42,10 +42,11 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 @Controller('letters')
 @ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(SuccessInterceptor)
 export class LetterController {
   constructor(private readonly letterService: LetterService) {}
-  @UseInterceptors(ClassSerializerInterceptor)
+
   @ApiOperation({ summary: '편지를 상대방에게 보낼 수 있음' })
   @ApiResponse({
     status: 201,
@@ -65,6 +66,7 @@ export class LetterController {
     );
   }
 
+  // 시리얼라이징 적용 필요
   @ApiOperation({ summary: '상대방과 편지를 한걸 모아볼수있음' })
   @ApiResponse({
     status: 200,
@@ -82,7 +84,6 @@ export class LetterController {
     );
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @ApiOperation({ summary: '쪽지탭용' })
   @ApiResponse({
     status: 200,
@@ -97,7 +98,7 @@ export class LetterController {
     console.log(instanceToPlain(list[0]));
     return list;
   }
-  @UseInterceptors(ClassSerializerInterceptor)
+
   @ApiOperation({ summary: '쪽지룸을 떠남' })
   @ApiResponse({
     status: 200,
