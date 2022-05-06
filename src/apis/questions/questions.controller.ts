@@ -38,8 +38,6 @@ import { QuestionsService } from './questions.service';
 @ApiTags('questions')
 @Controller('questions')
 @ApiBearerAuth('accessToken')
-@UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(SuccessInterceptor)
 @UseGuards(JwtAuthGuard)
 export class QuestionsController {
   constructor(private readonly questionService: QuestionsService) {}

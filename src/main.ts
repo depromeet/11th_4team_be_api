@@ -1,8 +1,9 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import { SuccessInterceptor } from './common/interceptors/sucess.interceptor';
 import { setupSwagger } from './utils/swagger';
 
 async function bootstrap() {
@@ -25,6 +26,8 @@ async function bootstrap() {
   //앱서버용
   app.getHttpAdapter().getInstance().set('etag', false);
   app.enableCors({ origin: true, credentials: true });
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(new SuccessInterceptor());
 
   const PORT = process.env.PORT;
 

@@ -34,8 +34,6 @@ import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 @ApiTags('user')
 @Controller('user')
 @ApiBearerAuth('accessToken')
-@UseInterceptors(SuccessInterceptor)
-@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
