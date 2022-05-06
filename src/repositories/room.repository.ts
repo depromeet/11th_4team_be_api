@@ -168,7 +168,8 @@ export class RoomRepository {
       .populate({
         path: 'userList',
         select: UserProfileSelect,
-      });
+      })
+      .lean<Room>({ defaults: true });
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
@@ -181,17 +182,20 @@ export class RoomRepository {
     userIdDto: UserIdDto,
   ): Promise<Room> {
     console.log(roomIdDto);
-    const room = await this.roomModel.findOneAndUpdate(
-      {
-        _id: roomIdDto.roomId,
-      },
-      {
-        $pull: {
-          userList: userIdDto.userId,
+    const room = await this.roomModel
+      .findOneAndUpdate(
+        {
+          _id: roomIdDto.roomId,
         },
-      },
-      { new: true },
-    );
+        {
+          $pull: {
+            userList: userIdDto.userId,
+          },
+        },
+        { new: true },
+      )
+      .lean<Room>({ defaults: true });
+
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
@@ -207,7 +211,9 @@ export class RoomRepository {
       .populate({
         path: 'userList',
         select: UserProfileSelect,
-      });
+      })
+      .lean<Room>({ defaults: true });
+
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }

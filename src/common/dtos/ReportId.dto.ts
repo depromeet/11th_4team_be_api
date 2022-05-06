@@ -8,7 +8,11 @@ import { Transform } from 'class-transformer';
  */
 export class ReportIdDto {
   constructor(reportId: string | Types.ObjectId) {
-    this.reportId = new Types.ObjectId(reportId);
+    if (reportId instanceof Types.ObjectId) {
+      this.reportId = reportId;
+    } else {
+      this.reportId = new Types.ObjectId(reportId);
+    }
   }
 
   @ApiProperty({

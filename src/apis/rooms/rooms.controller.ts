@@ -11,6 +11,7 @@ import {
   SerializeOptions,
   UseGuards,
   UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -46,7 +47,6 @@ import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 @Controller('rooms')
 @ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
-@UseInterceptors(SuccessInterceptor)
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 

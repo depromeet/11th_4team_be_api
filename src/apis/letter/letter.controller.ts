@@ -42,8 +42,6 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 @Controller('letters')
 @ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
-@UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(SuccessInterceptor)
 export class LetterController {
   constructor(private readonly letterService: LetterService) {}
 
