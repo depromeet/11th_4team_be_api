@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 
 import { Report } from 'src/models/report.model';
-import { ReportIdDto } from 'src/common/dtos/ReportId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 @Injectable()

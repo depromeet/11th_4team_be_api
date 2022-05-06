@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { QUESTION_FIND_FILTER_TYPE } from 'src/common/consts/enum';
 import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
@@ -22,6 +23,17 @@ export class QuestionsService {
     private questionRepository: QuestionRepository,
   ) {}
 
+  private filterRemoveBlockedUserFromCommentList(
+    commentList: Comment[],
+    blockedUserDto: BlockedUserDto,
+  ): Comment[] {
+    // 값이 없으면 언디파인드임.
+    return commentList.filter(
+      (comment) =>
+        !blockedUserDto.blockedUsers.find((e) => e.equals(comment.user._id)),
+    );
+  }
+
   // always should check if i join the room.
   private async checkMyRoom(userIdDto: UserIdDto): Promise<RoomIdDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto);
@@ -35,6 +47,7 @@ export class QuestionsService {
   async findQuestions(
     userIdDto: UserIdDto,
     questionFindRequestDto: QuestionFindRequestDto,
+    blockUserListDto: BlockedUserDto,
   ): Promise<QuestionListShowDto[]> {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const myRoomIdDto = await this.checkMyRoom(userIdDto);
@@ -43,16 +56,19 @@ export class QuestionsService {
       case QUESTION_FIND_FILTER_TYPE.NOTANSWERED:
         result = await this.questionRepository.getQuestionsByRoomIdNotAnswerd(
           myRoomIdDto,
+          blockUserListDto,
         );
         break;
       case QUESTION_FIND_FILTER_TYPE.OLDORDER:
         result = await this.questionRepository.getQuestionsByRoomIdOldOrder(
           myRoomIdDto,
+          blockUserListDto,
         );
         break;
       case QUESTION_FIND_FILTER_TYPE.NEWORDER:
         result = await this.questionRepository.getQuestionsByRoomIdNewOrder(
           myRoomIdDto,
+          blockUserListDto,
         );
 
         break;
@@ -66,7 +82,11 @@ export class QuestionsService {
   }
 
   @returnValueToDto(QuestionShowDto)
-  async findQuestionById(userIdDto: UserIdDto, questionIdDto: QuestionIdDto) {
+  async findQuestionById(
+    userIdDto: UserIdDto,
+    questionIdDto: QuestionIdDto,
+    blockUserListDto: BlockedUserDto,
+  ) {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     await this.checkMyRoom(userIdDto);
     const question = await this.questionRepository.getQuestionByQuestionId(
@@ -75,8 +95,12 @@ export class QuestionsService {
     if (!question) {
       throw new BadRequestException('질문 없음');
     }
-    question.myUserId = userIdDto.userId;
 
+    question.myUserId = userIdDto.userId;
+    question.commentList = this.filterRemoveBlockedUserFromCommentList(
+      question.commentList,
+      blockUserListDto,
+    );
     return question;
   }
 
