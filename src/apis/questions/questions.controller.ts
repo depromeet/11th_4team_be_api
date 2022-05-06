@@ -31,6 +31,7 @@ import { User } from 'src/models/user.model';
 import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
+import { QuestionListShowDto } from './dto/QuestionList.res.dto';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
 import { QuestionsService } from './questions.service';
 
@@ -48,8 +49,9 @@ export class QuestionsController {
   })
   @ApiResponse({
     status: 200,
-    description: '요청 성공시',
-    type: [QuestionShowDto],
+    description:
+      '요청 성공시 , 코멘트 갯수만 반환합니다 밑에 QuestionShow는 디테일 인포 용입니당!',
+    type: [QuestionListShowDto],
   })
   @Get()
   findQuestions(
