@@ -3,10 +3,12 @@ import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
 import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
 import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 import { MongoId } from 'src/common/dtos/MongoId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { Room } from 'src/models/room.model';
 import { User } from 'src/models/user.model';
 import { RoomRepository } from 'src/repositories/room.repository';
@@ -26,6 +28,15 @@ export class RoomsService {
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
   ) {}
+
+  private filterRemoveBlockedUserFromUserList(
+    userList: UserProfileDto[],
+    blockedUserDto: BlockedUserDto,
+  ) {
+    return userList.filter(
+      (user) => !blockedUserDto.blockedUsers.find((e) => e.equals(user._id)),
+    );
+  }
 
   /**
    * 룸을 생성할 수 있음 좌표정보, 룸 이름, 반경정보 등이 필요함
@@ -96,9 +107,11 @@ export class RoomsService {
    * @param userIdDto
    * @returns
    */
+  // 차단 로직 적용필요
   async addUserToRoom(
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
+    blockUserListDto: BlockedUserDto,
   ): Promise<ResFindOneRoomDto> {
     // 이전 룸에서 빼주는 로직 추가해야함
     const user = await this.userRepository.findOneByUserId(userIdDto);
@@ -117,6 +130,12 @@ export class RoomsService {
           : false;
         // const isFavoritRoom = user.favoriteRoomList.includes(user.myRoom._id);
         const room = await this.roomRepository.findOneByRoomId(roomIdDto);
+
+        // 차단 유저아웃
+        room.userList = this.filterRemoveBlockedUserFromUserList(
+          room.userList,
+          blockUserListDto,
+        );
         const result = { ...room, iFavorite, iAlarm: user.chatAlarm };
 
         return plainToInstance(ResFindOneRoomDto, result, {
@@ -140,6 +159,12 @@ export class RoomsService {
     )
       ? true
       : false;
+
+    // 차단 유저아웃
+    room.userList = this.filterRemoveBlockedUserFromUserList(
+      room.userList,
+      blockUserListDto,
+    );
 
     const result = { ...room, iFavorite, iAlarm: true };
     // console.log(result);

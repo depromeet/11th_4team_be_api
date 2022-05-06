@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsPhoneNumber,
   IsString,
+  Matches,
 } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
@@ -71,6 +72,7 @@ export class User {
     required: true,
   })
   @IsString()
+  @Matches(/^[가-힣]+$/)
   @Expose()
   nickname: string;
 
