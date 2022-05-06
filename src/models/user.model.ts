@@ -3,15 +3,13 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
-  IsObject,
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { getEnumToArray, STATUS_TYPE } from 'src/common/consts/enum';
+import { STATUS_TYPE } from 'src/common/consts/enum';
 import { Room } from './room.model';
-import * as mongoose from 'mongoose';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
@@ -101,7 +99,7 @@ export class User {
   FCMToken: string;
 
   // 룸리스트 아이디 형태만 저장
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Room' }] })
   favoriteRoomList: Room[];
 
   @ApiProperty({
@@ -111,7 +109,7 @@ export class User {
     description: '유저의 앱알림 설정 ( 앱 모든 알림 전체 )',
   })
   @Type(() => ResShortCutRoomDto)
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
+  @Prop({ type: Types.ObjectId, ref: 'Room' })
   @IsObjectId()
   @Expose()
   myRoom: Room;
@@ -138,7 +136,7 @@ export class User {
   @Expose()
   chatAlarm: boolean;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
   @IsObjectId()
   @Type(() => UserProfileDto)
   @Exclude()
@@ -149,7 +147,7 @@ export class User {
     description: '내가 차단한 유저들.  정보탭에서 보여지는 부분들',
   })
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
+    type: [{ type: Types.ObjectId, ref: User.name }],
   })
   @IsObjectId()
   @Type(() => UserProfileDto)
@@ -166,7 +164,7 @@ export class User {
     type: String,
     description: '한국시간으로 보정된 시간값',
   })
-  @Transform(({ value }) => toKRTimeZone(value))
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
   @Expose()
   createdAt: Date;
 }

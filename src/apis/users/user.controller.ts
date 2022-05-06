@@ -7,7 +7,6 @@ import {
   Controller,
   Post,
   Param,
-  Put,
   UseGuards,
   Get,
   Patch,
@@ -19,20 +18,14 @@ import {
   ApiBody,
   ApiOperation,
   ApiTags,
-  ApiParam,
   ApiBearerAuth,
-  ApiUnauthorizedResponse,
   ApiResponse,
-  ApiBasicAuth,
 } from '@nestjs/swagger';
-import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
-import { NicknameDto, UpdateProfileDto } from './dto/user.dto';
+import { NicknameDto } from './dto/user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
 import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
-import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mongooseClassSerializer.interceptor';
-import { LoggingInterceptor } from 'src/common/interceptors/test.interceptors';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
@@ -42,7 +35,7 @@ import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 @Controller('user')
 @ApiBearerAuth('accessToken')
 @UseInterceptors(SuccessInterceptor)
-// @UseInterceptors(ClassSerializerInterceptor)
+@UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -53,7 +46,6 @@ export class UserController {
     description: '요청 성공시',
     type: User,
   })
-  @MongooseClassSerializerInterceptor(User)
   @Get('')
   async getMyUserInfo(@ReqUser() user: User) {
     // findOneByUserId
@@ -67,14 +59,11 @@ export class UserController {
     description: '요청 성공시',
     type: User,
   })
-  @MongooseClassSerializerInterceptor(User)
   @Patch('')
   async updateProfile(
     @Body() updateProfileReqDto: UpdateProfileReqDto,
     @ReqUser() user: User,
   ): Promise<User> {
-    console.log(user);
-
     return await this.userService.updateProfile(
       user.userIdDto,
       updateProfileReqDto,
@@ -87,16 +76,14 @@ export class UserController {
     description: '요청 성공시',
     type: UserProfileDto,
   })
-  @MongooseClassSerializerInterceptor(UserProfileDto)
   @Get(':userId')
-  async getUserInfo(@Param() UserIdDto: UserIdDto) {
+  async getOtherUserInfo(@Param() UserIdDto: UserIdDto) {
     // findOneByUserId
-    return await this.userService.getUserInfo(UserIdDto);
+    return await this.userService.getOtherUserInfo(UserIdDto);
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단한다' })
   @Post(':userId/block')
-  @MongooseClassSerializerInterceptor(User)
   @ApiResponse({
     status: 201,
     description: '요청 성공시',
@@ -112,7 +99,6 @@ export class UserController {
     description: '요청 성공시',
     type: User,
   })
-  @MongooseClassSerializerInterceptor(User)
   @Delete(':userId/block')
   unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
     return this.userService.upBlockUser(user.userIdDto, otherUSerIdDto);
@@ -122,23 +108,19 @@ export class UserController {
 
   @ApiOperation({ summary: '상대방 유저를 신고한다.' })
   @Post(':userId/report')
-  @MongooseClassSerializerInterceptor(ReportResultDtoResDto)
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
     type: ReportResultDtoResDto,
   })
   reportUser(@Param() reportedIdDto: UserIdDto, @ReqUser() user: User) {
-    const result = this.userService.reportUser(user.userIdDto, reportedIdDto);
-    console.log(typeof result);
-    return result;
+    return this.userService.reportUser(user.userIdDto, reportedIdDto);
   }
 
   @ApiOperation({
     summary: '닉네임이 유효한지 , 내가 들어가있는 방정보가 있는지 확인한다.',
   })
   @Get('canChange/:nickname')
-  @MongooseClassSerializerInterceptor(CanChangeNicknameResDto)
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
@@ -157,7 +139,6 @@ export class UserController {
   @ApiOperation({
     summary: '알림 토글 ( 최신 상태를 리턴 )',
   })
-  @MongooseClassSerializerInterceptor(NewAlarmStateResDto)
   @Patch('alarm')
   @ApiResponse({
     status: 200,
