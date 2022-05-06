@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Type } from '@nestjs/common';
 import { ObjectId, Types } from 'mongoose';
 import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 import { MongoId } from 'src/common/dtos/MongoId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
@@ -24,10 +25,20 @@ export class LetterService {
     private readonly userRepository: UserRepository,
   ) {}
 
+  private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
+    // console.log('asdfasdfasdfasdfasdf', userIdDto.userId);
+    if (blockedUserDto.blockedUsers.find((id) => id.equals(userIdDto.userId))) {
+      throw new BadRequestException('차단된 유저입니다.');
+    }
+  }
+
   async sendLetterToReciever(
     twoUserList: TwoUserListDto,
     messageStringDto: MessageStringDto,
+    blockedUserDto: BlockedUserDto,
   ) {
+    this.checkBlocked(new UserIdDto(twoUserList.recevier), blockedUserDto);
+
     if (twoUserList.userList[0].equals(twoUserList.userList[1])) {
       throw new BadRequestException('유저 아이디가 같음');
     }
@@ -70,9 +81,13 @@ export class LetterService {
     return filterMyLetters;
   }
 
-  async getRoomsByMyUserId(myUserId: UserIdDto): Promise<LetterRoomDto[]> {
+  async getRoomsByMyUserId(
+    myUserId: UserIdDto,
+    blockedUserDto: BlockedUserDto,
+  ): Promise<LetterRoomDto[]> {
     const myLetterRooms = await this.letterRepository.getRoomsByMyUserId(
       myUserId,
+      blockedUserDto,
     );
     console.log(myLetterRooms);
 
@@ -85,6 +100,7 @@ export class LetterService {
   async leaveLetterRoomByRoomId(
     letterRoomIdDto: LetterRoomIdDto,
     myUserId: UserIdDto,
+    blockedUserDto: BlockedUserDto,
   ): Promise<LetterRoomDto[]> {
     await this.checkRoomJoin(myUserId, letterRoomIdDto);
 
@@ -100,7 +116,7 @@ export class LetterService {
       // 길이가 2가되면 두명다 나간거므로 삭제 진행
       await this.deleteRoomAndLetters(letterRoomIdDto);
     }
-    return this.getRoomsByMyUserId(myUserId);
+    return this.getRoomsByMyUserId(myUserId, blockedUserDto);
   }
 
   private async deleteRoomAndLetters(letterRoomIdDto: LetterRoomIdDto) {

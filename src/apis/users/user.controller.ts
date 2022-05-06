@@ -74,10 +74,17 @@ export class UserController {
     description: '요청 성공시',
     type: UserProfileDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: '차단된 유저 ,또는 없는 유저일경우',
+  })
   @Get(':userId')
-  async getOtherUserInfo(@Param() UserIdDto: UserIdDto) {
+  async getOtherUserInfo(@Param() UserIdDto: UserIdDto, @ReqUser() user: User) {
     // findOneByUserId
-    return await this.userService.getOtherUserInfo(UserIdDto);
+    return await this.userService.getOtherUserInfo(
+      UserIdDto,
+      user.blockedUserDto,
+    );
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단한다' })

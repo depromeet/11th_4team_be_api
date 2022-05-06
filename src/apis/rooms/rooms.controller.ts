@@ -76,7 +76,7 @@ export class RoomsController {
     console.log(user);
     // console.log(FindRoomDto);
     // 경도lng 위도lat
-    return this.roomsService.findRoom(FindRoomDto, new UserIdDto(user._id));
+    return this.roomsService.findRoom(FindRoomDto, user.userIdDto);
   }
   //TODO : 안읽은 채팅 갯수 ?
   @ApiOperation({ summary: '(채팅탭용)내 룸 정보 가져옴' })
@@ -94,7 +94,7 @@ export class RoomsController {
   getMyRoomShortCutInfo(@ReqUser() user: User) {
     // console.log(FindRoomDto);
     // 경도lng 위도lat
-    return this.roomsService.getMyRoomShortCutInfo(new UserIdDto(user._id));
+    return this.roomsService.getMyRoomShortCutInfo(user.userIdDto);
   }
 
   @ApiOperation({ summary: '(채팅탭용)내가 즐겨찾기한 채팅방 뽑아옴' })
@@ -133,14 +133,18 @@ export class RoomsController {
   })
   joinRoom(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     // 조인 룸시에 다른 룸에서 자동으로 나가져야함
-    return this.roomsService.addUserToRoom(roomId, new UserIdDto(user._id));
+    return this.roomsService.addUserToRoom(
+      roomId,
+      user.userIdDto,
+      user.blockedUserDto,
+    );
   }
 
   @ApiOperation({ summary: '유저가 채팅방에서 아예 나가버릴때' })
   @Delete(':roomId/join')
   outRoom(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     // 조인 룸시에 다른 룸에서 자동으로 나가져야함
-    return this.roomsService.pullUserFromRoom(roomId, new UserIdDto(user._id));
+    return this.roomsService.pullUserFromRoom(roomId, user.userIdDto);
   }
 
   @ApiOperation({ summary: '유저가 룸을 즐겨찾기에서 빼고넣는다' })
@@ -156,7 +160,7 @@ export class RoomsController {
   ) {
     return this.roomsService.toggleRoomToUserFavoriteList(
       roomId,
-      new UserIdDto(user._id),
+      user.userIdDto,
     );
   }
 
@@ -168,12 +172,12 @@ export class RoomsController {
     type: ResChatAlarmToggleDto,
   })
   turnOnChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-    return this.roomsService.toggleChatAlarm(new UserIdDto(user._id));
+    return this.roomsService.toggleChatAlarm(user.userIdDto);
   }
 
   // @ApiOperation({ summary: '유저가 채팅 알림을 끈다' })
   // @Delete(':roomId/alarm')
   // turnOffChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-  //   return this.roomsService.turnOffChatAlarm(new UserIdDto(user._id));
+  //   return this.roomsService.turnOffChatAlarm(user.userIdDto);
   // }
 }

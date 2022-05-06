@@ -59,6 +59,7 @@ export class QuestionsController {
     return this.questionService.findQuestions(
       user.userIdDto,
       questionFindRequestDto,
+      user.blockedUserDto,
     );
   }
 
@@ -88,6 +89,7 @@ export class QuestionsController {
     return await this.questionService.findQuestionById(
       user.userIdDto,
       questionIdDto,
+      user.blockedUserDto,
     );
   }
 

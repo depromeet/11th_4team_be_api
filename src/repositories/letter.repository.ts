@@ -9,6 +9,7 @@ import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 import { MessageStringDto } from 'src/apis/letter/dto/messageString.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
+import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 
 @Injectable()
 export class LetterRepository {
@@ -18,12 +19,22 @@ export class LetterRepository {
     private readonly letterRoomModel: Model<LetterRoom>,
   ) {}
 
-  async getRoomsByMyUserId(userIdDto: UserIdDto): Promise<LetterRoom[]> {
+  async getRoomsByMyUserId(
+    userIdDto: UserIdDto,
+    blockUserListDto: BlockedUserDto,
+  ): Promise<LetterRoom[]> {
     // 내가 속한 방에서 편지 하나 lookup 한뒤에 리턴
     // match LeftUserList에는 속하면 안됨.
     const myLetterRooms = await this.letterRoomModel
       .find({
-        joinUserList: { $elemMatch: { $eq: userIdDto.userId } },
+        $and: [
+          {
+            joinUserList: {
+              $eq: userIdDto.userId,
+            },
+          },
+          { joinUserList: { $nin: blockUserListDto.blockedUsers } },
+        ],
         leftUserList: { $ne: userIdDto.userId },
       })
       .populate({
