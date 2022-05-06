@@ -40,7 +40,7 @@ import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { ResChatAlarmToggleDto } from './dto/chatAlarmToggle.res.dto';
 import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { Room } from 'src/models/room.model';
-import { ResShortCutRoomDto } from '../../common/dtos/shortCutRoomInfo.res.dto';
+import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')

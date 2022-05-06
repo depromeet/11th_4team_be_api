@@ -10,6 +10,7 @@ import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 
 @Injectable()
 export class UserService {
@@ -18,11 +19,19 @@ export class UserService {
     private reportRepository: ReportRepository,
   ) {}
 
+  @returnValueToDto(User)
   async getUserInfo(userIdDto: UserIdDto): Promise<User> {
     // auto 시리얼 라이징
     return await this.userRepository.findOneByUserId(userIdDto);
   }
 
+  @returnValueToDto(UserProfileDto)
+  async getOtherUserInfo(userIdDto: UserIdDto): Promise<UserProfileDto> {
+    // auto 시리얼 라이징
+    return await this.userRepository.findOneByUserId(userIdDto);
+  }
+
+  @returnValueToDto(User)
   async updateProfile(
     userIdDto: UserIdDto,
     updateProfileReqDto: UpdateProfileReqDto,
@@ -34,6 +43,7 @@ export class UserService {
     );
   }
 
+  @returnValueToDto(User)
   async blockUser(
     myUserIdDto: UserIdDto,
     otherUserIdDto: UserIdDto,
@@ -60,7 +70,7 @@ export class UserService {
     // auto 시리얼 라이징
     return returnUser;
   }
-
+  @returnValueToDto(User)
   async upBlockUser(
     myUserIdDto: UserIdDto,
     otherUserIdDto: UserIdDto,
