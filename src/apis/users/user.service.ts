@@ -18,6 +18,12 @@ import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { LightningRepository } from 'src/repositories/lightning.repository';
+import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
+import {
+  USER_LEVELUP_COUNT_TYPE,
+  USER_LEVEL_TYPE,
+} from 'src/common/consts/enum';
 
 @Injectable()
 export class UserService {
@@ -26,6 +32,7 @@ export class UserService {
     private reportRepository: ReportRepository,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+    private lightnignRepository: LightningRepository,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -57,6 +64,8 @@ export class UserService {
     updateProfileReqDto: UpdateProfileReqDto,
   ): Promise<User> {
     // auto 시리얼 라이징
+
+    //TODO :  닉네임 변경시에 한번더 밸리데이션? 내프로필 정보랑 닉네임 일치하면 변경하고..
     return await this.userRepository.updateProfile(
       userIdDto,
       updateProfileReqDto,
@@ -171,5 +180,43 @@ export class UserService {
   async toggleAlarmAlarm(myUserIdDto: UserIdDto): Promise<NewAlarmStateResDto> {
     const appAlarm = await this.userRepository.toggleApptAlarm(myUserIdDto);
     return { appAlarm: appAlarm };
+  }
+
+  @returnValueToDto(SendLightningSuccessDtoResDto)
+  async sendLightningToUser(
+    sender: UserIdDto,
+    receive: UserIdDto,
+  ): Promise<SendLightningSuccessDtoResDto> {
+    const checkReportExist = this.lightnignRepository.findOneLightningByUserId(
+      sender,
+      receive,
+    );
+    if (checkReportExist) {
+      return { sendLightningSuccess: false };
+    }
+
+    const expireAt = new Date();
+    // utc 한국시간 기준으로 자정으로 설정
+    expireAt.setUTCHours(15, 0, 0, 0);
+    // expireAt.setHours()
+    await this.lightnignRepository.saveLighting(sender, receive, expireAt);
+    const addUserScore = await this.userRepository.addUserLigthningScore(
+      receive,
+    );
+
+    switch (addUserScore.lightningScore) {
+      case USER_LEVELUP_COUNT_TYPE.LEVEL1:
+        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL1);
+        break;
+      case USER_LEVELUP_COUNT_TYPE.LEVEL2:
+        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL2);
+        break;
+      case USER_LEVELUP_COUNT_TYPE.LEVEL3:
+        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL3);
+        break;
+      default:
+        break;
+    }
+    return { sendLightningSuccess: true };
   }
 }

@@ -30,6 +30,7 @@ import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
+import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -152,5 +153,23 @@ export class UserController {
   })
   toggleAppAlarm(@ReqUser() user: User) {
     return this.userService.toggleAlarmAlarm(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '상대방에게 번개를 보낸다',
+  })
+  @Post(':userId/lightning')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: SendLightningSuccessDtoResDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: '이미 요청되었으면하루에 한번  ',
+    type: SendLightningSuccessDtoResDto,
+  })
+  sendLightningToUser(@ReqUser() user: User, @Param() userIdDto: UserIdDto) {
+    return this.userService.sendLightningToUser(user.userIdDto, userIdDto);
   }
 }
