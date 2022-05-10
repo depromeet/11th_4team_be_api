@@ -72,11 +72,11 @@ export class UserService {
     );
   }
 
-  @returnValueToDto(User)
+  @returnValueToDto(UserProfileDto)
   async blockUser(
     myUserIdDto: UserIdDto,
     otherUserIdDto: UserIdDto,
-  ): Promise<User> {
+  ): Promise<UserProfileDto[]> {
     if (myUserIdDto.userId.equals(otherUserIdDto.userId)) {
       throw new BadRequestException('내 자신 차단');
     }
@@ -97,15 +97,20 @@ export class UserService {
     );
     console.log('asdfasdfasdfasdfasdf', returnUser);
     // auto 시리얼 라이징
-    return returnUser;
+    return returnUser.iBlockUsers;
   }
-  @returnValueToDto(User)
+  @returnValueToDto(UserProfileDto)
   async upBlockUser(
     myUserIdDto: UserIdDto,
     otherUserIdDto: UserIdDto,
-  ): Promise<User> {
+  ): Promise<UserProfileDto[]> {
     // auto 시리얼 라이징
-    return await this.userRepository.unBlockUser(myUserIdDto, otherUserIdDto);
+    const user = await this.userRepository.unBlockUser(
+      myUserIdDto,
+      otherUserIdDto,
+    );
+
+    return user.iBlockUsers;
   }
 
   async reportUser(
@@ -218,5 +223,14 @@ export class UserService {
         break;
     }
     return { sendLightningSuccess: true };
+  }
+
+  @returnValueToDto(UserProfileDto)
+  async getMyBlockUser(myUserIdDto: UserIdDto) {
+    console.log('check');
+    const user = await this.userRepository.findOneByUserId(myUserIdDto);
+    console.log(user);
+
+    return user.iBlockUsers;
   }
 }

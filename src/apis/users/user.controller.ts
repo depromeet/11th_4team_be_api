@@ -68,6 +68,17 @@ export class UserController {
       updateProfileReqDto,
     );
   }
+
+  @ApiOperation({ summary: '내 차단유저 목록을 불러온다' })
+  @Get('/block')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [UserProfileDto],
+  })
+  getMyBlockUser(@ReqUser() user: User) {
+    return this.userService.getMyBlockUser(user.userIdDto);
+  }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
   @ApiResponse({
@@ -93,7 +104,7 @@ export class UserController {
   @ApiResponse({
     status: 201,
     description: '요청 성공시',
-    type: User,
+    type: [UserProfileDto],
   })
   blockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {
     return this.userService.blockUser(user.userIdDto, otherUSerIdDto);
@@ -103,7 +114,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
-    type: User,
+    type: [UserProfileDto],
   })
   @Delete(':userId/block')
   unblockUser(@Param() otherUSerIdDto: UserIdDto, @ReqUser() user: User) {

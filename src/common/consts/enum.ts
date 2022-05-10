@@ -113,9 +113,10 @@ enum NOTIFICATION_POST_TYPE {
 
 //카테고리 타입 한글로
 enum QUESTION_FIND_FILTER_TYPE {
-  NOTANSWERED = 'NOTANSWERED', //대학교
-  OLDORDER = 'OLDORDER', //공연장
-  NEWORDER = 'NEWORDER', //한강공원
+  NOTANSWERED = 'NOTANSWERED', // 답변못받은거
+  OLDORDER = 'OLDORDER', //오래된순
+  NEWORDER = 'NEWORDER', //최신순
+  RECENT = 'RECENT', //최신순
 }
 
 enum USER_LEVEL_TYPE {
