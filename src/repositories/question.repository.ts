@@ -50,6 +50,23 @@ export class QuestionRepository {
       .lean<Question[]>({ defaults: true });
   }
 
+  async getRecent2Questions(
+    roomIdDto: RoomIdDto,
+    blockUserListDto: BlockedUserDto,
+  ): Promise<Question[]> {
+    return await this.questionModel
+      .find({
+        room: roomIdDto.roomId,
+        user: { $nin: blockUserListDto.blockedUsers },
+      })
+      .sort({ createdAt: -1 })
+      .limit(2)
+      .populate({
+        path: 'user',
+        select: UserProfileSelect,
+      })
+      .lean<Question[]>({ defaults: true });
+  }
   async getQuestionsByRoomIdNotAnswerd(
     roomIdDto: RoomIdDto,
     blockUserListDto: BlockedUserDto,

@@ -173,12 +173,12 @@ export class RoomsService {
       : false;
 
     // 차단 유저아웃
-    room.userList = this.filterRemoveBlockedUserFromUserList(
-      room.userList,
+    newRoom.userList = this.filterRemoveBlockedUserFromUserList(
+      newRoom.userList,
       blockUserListDto,
     );
 
-    const result = { ...room, iFavorite, iAlarm: true };
+    const result = { ...newRoom, iFavorite, iAlarm: true };
     // console.log(result);
     return plainToInstance(ResFindOneRoomDto, result, {
       excludeExtraneousValues: true,
