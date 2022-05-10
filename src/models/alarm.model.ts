@@ -10,6 +10,11 @@ import { Document, Types } from 'mongoose';
 import { User } from './user.model';
 import { IsObjectId } from 'class-validator-mongo-object-id';
 import { CHAT_TYPE, EVENT_TYPE } from 'src/common/consts/enum';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
+import { Expose, Transform, Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 
 const options: SchemaOptions = {
   collection: 'alarm',
@@ -17,57 +22,84 @@ const options: SchemaOptions = {
 };
 
 @Schema(options)
-export class Chat extends Document {
+export class Alarm {
+  @ApiProperty({
+    description: '개별알림의 고유아이디',
+    type: String,
+  })
+  // 시리얼 라이제이션 할때 사용
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Type(() => Types.ObjectId)
+  @Expose()
+  _id: Types.ObjectId;
+
+  @Prop({ required: true, type: Types.ObjectId })
+  user: Types.ObjectId;
+
+  @ApiProperty({
+    description: '알림 발송의 주체가 null 값이 될 수 있음 주의!!!',
+    type: UserProfileDto,
+    default: null,
+    nullable: true,
+  })
   @Prop({ required: true, type: Types.ObjectId, ref: 'user' })
-  @IsObjectId()
-  receiver: Types.ObjectId;
+  sender: UserProfileDto;
 
-  @Prop({
-    default: false,
+  // @Prop({ required: true })
+  // @IsString()
+  // @IsEnum(EVENT_TYPE)
+  // eventType: EVENT_TYPE;
+
+  @ApiProperty({
+    type: String,
+    description: '한국시간으로 보정된 시간값 ( 알림이 쌓인 시간 )',
   })
-  @IsNotEmpty()
-  @IsBoolean()
-  watch: boolean;
-
-  @Prop({
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsArray()
-  list: List;
-}
-
-@Schema()
-export class List {
-  @Prop({ required: true, type: Types.ObjectId, ref: 'user' })
-  @IsObjectId()
-  sender: Types.ObjectId;
-
-  @Prop({ required: true })
-  @IsString()
-  @IsEnum(EVENT_TYPE)
-  eventType: EVENT_TYPE;
-
-  @Prop({
-    default: Date.now(),
-    type: Date,
-    ref: 'user',
-  })
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  @Expose()
   createdAt: Date;
 
+  @ApiProperty({
+    type: String,
+    description: '굵은 글씨 부분',
+  })
   @Prop({
     required: true,
+    default: '',
+    type: String,
   })
-  @IsNotEmpty()
-  @IsString()
-  message: string;
+  title: string;
+
+  @ApiProperty({
+    type: String,
+    description: '얇은 글씨 부분',
+  })
+  @Prop({
+    required: true,
+    default: '',
+    type: String,
+  })
+  subTitle: string;
 
   @Prop({
     required: true,
+    default: '',
+    type: String,
   })
-  @IsNotEmpty()
-  @IsString()
   deepLink: string;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '내가 알림을 눌러봤는지에 대한 정보',
+  })
+  @Prop({
+    default: true,
+    type: Boolean,
+  })
+  @IsBoolean()
+  @Expose()
+  iWatch: boolean;
 }
 
-export const AlarmSchema = SchemaFactory.createForClass(Chat);
+export const AlarmSchema = SchemaFactory.createForClass(Alarm);
+// 한달 간격 사라짐
+AlarmSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
