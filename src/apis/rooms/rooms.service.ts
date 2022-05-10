@@ -118,6 +118,7 @@ export class RoomsService {
     // 유저가현재 들어가있는 방이있으면
     // safe 어프로치 populate 안때려도 가상으로 데려감 몽고디비 Document 형식이면
     // console.log(typeof roomIdDto.roomId, roomIdDto.roomId, user.myRoom._id);
+    const room = await this.roomRepository.findOneByRoomId(roomIdDto);
 
     if (user.myRoom) {
       // 유저가 들어간 채팅방이 있을경우
@@ -129,7 +130,6 @@ export class RoomsService {
           ? true
           : false;
         // const isFavoritRoom = user.favoriteRoomList.includes(user.myRoom._id);
-        const room = await this.roomRepository.findOneByRoomId(roomIdDto);
 
         // 차단 유저아웃
         room.userList = this.filterRemoveBlockedUserFromUserList(
@@ -143,16 +143,28 @@ export class RoomsService {
         });
       } else {
         // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
+        // 300명인지 체크하는 로직추가
+        if (room.userCount >= 300) {
+          throw new BadRequestException('유저수가 300명이 넘었습니다.');
+        }
+
         await this.roomRepository.pullUserFromRoom(
           new RoomIdDto(user.myRoom._id),
           userIdDto,
         );
       }
     }
+    // 300명인지 체크하는 로직추가
+    if (room.userCount >= 300) {
+      throw new BadRequestException('유저수가 300명이 넘었습니다.');
+    }
     // 룸에 새로 들어갈때,,,?
     await this.userRepository.setMyRoom(userIdDto, roomIdDto);
     await this.userRepository.turnOnChatAlarm(userIdDto);
-    const room = await this.roomRepository.addUserToRoom(roomIdDto, userIdDto);
+    const newRoom = await this.roomRepository.addUserToRoom(
+      roomIdDto,
+      userIdDto,
+    );
     //check
     const iFavorite = user.favoriteRoomList.find((room) =>
       room._id.equals(roomIdDto.roomId),
