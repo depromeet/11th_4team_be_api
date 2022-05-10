@@ -72,6 +72,13 @@ export class QuestionsService {
         );
 
         break;
+      case QUESTION_FIND_FILTER_TYPE.RECENT:
+        result = await this.questionRepository.getRecent2Questions(
+          myRoomIdDto,
+          blockUserListDto,
+        );
+
+        break;
     }
 
     result.forEach(function (element) {

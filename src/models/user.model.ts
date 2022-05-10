@@ -174,6 +174,28 @@ export class User {
   @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
   @Expose()
   createdAt: Date;
+
+  @ApiProperty({
+    type: Number,
+    description: '유저의 번개 점수',
+  })
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  @Expose()
+  lightningScore: number;
+
+  @ApiProperty({
+    type: Number,
+    description: '유저의 확성기 레벨',
+  })
+  @Prop({
+    type: Number,
+    default: 0,
+  })
+  @Expose()
+  level: number;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);

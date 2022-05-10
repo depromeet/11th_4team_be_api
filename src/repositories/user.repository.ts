@@ -15,7 +15,7 @@ import { Room } from 'src/models/room.model';
 import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
-import { STATUS_TYPE } from 'src/common/consts/enum';
+import { STATUS_TYPE, USER_LEVEL_TYPE } from 'src/common/consts/enum';
 
 @Injectable()
 export class UserRepository {
@@ -382,5 +382,21 @@ export class UserRepository {
     console.log(roomInfo);
 
     return roomInfo.length ? roomInfo[0] : null;
+  }
+
+  async addUserLigthningScore(userIdDto: UserIdDto): Promise<User> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      { $inc: { lightningScore: 1 } },
+      { new: true },
+    );
+  }
+
+  async levelUpUser(userIdDto: UserIdDto, userlevel: number): Promise<User> {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      { level: userlevel },
+      { new: true },
+    );
   }
 }
