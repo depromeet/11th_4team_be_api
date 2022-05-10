@@ -57,6 +57,8 @@ export class UserService {
     updateProfileReqDto: UpdateProfileReqDto,
   ): Promise<User> {
     // auto 시리얼 라이징
+
+    //TODO :  닉네임 변경시에 한번더 밸리데이션? 내프로필 정보랑 닉네임 일치하면 변경하고..
     return await this.userRepository.updateProfile(
       userIdDto,
       updateProfileReqDto,
