@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { RoomsModule } from './apis/rooms/rooms.module';
 import { LetterModule } from './apis/letter/letter.module';
 import { QuestionsModule } from './apis/questions/questions.module';
-import { AlarmModule } from './alarm/alarm.module';
+import { AlarmModule } from './apis/alarm/alarm.module';
 import mongooseLeanDefaults from 'mongoose-lean-defaults';
 @Module({
   imports: [

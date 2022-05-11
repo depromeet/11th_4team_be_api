@@ -1,15 +1,7 @@
-import {
-  IsBoolean,
-  IsNotEmpty,
-  IsString,
-  IsEnum,
-  IsArray,
-} from 'class-validator';
+import { IsBoolean } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
-import { User } from './user.model';
-import { IsObjectId } from 'class-validator-mongo-object-id';
-import { CHAT_TYPE, EVENT_TYPE } from 'src/common/consts/enum';
+import { Types } from 'mongoose';
+
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { Expose, Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
