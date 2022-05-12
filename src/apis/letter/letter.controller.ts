@@ -67,6 +67,7 @@ export class LetterController {
       twoUserList,
       messageStringDto,
       user.blockedUserDto,
+      user,
     );
   }
 

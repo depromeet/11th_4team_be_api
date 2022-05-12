@@ -7,6 +7,7 @@ import { Expose, Transform, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
+import { ALARM_STORE_TYPE } from 'src/common/consts/enum';
 
 const options: SchemaOptions = {
   collection: 'alarm',
@@ -50,16 +51,16 @@ export class Alarm {
   @Expose()
   createdAt: Date;
 
-  @ApiProperty({
-    type: String,
-    description: '굵은 글씨 부분',
-  })
+  // @ApiProperty({
+  //   type: String,
+  //   description: '굵은 글씨 부분',
+  // })
   @Prop({
     required: true,
     default: '',
     type: String,
   })
-  title: string;
+  rawTitle: string;
 
   @ApiProperty({
     type: String,
@@ -90,6 +91,16 @@ export class Alarm {
   @IsBoolean()
   @Expose()
   iWatch: boolean;
+
+  @ApiProperty({
+    description: '알림 타입 정보',
+    enum: ALARM_STORE_TYPE,
+  })
+  @Prop({
+    required: true,
+    enum: ALARM_STORE_TYPE,
+  })
+  alarmType: string;
 }
 
 export const AlarmSchema = SchemaFactory.createForClass(Alarm);

@@ -5,10 +5,10 @@ WORKDIR /app
 COPY ./package.json ./
 COPY ./package-lock.json ./
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-EXPOSE 8002
+EXPOSE 8082
 
-CMD ["npm","run","dev"]
+CMD ["npm","run","start:dev"]

@@ -133,7 +133,38 @@ enum USER_LEVELUP_COUNT_TYPE {
   LEVEL3 = 100, //한강공원
 }
 
+enum PUSH_ALRAM_TYPE {
+  COMMENT = 'comment',
+  LETTER = 'letter',
+  CHAT = 'CHAT',
+  OFFICIAL = 'official',
+}
+
+enum ALARM_TYPE {
+  COMMENT = 'comment',
+  LETTER = 'letter',
+  CHAT = 'CHAT',
+  OFFICIAL = 'official',
+  LIGHTNING = 'lightning',
+  LIGHTNING_LEVELUP = 'lightningLevelUp',
+}
+
+enum ALARM_STORE_TYPE {
+  // 댓글 줬을때
+  COMMENT = 'comment',
+  // 번개 줬을 떄
+  LIGHTNING = 'lightning',
+  // 시스템 전부 공지알림
+  OFFICIAL = 'official',
+}
+
+const PUSH_ALARM = 'pushAlarm';
+
 export {
+  PUSH_ALRAM_TYPE,
+  ALARM_STORE_TYPE,
+  PUSH_ALARM,
+  ALARM_TYPE,
   USER_LEVELUP_COUNT_TYPE,
   USER_LEVEL_TYPE,
   QUESTION_FIND_FILTER_TYPE,

@@ -1,9 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { AlarmRepository } from 'src/repositories/alarm.repository';
-
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import {
+  ALARM_TYPE,
+  PUSH_ALARM,
+  PUSH_ALRAM_TYPE,
+} from 'src/common/consts/enum';
+import { Letter } from 'src/models/letter.model';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { SaveAlarmDto } from './dto/saveAlarm.dto';
+import { User } from 'src/models/user.model';
+import { SendPushAlarmDto } from './dto/sendPushAlarm.dto';
+import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class AlarmService {
-  constructor(private readonly alarmRepository: AlarmRepository) {}
+  constructor(
+    private readonly alarmRepository: AlarmRepository,
+    @InjectQueue(PUSH_ALARM) private readonly pushAlarmQueue: Queue,
+  ) {}
 
   //pushAlarm  --> fcm push
   // storeAlarm --> user
@@ -20,15 +35,35 @@ export class AlarmService {
 
   ///--------------------------------------------- 알림탭
 
-  // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
-  // async (myUserIdDto: UserIdDto) {
-  //     console.log('check');
-  //     const user = await this.userRepository.findOneByUserId(myUserIdDto);
-  //     console.log(user);
-  //     return user.iBlockUsers;
-  //   }
+  // 나한테 편지가 왔을 때
+  // 푸시알림만 해야함
+  async letterAlarm(sender: User, receiver: UserIdDto, letter: Letter) {
+    // pushAlarm To LETTER
+    //saveAlarm.dto make.
+    const saveAlarmObj = {
+      nickname: sender.nickname,
+      content: letter.message,
+      pushAlarmType: PUSH_ALRAM_TYPE.LETTER,
+      // Title: ,
+      // subTitle: sender.nickname + ' : ' + letter.message,
+    };
+    const sendPushAlarmDto = plainToInstance(SendPushAlarmDto, saveAlarmObj);
+    const job = await this.pushAlarmQueue.add(
+      ALARM_TYPE.LETTER,
+      sendPushAlarmDto,
+    );
+  }
 
   // 다른사람이 나한테 번개를 줬을 때
+  async storeLightningAlarm(sender: UserIdDto, receiver: UserIdDto) {
+    // pushAlarm To LETTER
+
+    console.log('check', sender);
+    // const user = await this.userRepository.findOneByUserId(myUserIdDto);
+    // console.log(user);
+  }
+
+  // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
 
   // 내 레벨이 올랐을 때
 
