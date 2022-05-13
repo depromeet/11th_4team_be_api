@@ -2,7 +2,7 @@ import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { plainToInstance } from 'class-transformer';
 import { PUSH_ALARM, ALARM_TYPE } from 'src/common/consts/enum';
-import { SendPushAlarmDto } from './dto/sendPushAlarm.dto';
+import { SendPushAlarmSubDto } from './dto/sendPushAlarm.sub.dto';
 
 @Processor(PUSH_ALARM)
 export class PushAlarmProcessor {
@@ -11,7 +11,7 @@ export class PushAlarmProcessor {
     // job.data
     console.log('processor Letter ', job.data);
 
-    const sendPushAlarmDto = plainToInstance(SendPushAlarmDto, job.data);
+    const sendPushAlarmDto = plainToInstance(SendPushAlarmSubDto, job.data);
     console.log(sendPushAlarmDto.subTitle, sendPushAlarmDto.Title);
   }
 }

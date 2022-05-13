@@ -11,8 +11,7 @@ import { Letter } from 'src/models/letter.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { SaveAlarmDto } from './dto/saveAlarm.dto';
 import { User } from 'src/models/user.model';
-import { SendPushAlarmDto } from './dto/sendPushAlarm.dto';
-import { plainToInstance } from 'class-transformer';
+import { SendPushAlarmPubDto } from './dto/sendPushAlarm.pub.dto';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -40,18 +39,15 @@ export class AlarmService {
   async letterAlarm(sender: User, receiver: UserIdDto, letter: Letter) {
     // pushAlarm To LETTER
     //saveAlarm.dto make.
-    const saveAlarmObj = {
+    const saveAlarmObj: SendPushAlarmPubDto = {
       nickname: sender.nickname,
       content: letter.message,
       pushAlarmType: PUSH_ALRAM_TYPE.LETTER,
       // Title: ,
       // subTitle: sender.nickname + ' : ' + letter.message,
     };
-    const sendPushAlarmDto = plainToInstance(SendPushAlarmDto, saveAlarmObj);
-    const job = await this.pushAlarmQueue.add(
-      ALARM_TYPE.LETTER,
-      sendPushAlarmDto,
-    );
+    // const sendPushAlarmDto = plainToInstance(SendPushAlarmDto, saveAlarmObj);
+    const job = await this.pushAlarmQueue.add(ALARM_TYPE.LETTER, saveAlarmObj);
   }
 
   // 다른사람이 나한테 번개를 줬을 때

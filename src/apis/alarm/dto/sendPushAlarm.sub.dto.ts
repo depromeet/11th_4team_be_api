@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 import { PUSH_ALRAM_TYPE } from 'src/common/consts/enum';
 
 // use for message transfor
-export class SendPushAlarmDto {
+export class SendPushAlarmSubDto {
   @Expose()
   roomName?: string;
   @Expose()
