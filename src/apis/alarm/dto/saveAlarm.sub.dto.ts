@@ -1,4 +1,4 @@
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { ALARM_STORE_TYPE } from 'src/common/consts/enum';
 
@@ -11,7 +11,7 @@ export class SaveAlarmSubDto {
   nickname: string;
 
   @Expose()
-  user: Types.ObjectId;
+  user: string;
 
   @Expose()
   content?: string;

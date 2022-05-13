@@ -151,6 +151,7 @@ export class QuestionsController {
       user.userIdDto,
       questionIdDto,
       commentStringDto,
+      user,
     );
   }
 

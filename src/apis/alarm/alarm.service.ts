@@ -75,12 +75,7 @@ export class AlarmService {
     };
     // const redis = await this.pushAlarmQueue.isReady();
     // console.log('check', redis);
-    try {
-      await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.LETTER, sendPushAlarmObj);
-    } catch (error) {
-      console.log(error);
-    }
-    console.log('check2', sender);
+    await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.LETTER, sendPushAlarmObj);
   }
 
   // 다른사람이 나한테 번개를 줬을 때
@@ -100,13 +95,13 @@ export class AlarmService {
     sender: User,
     receiver: UserIdDto,
     room: Room,
-    comment: Comment,
+    comment: string,
   ) {
-    console.log('check', sender);
+    // console.log('check', sender);
     const saveAlarmDto: SaveAlarmPubDto = {
       nickname: sender.nickname,
       user: receiver.userId,
-      content: comment.comment,
+      content: comment,
       roomName: room.name,
       alarmType: ALARM_STORE_TYPE.COMMENT,
     };
@@ -114,9 +109,9 @@ export class AlarmService {
 
     const sendPushAlarmObj: SendPushAlarmPubDto = {
       nickname: sender.nickname,
-      content: comment.comment,
+      content: comment,
       receivers: [receiver.userId],
-      pushAlarmType: PUSH_ALARM_TYPE.LETTER,
+      pushAlarmType: PUSH_ALARM_TYPE.COMMENT,
     };
     await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.COMMENT, sendPushAlarmObj);
   }

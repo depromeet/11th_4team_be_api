@@ -16,7 +16,13 @@ export class SendPushAlarmSubDto {
   pushAlarmType: PUSH_ALARM_TYPE;
 
   @Expose()
-  @Transform((value) => value.obj.receivers, { toClassOnly: true })
+  // @Transform((value) => value.obj.receivers, { toClassOnly: true })
+  @Transform(
+    (value) => value.obj.receivers.map((e: string) => new Types.ObjectId(e)),
+    {
+      toClassOnly: true,
+    },
+  )
   receivers: Types.ObjectId[];
 
   //need to be updated 딥링크 양식 정의 필요 ( 클라와 함께)

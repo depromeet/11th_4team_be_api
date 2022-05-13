@@ -39,6 +39,14 @@ export class RoomsService {
   }
 
   /**
+   * 룸 정보를 가져옴
+   */
+  @returnValueToDto(Room)
+  async findOneByRoomId(roomIdDto: RoomIdDto): Promise<Room> {
+    return await this.roomRepository.findOneByRoomId(roomIdDto);
+  }
+
+  /**
    * 룸을 생성할 수 있음 좌표정보, 룸 이름, 반경정보 등이 필요함
    * @param createRoomDto
    * @returns room

@@ -10,5 +10,7 @@ export class SaveAlarmPubDto extends PickType(SaveAlarmSubDto, [
   'nickname',
   'content',
   'alarmType',
-  'user',
-] as const) {}
+] as const) {
+  @Expose()
+  user: Types.ObjectId;
+}
