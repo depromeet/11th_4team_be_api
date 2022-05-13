@@ -8,4 +8,5 @@ export class SendPushAlarmPubDto extends PickType(SendPushAlarmSubDto, [
   'nickname',
   'content',
   'pushAlarmType',
+  'receivers',
 ] as const) {}

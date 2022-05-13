@@ -29,14 +29,14 @@ export class Alarm {
   @Prop({ required: true, type: Types.ObjectId })
   user: Types.ObjectId;
 
-  @ApiProperty({
-    description: '알림 발송의 주체가 null 값이 될 수 있음 주의!!!',
-    type: UserProfileDto,
-    default: null,
-    nullable: true,
-  })
-  @Prop({ required: true, type: Types.ObjectId, ref: 'user' })
-  sender: UserProfileDto;
+  // @ApiProperty({
+  //   description: '알림 발송의 주체가 null 값이 될 수 있음 주의!!!',
+  //   type: UserProfileDto,
+  //   default: null,
+  //   nullable: true,
+  // })
+  // @Prop({ required: true, type: Types.ObjectId, ref: 'user' })
+  // sender: UserProfileDto;
 
   // @Prop({ required: true })
   // @IsString()

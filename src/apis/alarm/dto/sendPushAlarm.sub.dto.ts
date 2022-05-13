@@ -1,5 +1,6 @@
-import { Expose } from 'class-transformer';
-import { PUSH_ALRAM_TYPE } from 'src/common/consts/enum';
+import { Expose, Transform } from 'class-transformer';
+import { PUSH_ALARM_TYPE } from 'src/common/consts/enum';
+import { Types } from 'mongoose';
 
 // use for message transfor
 export class SendPushAlarmSubDto {
@@ -12,19 +13,25 @@ export class SendPushAlarmSubDto {
   content: string;
 
   @Expose()
-  pushAlarmType: PUSH_ALRAM_TYPE;
+  pushAlarmType: PUSH_ALARM_TYPE;
 
   @Expose()
-  get Title(): string {
+  @Transform((value) => value.obj.receivers, { toClassOnly: true })
+  receivers: Types.ObjectId[];
+
+  //need to be updated 딥링크 양식 정의 필요 ( 클라와 함께)
+  @Expose()
+  deepLink: string;
+
+  @Expose()
+  get title(): string {
     switch (this.pushAlarmType) {
-      case PUSH_ALRAM_TYPE.CHAT:
+      case PUSH_ALARM_TYPE.CHAT:
         return this.roomName + ' 채팅방';
-      case PUSH_ALRAM_TYPE.COMMENT:
+      case PUSH_ALARM_TYPE.COMMENT:
         return '내 질문에 새로운 댓글이 달렸어요';
-      case PUSH_ALRAM_TYPE.LETTER:
+      case PUSH_ALARM_TYPE.LETTER:
         return '쪽지가 도착했어요';
-      case PUSH_ALRAM_TYPE.OFFICIAL:
-        return '서비스 공식알림';
     }
   }
 

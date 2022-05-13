@@ -23,8 +23,14 @@ import { BullModule } from '@nestjs/bull';
         redis: {
           host: configService.get('REDIS_HOST'),
           port: Number(configService.get('REDIS_PORT')),
+          retryStrategy: (times) => {
+            // check connection
+            console.log('could not connect to redis!');
+            process.exit(1);
+          },
         },
       }),
+
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({

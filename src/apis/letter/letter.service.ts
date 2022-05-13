@@ -58,7 +58,7 @@ export class LetterService {
       twoUserList,
       messageStringDto,
     );
-    await this.alarmService.letterAlarm(
+    await this.alarmService.pushLetterAlarm(
       senderUserInfo,
       new UserIdDto(twoUserList.recevier),
       newLetter,

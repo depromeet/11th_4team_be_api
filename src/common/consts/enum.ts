@@ -133,38 +133,42 @@ enum USER_LEVELUP_COUNT_TYPE {
   LEVEL3 = 100, //한강공원
 }
 
-enum PUSH_ALRAM_TYPE {
+enum PUSH_ALARM_TYPE {
   COMMENT = 'comment',
   LETTER = 'letter',
   CHAT = 'chat',
-  OFFICIAL = 'official',
 }
 
-enum ALARM_TYPE {
-  COMMENT = 'comment',
-  LETTER = 'letter',
-  CHAT = 'chat',
-  OFFICIAL = 'official',
-  LIGHTNING = 'lightning',
-  LIGHTNING_LEVELUP = 'lightningLevelUp',
-}
+// enum ALARM_TYPE {
+//   COMMENT = 'comment',
+//   LETTER = 'letter',
+//   CHAT = 'chat',
+//   OFFICIAL = 'official',
+//   LIGHTNING = 'lightning',
+//   LIGHTNING_LEVELUP = 'lightningLevelUp',
+// }
 
 enum ALARM_STORE_TYPE {
   // 댓글 줬을때
   COMMENT = 'comment',
   // 번개 줬을 떄
   LIGHTNING = 'lightning',
+
+  // 번개 라이트닝 레벨업?
+  // LIGHTNING = 'lightning',
   // 시스템 전부 공지알림
   OFFICIAL = 'official',
 }
 
 const PUSH_ALARM = 'pushAlarm';
+const SAVE_ALARM = 'saveAlarm';
 
 export {
-  PUSH_ALRAM_TYPE,
+  PUSH_ALARM_TYPE,
   ALARM_STORE_TYPE,
   PUSH_ALARM,
-  ALARM_TYPE,
+  SAVE_ALARM,
+  // ALARM_TYPE,
   USER_LEVELUP_COUNT_TYPE,
   USER_LEVEL_TYPE,
   QUESTION_FIND_FILTER_TYPE,

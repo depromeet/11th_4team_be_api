@@ -6,17 +6,28 @@ import { UserModule } from '../users/user.module';
 import { AlarmService } from './alarm.service';
 import { BullModule } from '@nestjs/bull';
 import { PushAlarmProcessor } from './pushAlarm.processor';
-import { PUSH_ALARM } from 'src/common/consts/enum';
+import { PUSH_ALARM, SAVE_ALARM } from 'src/common/consts/enum';
+import { SaveAlarmProcessor } from './saveAlarm.processor';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Alarm.name, schema: AlarmSchema }]),
     forwardRef(() => UserModule),
-    BullModule.registerQueue({
-      name: PUSH_ALARM,
-    }),
+    BullModule.registerQueue(
+      {
+        name: PUSH_ALARM,
+      },
+      {
+        name: SAVE_ALARM,
+      },
+    ),
   ],
-  providers: [AlarmService, AlarmRepository, PushAlarmProcessor],
+  providers: [
+    AlarmService,
+    AlarmRepository,
+    PushAlarmProcessor,
+    SaveAlarmProcessor,
+  ],
   exports: [AlarmService, AlarmRepository],
 })
 export class AlarmModule {}

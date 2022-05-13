@@ -4,6 +4,9 @@ import { Model } from 'mongoose';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 
 import { Alarm } from 'src/models/alarm.model';
+import { SaveAlarmSubDto } from 'src/apis/alarm/dto/saveAlarm.sub.dto';
+import { instanceToPlain } from 'class-transformer';
+import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 
 @Injectable()
 export class AlarmRepository {
@@ -12,14 +15,16 @@ export class AlarmRepository {
     private readonly AlarmModel: Model<Alarm>,
   ) {}
 
-  async createAlarm(userIdDto: UserIdDto): Promise<Alarm> {
-    const report = new this.AlarmModel({
-      user: userIdDto.userId,
-    });
-    return await report.save();
+  async createAlarm(saveAlarmDto: SaveAlarmSubDto): Promise<Alarm> {
+    const alarm = new this.AlarmModel(instanceToPlain(saveAlarmDto));
+    return await alarm.save();
   }
 
-  async findOneAlarmByUserId(userIdDto: UserIdDto): Promise<Alarm | null> {
-    return await this.AlarmModel.findOne({ user: userIdDto.userId });
+  async findAlarmByUserId(userIdDto: UserIdDto): Promise<Alarm[]> {
+    return await this.AlarmModel.find({ user: userIdDto.userId });
+  }
+
+  async watchOneAlarm(alarmIdDto: AlarmIdDto): Promise<Alarm[]> {
+    return await this.AlarmModel.find({ _id: alarmIdDto.alarmId });
   }
 }

@@ -3,21 +3,51 @@ import { AlarmRepository } from 'src/repositories/alarm.repository';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import {
-  ALARM_TYPE,
+  ALARM_STORE_TYPE,
   PUSH_ALARM,
-  PUSH_ALRAM_TYPE,
+  PUSH_ALARM_TYPE,
+  SAVE_ALARM,
 } from 'src/common/consts/enum';
 import { Letter } from 'src/models/letter.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
-import { SaveAlarmDto } from './dto/saveAlarm.dto';
 import { User } from 'src/models/user.model';
 import { SendPushAlarmPubDto } from './dto/sendPushAlarm.pub.dto';
+import { SaveAlarmPubDto } from './dto/saveAlarm.pub.dto';
+import { Comment } from 'src/models/question.model';
+import { Room } from 'src/models/room.model';
+import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 @Injectable()
 export class AlarmService {
   constructor(
     private readonly alarmRepository: AlarmRepository,
     @InjectQueue(PUSH_ALARM) private readonly pushAlarmQueue: Queue,
+    @InjectQueue(SAVE_ALARM) private readonly saveAlarmQueue: Queue,
   ) {}
+
+  // enum PUSH_ALARM_TYPE {
+  //   COMMENT = 'comment',
+  //   LETTER = 'letter',
+  //   CHAT = 'chat',
+  //   OFFICIAL = 'official',
+  // }
+
+  // enum ALARM_TYPE {
+  //   COMMENT = 'comment',
+  //   LETTER = 'letter',
+  //   CHAT = 'chat',
+  //   OFFICIAL = 'official',
+  //   LIGHTNING = 'lightning',
+  //   LIGHTNING_LEVELUP = 'lightningLevelUp',
+  // }
+
+  // enum ALARM_STORE_TYPE {
+  //   // 댓글 줬을때
+  //   COMMENT = 'comment',
+  //   // 번개 줬을 떄
+  //   LIGHTNING = 'lightning',
+  //   // 시스템 전부 공지알림
+  //   OFFICIAL = 'official',
+  // }
 
   //pushAlarm  --> fcm push
   // storeAlarm --> user
@@ -36,38 +66,72 @@ export class AlarmService {
 
   // 나한테 편지가 왔을 때
   // 푸시알림만 해야함
-  async letterAlarm(sender: User, receiver: UserIdDto, letter: Letter) {
-    // pushAlarm To LETTER
-    //saveAlarm.dto make.
-    const saveAlarmObj: SendPushAlarmPubDto = {
+  async pushLetterAlarm(sender: User, receiver: UserIdDto, letter: Letter) {
+    const sendPushAlarmObj: SendPushAlarmPubDto = {
       nickname: sender.nickname,
       content: letter.message,
-      pushAlarmType: PUSH_ALRAM_TYPE.LETTER,
-      // Title: ,
-      // subTitle: sender.nickname + ' : ' + letter.message,
+      pushAlarmType: PUSH_ALARM_TYPE.LETTER,
+      receivers: [receiver.userId],
     };
-    // const sendPushAlarmDto = plainToInstance(SendPushAlarmDto, saveAlarmObj);
-    const job = await this.pushAlarmQueue.add(ALARM_TYPE.LETTER, saveAlarmObj);
+    // const redis = await this.pushAlarmQueue.isReady();
+    // console.log('check', redis);
+    try {
+      await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.LETTER, sendPushAlarmObj);
+    } catch (error) {
+      console.log(error);
+    }
+    console.log('check2', sender);
   }
 
   // 다른사람이 나한테 번개를 줬을 때
-  async storeLightningAlarm(sender: UserIdDto, receiver: UserIdDto) {
-    // pushAlarm To LETTER
-
+  async storeLightningAlarm(sender: User, receiver: UserIdDto) {
     console.log('check', sender);
-    // const user = await this.userRepository.findOneByUserId(myUserIdDto);
-    // console.log(user);
+    const saveAlarmDto: SaveAlarmPubDto = {
+      nickname: sender.nickname,
+      user: receiver.userId,
+      alarmType: ALARM_STORE_TYPE.COMMENT,
+    };
+    await this.pushAlarmQueue.add(ALARM_STORE_TYPE.LIGHTNING, saveAlarmDto);
   }
 
   // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
 
-  // 내 레벨이 올랐을 때
+  async handleCommentAlarm(
+    sender: User,
+    receiver: UserIdDto,
+    room: Room,
+    comment: Comment,
+  ) {
+    console.log('check', sender);
+    const saveAlarmDto: SaveAlarmPubDto = {
+      nickname: sender.nickname,
+      user: receiver.userId,
+      content: comment.comment,
+      roomName: room.name,
+      alarmType: ALARM_STORE_TYPE.COMMENT,
+    };
+    await this.saveAlarmQueue.add(ALARM_STORE_TYPE.COMMENT, saveAlarmDto);
 
-  // 서비스 공식알림
+    const sendPushAlarmObj: SendPushAlarmPubDto = {
+      nickname: sender.nickname,
+      content: comment.comment,
+      receivers: [receiver.userId],
+      pushAlarmType: PUSH_ALARM_TYPE.LETTER,
+    };
+    await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.COMMENT, sendPushAlarmObj);
+  }
+
+  // 내 레벨이 올랐을 때 (기획 기달려야함)
+
+  // 서비스 공식알림 ( 추후 추가 )
 
   // 알림 읽었을 때
+  async watchAlarm(alarmIdDto: AlarmIdDto) {}
 
   // 알림전체읽음
+  async watchAllAlarm(userIdDto: UserIdDto) {}
+
+  async getMyAlarms(userIdDto: UserIdDto) {}
 
   // 안읽은 알림 갯수
 
