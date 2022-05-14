@@ -13,6 +13,7 @@ import { User } from 'src/models/user.model';
 import { LetterRepository } from 'src/repositories/letter.repository';
 import { RoomRepository } from 'src/repositories/room.repository';
 import { UserRepository } from 'src/repositories/user.repository';
+import { AlarmService } from '../alarm/alarm.service';
 import { ResLetterDto } from './dto/Letter.res.dto';
 import { LetterRoomDto } from './dto/LetterRoom.res.dto';
 import { MessageStringDto } from './dto/messageString.dto';
@@ -23,6 +24,7 @@ export class LetterService {
   constructor(
     private readonly letterRepository: LetterRepository,
     private readonly userRepository: UserRepository,
+    private readonly alarmService: AlarmService,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -36,6 +38,7 @@ export class LetterService {
     twoUserList: TwoUserListDto,
     messageStringDto: MessageStringDto,
     blockedUserDto: BlockedUserDto,
+    senderUserInfo: User,
   ) {
     this.checkBlocked(new UserIdDto(twoUserList.recevier), blockedUserDto);
 
@@ -54,6 +57,11 @@ export class LetterService {
       new LetterRoomIdDto(letterRoom._id),
       twoUserList,
       messageStringDto,
+    );
+    await this.alarmService.pushLetterAlarm(
+      senderUserInfo,
+      new UserIdDto(twoUserList.recevier),
+      newLetter,
     );
     return new ResLetterDto(
       newLetter,

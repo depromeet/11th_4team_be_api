@@ -17,25 +17,25 @@ enum STATUS_TYPE {
 
 //카테고리 타입 한글로
 enum CATEGORY_TYPE {
-  UNIVERCITY = 'UNIVERCITY', //대학교
+  UNIVERSITY = 'UNIVERSITY', //대학교
   CONCERTHALL = 'CONCERTHALL', //공연장
-  HAN_RIVER_PRAK = 'HAN_RIVER_PRAK', //한강공원
+  HAN_RIVER_PRAK = 'HANRIVERPRAK', //한강공원
   STADIUM = 'STADIUM', // 경기장
   EXHIBITION = 'EXHIBITION', //박람회 전시회
-  AMUSEMENT_PARK = 'AMUSEMENT_PARK', // 놀이공원
-  DEPARTMENT_STORE = 'DEPARTMENT_STORE', //백화점
+  AMUSEMENT_PARK = 'AMUSEMENTPARK', // 놀이공원
+  DEPARTMENT_STORE = 'DEPARTMENTSTORE', //백화점
   // AMUSEMENT_PARK,
   // HAN_RIVER_PRAk,
 }
 //TODO : 카테고리 정보 추가
 enum FIND_ROOM_FILTER_TYPE {
-  UNIVERCITY = 'UNIVERCITY', //대학교
+  UNIVERSITY = 'UNIVERSITY', //대학교
   CONCERTHALL = 'CONCERTHALL', //공연장
-  HAN_RIVER_PRAK = 'HAN_RIVER_PRAK', //한강공원
+  HAN_RIVER_PRAK = 'HANRIVERPRAK', //한강공원
   STADIUM = 'STADIUM', // 경기장
   EXHIBITION = 'EXHIBITION', //박람회 전시회
-  AMUSEMENT_PARK = 'AMUSEMENT_PARK', // 놀이공원
-  DEPARTMENT_STORE = 'DEPARTMENT_STORE', //백화점
+  AMUSEMENT_PARK = 'AMUSEMENTPARK', // 놀이공원
+  DEPARTMENT_STORE = 'DEPARTMENTSTORE', //백화점
 
   ALL = 'ALL',
   FAVORITE = 'FAVORITE',
@@ -133,7 +133,42 @@ enum USER_LEVELUP_COUNT_TYPE {
   LEVEL3 = 100, //한강공원
 }
 
+enum PUSH_ALARM_TYPE {
+  COMMENT = 'comment',
+  LETTER = 'letter',
+  CHAT = 'chat',
+}
+
+// enum ALARM_TYPE {
+//   COMMENT = 'comment',
+//   LETTER = 'letter',
+//   CHAT = 'chat',
+//   OFFICIAL = 'official',
+//   LIGHTNING = 'lightning',
+//   LIGHTNING_LEVELUP = 'lightningLevelUp',
+// }
+
+enum ALARM_STORE_TYPE {
+  // 댓글 줬을때
+  COMMENT = 'comment',
+  // 번개 줬을 떄
+  LIGHTNING = 'lightning',
+
+  // 번개 라이트닝 레벨업?
+  // LIGHTNING = 'lightning',
+  // 시스템 전부 공지알림
+  OFFICIAL = 'official',
+}
+
+const PUSH_ALARM = 'pushAlarm';
+const SAVE_ALARM = 'saveAlarm';
+
 export {
+  PUSH_ALARM_TYPE,
+  ALARM_STORE_TYPE,
+  PUSH_ALARM,
+  SAVE_ALARM,
+  // ALARM_TYPE,
   USER_LEVELUP_COUNT_TYPE,
   USER_LEVEL_TYPE,
   QUESTION_FIND_FILTER_TYPE,

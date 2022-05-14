@@ -1,14 +1,24 @@
 version: '3.7'
 services:
-  backend:
-    image: water0641/tikitaka-api:0.1.0
-    container_name: api
-    hostname: api
-    environment:
-      - MONGO_URI=${MONGO_URI}
-      - PORT=${PORT}
-      - JWT_SECRET=${JWT_SECRET}
-      - SWAGGER_USER=${SWAGGER_USER}
-      - SWAGGER_PASSWORD=${SWAGGER_PASSWORD}
+  # backend:
+  #   build:
+  #     dockerfile: Dockerfile.dev
+  #     context: ./
+  #   container_name: api
+  #   volumes:
+  #     - ./:/app
+  #   hostname: api
+  #   environment:
+  #     - MONGO_URI=${MONGO_URI}
+  #     - PORT=${PORT}
+  #     - JWT_SECRET=${JWT_SECRET}
+  #     - SWAGGER_USER=${SWAGGER_USER}
+  #     - SWAGGER_PASSWORD=${SWAGGER_PASSWORD}
+  #     - REDIS_HOST=${REDIS_HOST}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #   ports:
+  #     - '8082:8082'
+  redis:
+    image: 'redis:alpine'
     ports:
-      - '8082:8082'
+      - '6379:6379'

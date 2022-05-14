@@ -7,6 +7,7 @@ import { User, UserSchema } from 'src/models/user.model';
 import { LightningRepository } from 'src/repositories/lightning.repository';
 import { ReportRepository } from 'src/repositories/report.repository';
 import { UserRepository } from 'src/repositories/user.repository';
+import { AlarmModule } from '../alarm/alarm.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
@@ -18,6 +19,7 @@ import { UserService } from './user.service';
       { name: Lightning.name, schema: LightningSchema },
     ]),
     forwardRef(() => AuthModule),
+    forwardRef(() => AlarmModule),
   ],
   controllers: [UserController],
   providers: [

@@ -9,6 +9,7 @@ import { UserModule } from '../users/user.module';
 import { LetterRepository } from 'src/repositories/letter.repository';
 import { Letter, LetterSchema } from 'src/models/letter.model';
 import { LetterRoom, LetterRoomSchema } from 'src/models/letterRoom.model';
+import { AlarmModule } from '../alarm/alarm.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -18,6 +19,7 @@ import { LetterRoom, LetterRoomSchema } from 'src/models/letterRoom.model';
       { name: LetterRoom.name, schema: LetterRoomSchema },
     ]),
     forwardRef(() => UserModule),
+    forwardRef(() => AlarmModule),
   ],
   providers: [LetterService, LetterRepository],
   controllers: [LetterController],

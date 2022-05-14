@@ -1,6 +1,6 @@
 import { UserModule } from './apis/users/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import * as mongoose from 'mongoose';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middleware';
@@ -11,9 +11,28 @@ import { AuthModule } from './auth/auth.module';
 import { RoomsModule } from './apis/rooms/rooms.module';
 import { LetterModule } from './apis/letter/letter.module';
 import { QuestionsModule } from './apis/questions/questions.module';
+import { AlarmModule } from './apis/alarm/alarm.module';
 import mongooseLeanDefaults from 'mongoose-lean-defaults';
+import { BullModule } from '@nestjs/bull';
+
 @Module({
   imports: [
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get('REDIS_HOST'),
+          port: Number(configService.get('REDIS_PORT')),
+          retryStrategy: (times) => {
+            // check connection
+            console.log('could not connect to redis!');
+            process.exit(1);
+          },
+        },
+      }),
+
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -28,6 +47,7 @@ import mongooseLeanDefaults from 'mongoose-lean-defaults';
     RoomsModule,
     LetterModule,
     QuestionsModule,
+    AlarmModule,
   ],
   providers: [
     {
