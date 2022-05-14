@@ -65,7 +65,7 @@ export class User {
   })
   @IsPhoneNumber('KR')
   @IsNotEmpty()
-  @Exclude()
+  @Expose()
   phoneNumber: string;
 
   @ApiProperty({ example: '백엔드개발자', description: '회원 닉네임' })

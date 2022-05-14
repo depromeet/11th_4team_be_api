@@ -8,8 +8,11 @@ import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { Comment, Question } from 'src/models/question.model';
+import { User } from 'src/models/user.model';
 import { QuestionRepository } from 'src/repositories/question.repository';
 import { UserRepository } from 'src/repositories/user.repository';
+import { AlarmService } from '../alarm/alarm.service';
+import { RoomsService } from '../rooms/rooms.service';
 import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
@@ -21,6 +24,8 @@ export class QuestionsService {
   constructor(
     private userRepository: UserRepository,
     private questionRepository: QuestionRepository,
+    private roomsService: RoomsService,
+    private alarmService: AlarmService,
   ) {}
 
   private filterRemoveBlockedUserFromCommentList(
@@ -172,12 +177,22 @@ export class QuestionsService {
     userIdDto: UserIdDto,
     questionIdDto: QuestionIdDto,
     commentStringDto: CommentStringDto,
+    userInfo: User,
   ) {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const question = await this.questionRepository.addCommentToQuestion(
       userIdDto,
       commentStringDto,
       questionIdDto,
+    );
+    const room = await this.roomsService.findOneByRoomId(
+      new RoomIdDto(question.room._id),
+    );
+    await this.alarmService.handleCommentAlarm(
+      userInfo,
+      new UserIdDto(question.user._id),
+      room,
+      commentStringDto.comment,
     );
     return question.commentList;
   }

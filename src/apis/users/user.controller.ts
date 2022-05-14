@@ -31,13 +31,19 @@ import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
+import { AlarmShowDto } from '../alarm/dto/alarmShow.dto';
+import { AlarmService } from '../alarm/alarm.service';
+import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 
 @ApiTags('user')
 @Controller('user')
 @ApiBearerAuth('accessToken')
 @UseGuards(JwtAuthGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly alarmService: AlarmService,
+  ) {}
 
   @ApiOperation({ summary: '내 정보를 가져온다.' })
   @ApiResponse({
@@ -181,6 +187,49 @@ export class UserController {
     type: SendLightningSuccessDtoResDto,
   })
   sendLightningToUser(@ReqUser() user: User, @Param() userIdDto: UserIdDto) {
-    return this.userService.sendLightningToUser(user.userIdDto, userIdDto);
+    return this.userService.sendLightningToUser(
+      user.userIdDto,
+      userIdDto,
+      user,
+    );
+  }
+
+  @ApiOperation({
+    summary: '내 알림을 불러온다.',
+  })
+  @Get('noti')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  getMyAllAlarm(@ReqUser() user: User) {
+    return this.alarmService.getMyAlarms(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '내 알림을 다 보게끔 한다.',
+  })
+  @Patch('noti/watchAll')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  watchAllAlarm(@ReqUser() user: User) {
+    return this.alarmService.watchAllAlarm(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '내 알림 보는걸로 처리',
+  })
+  @Patch('noti/:alarmId')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  watchOneAlarm(@ReqUser() user: User, @Param() alarmIdDto: AlarmIdDto) {
+    return this.alarmService.watchAlarm(user.userIdDto, alarmIdDto);
   }
 }
