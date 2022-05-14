@@ -17,7 +17,7 @@ enum STATUS_TYPE {
 
 //카테고리 타입 한글로
 enum CATEGORY_TYPE {
-  UNIVERCITY = 'UNIVERCITY', //대학교
+  UNIVERSITY = 'UNIVERSITY', //대학교
   CONCERTHALL = 'CONCERTHALL', //공연장
   HAN_RIVER_PRAK = 'HANRIVERPRAK', //한강공원
   STADIUM = 'STADIUM', // 경기장
@@ -29,7 +29,7 @@ enum CATEGORY_TYPE {
 }
 //TODO : 카테고리 정보 추가
 enum FIND_ROOM_FILTER_TYPE {
-  UNIVERCITY = 'UNIVERCITY', //대학교
+  UNIVERSITY = 'UNIVERSITY', //대학교
   CONCERTHALL = 'CONCERTHALL', //공연장
   HAN_RIVER_PRAK = 'HANRIVERPRAK', //한강공원
   STADIUM = 'STADIUM', // 경기장

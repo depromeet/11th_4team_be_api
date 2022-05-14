@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { AlarmRepository } from 'src/repositories/alarm.repository';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -12,10 +12,12 @@ import { Letter } from 'src/models/letter.model';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { User } from 'src/models/user.model';
 import { SendPushAlarmPubDto } from './dto/sendPushAlarm.pub.dto';
-import { SaveAlarmPubDto } from './dto/saveAlarm.pub.dto';
+import { SaveAlarmDto } from './dto/saveAlarm.dto';
 import { Comment } from 'src/models/question.model';
 import { Room } from 'src/models/room.model';
 import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
+import { AlarmShowDto } from './dto/alarmShow.dto';
+import { plainToInstance } from 'class-transformer';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -81,12 +83,13 @@ export class AlarmService {
   // 다른사람이 나한테 번개를 줬을 때
   async storeLightningAlarm(sender: User, receiver: UserIdDto) {
     console.log('check', sender);
-    const saveAlarmDto: SaveAlarmPubDto = {
+    const saveAlarmDto: SaveAlarmDto = {
       nickname: sender.nickname,
-      user: receiver.userId,
-      alarmType: ALARM_STORE_TYPE.COMMENT,
+      user: receiver.userId.toString(),
+      alarmType: ALARM_STORE_TYPE.LIGHTNING,
+      deepLink: '',
     };
-    await this.pushAlarmQueue.add(ALARM_STORE_TYPE.LIGHTNING, saveAlarmDto);
+    await this.saveAlarmQueue.add(ALARM_STORE_TYPE.LIGHTNING, saveAlarmDto);
   }
 
   // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
@@ -98,12 +101,13 @@ export class AlarmService {
     comment: string,
   ) {
     // console.log('check', sender);
-    const saveAlarmDto: SaveAlarmPubDto = {
+    const saveAlarmDto: SaveAlarmDto = {
       nickname: sender.nickname,
-      user: receiver.userId,
+      user: receiver.userId.toString(),
       content: comment,
       roomName: room.name,
       alarmType: ALARM_STORE_TYPE.COMMENT,
+      deepLink: '',
     };
     await this.saveAlarmQueue.add(ALARM_STORE_TYPE.COMMENT, saveAlarmDto);
 
@@ -117,16 +121,33 @@ export class AlarmService {
   }
 
   // 내 레벨이 올랐을 때 (기획 기달려야함)
+  async handleLevelUpAlarm() {}
 
   // 서비스 공식알림 ( 추후 추가 )
 
   // 알림 읽었을 때
-  async watchAlarm(alarmIdDto: AlarmIdDto) {}
+  async watchAlarm(userIdDto: UserIdDto, alarmIdDto: AlarmIdDto) {
+    const alarm = await this.alarmRepository.watchOneAlarm(
+      userIdDto,
+      alarmIdDto,
+    );
+    if (!alarm) {
+      throw new BadRequestException('권한 없음');
+    }
+  }
 
   // 알림전체읽음
-  async watchAllAlarm(userIdDto: UserIdDto) {}
+  async watchAllAlarm(userIdDto: UserIdDto) {
+    await this.alarmRepository.watchAllAlarm(userIdDto);
+  }
 
-  async getMyAlarms(userIdDto: UserIdDto) {}
+  async getMyAlarms(userIdDto: UserIdDto): Promise<AlarmShowDto[]> {
+    const alarmRawList = await this.alarmRepository.findAlarmByUserId(
+      userIdDto,
+    );
+
+    return plainToInstance(AlarmShowDto, alarmRawList);
+  }
 
   // 안읽은 알림 갯수
 

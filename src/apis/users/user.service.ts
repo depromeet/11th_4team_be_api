@@ -24,6 +24,7 @@ import {
   USER_LEVELUP_COUNT_TYPE,
   USER_LEVEL_TYPE,
 } from 'src/common/consts/enum';
+import { AlarmService } from '../alarm/alarm.service';
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,7 @@ export class UserService {
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
     private lightnignRepository: LightningRepository,
+    private alarmService: AlarmService,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -191,11 +193,11 @@ export class UserService {
   async sendLightningToUser(
     sender: UserIdDto,
     receive: UserIdDto,
+    user: User,
   ): Promise<SendLightningSuccessDtoResDto> {
-    const checkReportExist = this.lightnignRepository.findOneLightningByUserId(
-      sender,
-      receive,
-    );
+    const checkReportExist =
+      await this.lightnignRepository.findOneLightningByUserId(sender, receive);
+    console.log(checkReportExist);
     if (checkReportExist) {
       return { sendLightningSuccess: false };
     }
@@ -204,20 +206,30 @@ export class UserService {
     // utc 한국시간 기준으로 자정으로 설정
     expireAt.setUTCHours(15, 0, 0, 0);
     // expireAt.setHours()
-    await this.lightnignRepository.saveLighting(sender, receive, expireAt);
-    const addUserScore = await this.userRepository.addUserLigthningScore(
-      receive,
-    );
+    const [_1, addUserScore, _2] = await Promise.all([
+      this.lightnignRepository.saveLighting(sender, receive, expireAt),
+      this.userRepository.addUserLigthningScore(receive),
+      this.alarmService.storeLightningAlarm(user, receive),
+    ]);
 
     switch (addUserScore.lightningScore) {
       case USER_LEVELUP_COUNT_TYPE.LEVEL1:
-        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL1);
+        await Promise.all([
+          this.alarmService.handleLevelUpAlarm(),
+          this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL1),
+        ]);
         break;
       case USER_LEVELUP_COUNT_TYPE.LEVEL2:
-        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL2);
+        await Promise.all([
+          this.alarmService.handleLevelUpAlarm(),
+          this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL2),
+        ]);
         break;
       case USER_LEVELUP_COUNT_TYPE.LEVEL3:
-        await this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL3);
+        await Promise.all([
+          this.alarmService.handleLevelUpAlarm(),
+          this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL3),
+        ]);
         break;
       default:
         break;

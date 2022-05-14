@@ -43,38 +43,32 @@ export class Alarm {
   // @IsEnum(EVENT_TYPE)
   // eventType: EVENT_TYPE;
 
-  @ApiProperty({
-    type: String,
-    description: '한국시간으로 보정된 시간값 ( 알림이 쌓인 시간 )',
-  })
-  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
-  @Expose()
-  createdAt: Date;
+  // @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  // @Expose()
+  // createdAt: Date;
 
   // @ApiProperty({
   //   type: String,
   //   description: '굵은 글씨 부분',
   // })
   @Prop({
-    required: true,
-    default: '',
     type: String,
   })
-  rawTitle: string;
+  roomName: string;
 
-  @ApiProperty({
-    type: String,
-    description: '얇은 글씨 부분',
-  })
   @Prop({
     required: true,
     default: '',
     type: String,
   })
-  subTitle: string;
+  nickname: string;
 
   @Prop({
-    required: true,
+    type: String,
+  })
+  content: string;
+
+  @Prop({
     default: '',
     type: String,
   })
@@ -85,7 +79,7 @@ export class Alarm {
     description: '내가 알림을 눌러봤는지에 대한 정보',
   })
   @Prop({
-    default: true,
+    default: false,
     type: Boolean,
   })
   @IsBoolean()
