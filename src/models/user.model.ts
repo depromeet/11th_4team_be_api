@@ -12,7 +12,7 @@ import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { STATUS_TYPE } from 'src/common/consts/enum';
 import { Room } from './room.model';
-import { IsObjectId } from 'class-validator-mongo-object-id';
+import { IsMongoId } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
@@ -116,7 +116,7 @@ export class User {
   })
   @Type(() => ResShortCutRoomDto)
   @Prop({ type: Types.ObjectId, ref: 'Room' })
-  @IsObjectId()
+  @IsMongoId()
   @Expose()
   myRoom: Room;
 
@@ -143,7 +143,7 @@ export class User {
   chatAlarm: boolean;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
-  @IsObjectId()
+  @IsMongoId()
   @Exclude()
   blockedUsers: Types.ObjectId[];
 
@@ -154,7 +154,7 @@ export class User {
   @Prop({
     type: [{ type: Types.ObjectId, ref: User.name }],
   })
-  @IsObjectId()
+  @IsMongoId()
   @Type(() => UserProfileDto)
   @Expose()
   iBlockUsers: UserProfileDto[];

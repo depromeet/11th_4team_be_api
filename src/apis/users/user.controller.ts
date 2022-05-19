@@ -13,6 +13,8 @@ import {
   Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -34,6 +36,7 @@ import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.d
 import { AlarmShowDto } from '../alarm/dto/alarmShow.dto';
 import { AlarmService } from '../alarm/alarm.service';
 import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
+import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
 
 @ApiTags('user')
 @Controller('user')
@@ -84,6 +87,46 @@ export class UserController {
   })
   getMyBlockUser(@ReqUser() user: User) {
     return this.userService.getMyBlockUser(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '내 알림을 불러온다.',
+  })
+  @Get('noti')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  getMyAllAlarm(@ReqUser() user: User, @Query() pageLastIdDto: PageLastIdDto) {
+    console.log('asdfasdfasdf', pageLastIdDto);
+    return this.alarmService.getMyAlarms(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '내 알림을 다 보게끔 한다.',
+  })
+  @Patch('noti/watchAll')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  watchAllAlarm(@ReqUser() user: User) {
+    return this.alarmService.watchAllAlarm(user.userIdDto);
+  }
+
+  @ApiOperation({
+    summary: '내 알림 보는걸로 처리',
+  })
+  @Patch('noti/:alarmId')
+  @ApiResponse({
+    status: 201,
+    description: '요청 성공시',
+    type: [AlarmShowDto],
+  })
+  watchOneAlarm(@ReqUser() user: User, @Param() alarmIdDto: AlarmIdDto) {
+    return this.alarmService.watchAlarm(user.userIdDto, alarmIdDto);
   }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
@@ -192,44 +235,5 @@ export class UserController {
       userIdDto,
       user,
     );
-  }
-
-  @ApiOperation({
-    summary: '내 알림을 불러온다.',
-  })
-  @Get('noti')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  getMyAllAlarm(@ReqUser() user: User) {
-    return this.alarmService.getMyAlarms(user.userIdDto);
-  }
-
-  @ApiOperation({
-    summary: '내 알림을 다 보게끔 한다.',
-  })
-  @Patch('noti/watchAll')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  watchAllAlarm(@ReqUser() user: User) {
-    return this.alarmService.watchAllAlarm(user.userIdDto);
-  }
-
-  @ApiOperation({
-    summary: '내 알림 보는걸로 처리',
-  })
-  @Patch('noti/:alarmId')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  watchOneAlarm(@ReqUser() user: User, @Param() alarmIdDto: AlarmIdDto) {
-    return this.alarmService.watchAlarm(user.userIdDto, alarmIdDto);
   }
 }

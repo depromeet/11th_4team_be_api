@@ -2,7 +2,7 @@ import { Socket } from 'socket.io';
 import { IsBoolean, IsNotEmpty, IsString, IsEnum } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
-import { IsObjectId } from 'class-validator-mongo-object-id';
+import { IsMongoId } from 'class-validator';
 import * as mongoose from 'mongoose';
 import { CHAT_TYPE } from 'src/common/consts/enum';
 import { Room } from './room.model';
@@ -25,7 +25,7 @@ export class Chat extends Document {
   sender: Socket;
 
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'room' })
-  @IsObjectId()
+  @IsMongoId()
   room: Room;
 
   @Prop({

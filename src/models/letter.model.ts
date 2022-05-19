@@ -1,7 +1,7 @@
 import { IsArray, IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { User } from './user.model';
-import { IsObjectId } from 'class-validator-mongo-object-id';
+import { IsMongoId } from 'class-validator';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -17,12 +17,12 @@ export class Letter extends Document {
     type: MongooseSchema.Types.ObjectId,
     ref: 'LetterRoom',
   })
-  @IsObjectId()
+  @IsMongoId()
   letterRoom: Types.ObjectId;
 
   //보낸 사람
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  @IsObjectId()
+  @IsMongoId()
   sender: User;
 
   // 보일 수 있는 유저.. 채팅방 나가면 없애버리는거임

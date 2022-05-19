@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Transform, Type } from 'class-transformer';
-import { Types } from 'mongoose';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { ALARM_STORE_TYPE } from 'src/common/consts/enum';
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 
 // use for message transfor
 export class AlarmShowDto {
@@ -70,4 +70,12 @@ export class AlarmShowDto {
   })
   @Expose()
   alarmType: ALARM_STORE_TYPE;
+
+  @ApiProperty({
+    type: String,
+    description: '한국시간으로 보정된 시간값',
+  })
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  @Expose()
+  createdAt: Date;
 }

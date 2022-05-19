@@ -21,6 +21,7 @@ export class AlarmRepository {
   }
 
   async findAlarmByUserId(userIdDto: UserIdDto): Promise<Alarm[]> {
+    console.log(userIdDto);
     return await this.AlarmModel.find({ user: userIdDto.userId });
   }
 

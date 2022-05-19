@@ -142,6 +142,7 @@ export class AlarmService {
   }
 
   async getMyAlarms(userIdDto: UserIdDto): Promise<AlarmShowDto[]> {
+    console.log(userIdDto);
     const alarmRawList = await this.alarmRepository.findAlarmByUserId(
       userIdDto,
     );

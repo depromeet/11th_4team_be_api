@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { User } from './user.model';
-import { IsObjectId } from 'class-validator-mongo-object-id';
+import { IsMongoId } from 'class-validator';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { IsArray } from 'class-validator';
 import { Letter } from './letter.model';
