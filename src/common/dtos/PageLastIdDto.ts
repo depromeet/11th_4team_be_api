@@ -29,7 +29,6 @@ export class PageLastIdDto {
     required: false,
   })
   @IsOptional()
-  @MongoIdValidationTransfrom('lastId', { toClassOnly: true })
-  // @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
+  @MongoIdValidationTransfrom({ toClassOnly: true })
   lastId: Types.ObjectId;
 }

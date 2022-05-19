@@ -10,11 +10,11 @@ export const failToConvertMongoId = 'mongoIdCheckFail';
  * @returns null | mongoIdObject
  */
 export const MongoIdTransfrom =
-  (fieldName: string, options?: ExposeOptions) => (target, propertyKey) => {
+  (options?: ExposeOptions) => (target, propertyKey) => {
     Transform((value) => {
-      if (!mongoose.isValidObjectId(value.obj[fieldName]))
+      if (!mongoose.isValidObjectId(value.obj[propertyKey]))
         return failToConvertMongoId;
-      return new Types.ObjectId(value.obj[fieldName]);
+      return new Types.ObjectId(value.obj[propertyKey]);
     }, options)(target, propertyKey);
   };
 // @Transform((value) => value.obj._id.toString())
