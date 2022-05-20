@@ -89,45 +89,6 @@ export class UserController {
     return this.userService.getMyBlockUser(user.userIdDto);
   }
 
-  @ApiOperation({
-    summary: '내 알림을 불러온다.',
-  })
-  @Get('noti')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  getMyAllAlarm(@ReqUser() user: User, @Query() pageLastIdDto: PageLastIdDto) {
-    console.log('asdfasdfasdf', pageLastIdDto);
-    return this.alarmService.getMyAlarms(user.userIdDto);
-  }
-
-  @ApiOperation({
-    summary: '내 알림을 다 보게끔 한다.',
-  })
-  @Patch('noti/watchAll')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  watchAllAlarm(@ReqUser() user: User) {
-    return this.alarmService.watchAllAlarm(user.userIdDto);
-  }
-
-  @ApiOperation({
-    summary: '내 알림 보는걸로 처리',
-  })
-  @Patch('noti/:alarmId')
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
-  })
-  watchOneAlarm(@ReqUser() user: User, @Param() alarmIdDto: AlarmIdDto) {
-    return this.alarmService.watchAlarm(user.userIdDto, alarmIdDto);
-  }
   //
   @ApiOperation({ summary: '상대방 유저정보를 가져온다.' })
   @ApiResponse({

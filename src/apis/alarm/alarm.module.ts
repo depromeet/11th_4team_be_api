@@ -8,6 +8,7 @@ import { BullModule } from '@nestjs/bull';
 import { PushAlarmProcessor } from './pushAlarm.processor';
 import { PUSH_ALARM, SAVE_ALARM } from 'src/common/consts/enum';
 import { SaveAlarmProcessor } from './saveAlarm.processor';
+import { NotiController } from './noti.controller';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SaveAlarmProcessor } from './saveAlarm.processor';
       },
     ),
   ],
+  controllers: [NotiController],
   providers: [
     AlarmService,
     AlarmRepository,

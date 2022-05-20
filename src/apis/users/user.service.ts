@@ -215,19 +215,19 @@ export class UserService {
     switch (addUserScore.lightningScore) {
       case USER_LEVELUP_COUNT_TYPE.LEVEL1:
         await Promise.all([
-          this.alarmService.handleLevelUpAlarm(),
+          this.alarmService.handleLevelUpAlarm(receive, '1'),
           this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL1),
         ]);
         break;
       case USER_LEVELUP_COUNT_TYPE.LEVEL2:
         await Promise.all([
-          this.alarmService.handleLevelUpAlarm(),
+          this.alarmService.handleLevelUpAlarm(receive, '2'),
           this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL2),
         ]);
         break;
       case USER_LEVELUP_COUNT_TYPE.LEVEL3:
         await Promise.all([
-          this.alarmService.handleLevelUpAlarm(),
+          this.alarmService.handleLevelUpAlarm(receive, '3'),
           this.userRepository.levelUpUser(receive, USER_LEVEL_TYPE.LEVEL3),
         ]);
         break;

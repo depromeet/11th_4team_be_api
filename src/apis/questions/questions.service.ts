@@ -197,6 +197,7 @@ export class QuestionsService {
       new UserIdDto(question.user._id),
       room,
       commentStringDto.comment,
+      questionIdDto,
     );
     return question.commentList;
   }

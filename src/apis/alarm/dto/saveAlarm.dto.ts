@@ -8,7 +8,7 @@ export class SaveAlarmDto {
   @Expose()
   roomName?: string;
   @Expose()
-  nickname: string;
+  nickname?: string;
 
   @Expose()
   @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
@@ -17,9 +17,21 @@ export class SaveAlarmDto {
   @Expose()
   content?: string;
 
-  //need to be updated 딥링크 양식 정의 필요 ( 클라와 함께)
   @Expose()
-  deepLink: string;
+  questionId?: string;
+
+  //need to be updated 딥링크 양식 정의 필요 ( 클라와 함께)
+  // @Expose()
+  // get deepLink(): string {
+  //   switch (this.alarmType) {
+  //     case ALARM_STORE_TYPE.LIGHTNING:
+  //       return this.roomName + ' 채팅방';
+  //     case ALARM_STORE_TYPE.COMMENT:
+  //       return '내 질문에 새로운 댓글이 달렸어요';
+  //     // case ALARM_STORE_TYPE.OFFICIAL:
+  //     //   return '쪽지가 도착했어요';
+  //   }
+  // }
 
   @Expose()
   alarmType: ALARM_STORE_TYPE;

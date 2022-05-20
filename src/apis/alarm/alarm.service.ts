@@ -18,6 +18,7 @@ import { Room } from 'src/models/room.model';
 import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 import { AlarmShowDto } from './dto/alarmShow.dto';
 import { plainToInstance } from 'class-transformer';
+import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -87,9 +88,21 @@ export class AlarmService {
       nickname: sender.nickname,
       user: receiver.userId.toString(),
       alarmType: ALARM_STORE_TYPE.LIGHTNING,
-      deepLink: '',
     };
     await this.saveAlarmQueue.add(ALARM_STORE_TYPE.LIGHTNING, saveAlarmDto);
+  }
+  // 내 레벨이 올랐을 때 (기획 기달려야함)
+
+  async handleLevelUpAlarm(receiver: UserIdDto, level: string) {
+    const saveAlarmDto: SaveAlarmDto = {
+      user: receiver.userId.toString(),
+      content: level,
+      alarmType: ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
+    };
+    await this.saveAlarmQueue.add(
+      ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
+      saveAlarmDto,
+    );
   }
 
   // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
@@ -99,6 +112,7 @@ export class AlarmService {
     receiver: UserIdDto,
     room: Room,
     comment: string,
+    questionIdDto: QuestionIdDto,
   ) {
     // console.log('check', sender);
     const saveAlarmDto: SaveAlarmDto = {
@@ -107,7 +121,7 @@ export class AlarmService {
       content: comment,
       roomName: room.name,
       alarmType: ALARM_STORE_TYPE.COMMENT,
-      deepLink: '',
+      questionId: questionIdDto.questionId.toString(),
     };
     await this.saveAlarmQueue.add(ALARM_STORE_TYPE.COMMENT, saveAlarmDto);
 
@@ -119,9 +133,6 @@ export class AlarmService {
     };
     await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.COMMENT, sendPushAlarmObj);
   }
-
-  // 내 레벨이 올랐을 때 (기획 기달려야함)
-  async handleLevelUpAlarm() {}
 
   // 서비스 공식알림 ( 추후 추가 )
 
@@ -147,7 +158,9 @@ export class AlarmService {
       userIdDto,
     );
 
-    return plainToInstance(AlarmShowDto, alarmRawList);
+    return plainToInstance(AlarmShowDto, alarmRawList, {
+      excludeExtraneousValues: true,
+    });
   }
 
   // 안읽은 알림 갯수
