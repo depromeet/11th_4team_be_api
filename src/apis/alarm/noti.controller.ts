@@ -74,9 +74,8 @@ export class NotiController {
   })
   @Patch(':alarmId')
   @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: [AlarmShowDto],
+    status: 200,
+    description: '성공 응답만 리턴',
   })
   watchOneAlarm(@ReqUser() user: User, @Param() alarmIdDto: AlarmIdDto) {
     return this.alarmService.watchAlarm(user.userIdDto, alarmIdDto);

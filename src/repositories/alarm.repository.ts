@@ -53,14 +53,14 @@ export class AlarmRepository {
   ): Promise<Alarm | null> {
     return await this.AlarmModel.findOneAndUpdate(
       { _id: alarmIdDto.alarmId, user: userIdDto.userId },
-      { watch: true },
+      { iWatch: true },
     );
   }
 
   async watchAllAlarm(userIdDto: UserIdDto) {
     await this.AlarmModel.updateMany(
       { user: userIdDto.userId },
-      { watch: true },
+      { iWatch: true },
     );
   }
 }

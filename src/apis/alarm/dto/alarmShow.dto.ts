@@ -108,4 +108,10 @@ export class AlarmShowDto {
   @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
   questionId?: string;
+  @ApiProperty({
+    type: Boolean,
+    description: '내가 봤는지 ',
+  })
+  @Expose()
+  iWatch: boolean;
 }
