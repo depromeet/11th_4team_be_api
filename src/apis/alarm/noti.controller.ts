@@ -53,7 +53,7 @@ export class NotiController {
   })
   getMyAllAlarm(@ReqUser() user: User, @Query() pageLastIdDto: PageLastIdDto) {
     console.log('asdfasdfasdf', pageLastIdDto);
-    return this.alarmService.getMyAlarms(user.userIdDto);
+    return this.alarmService.getMyAlarms(user.userIdDto, pageLastIdDto);
   }
 
   @ApiOperation({

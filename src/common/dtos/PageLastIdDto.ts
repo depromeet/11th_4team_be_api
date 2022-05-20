@@ -28,7 +28,6 @@ export class PageLastIdDto {
     description: 'lastId (커서) 방식으로 페이지 네이션을 합니다.',
     required: false,
   })
-  @IsOptional()
   @MongoIdValidationTransfrom({ toClassOnly: true })
   lastId: Types.ObjectId;
 }

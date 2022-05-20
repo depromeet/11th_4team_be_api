@@ -7,6 +7,7 @@ import { Alarm } from 'src/models/alarm.model';
 import { SaveAlarmDto } from 'src/apis/alarm/dto/saveAlarm.dto';
 import { instanceToPlain } from 'class-transformer';
 import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
+import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
 
 @Injectable()
 export class AlarmRepository {
@@ -20,11 +21,30 @@ export class AlarmRepository {
     return await alarm.save();
   }
 
-  async findAlarmByUserId(userIdDto: UserIdDto): Promise<Alarm[]> {
+  async findAlarmByUserIdFirst(
+    userIdDto: UserIdDto,
+    limitCount: number,
+  ): Promise<Alarm[]> {
     console.log(userIdDto);
-    return await this.AlarmModel.find({ user: userIdDto.userId }).lean<
-      Alarm[]
-    >();
+    return await this.AlarmModel.find({ user: userIdDto.userId })
+      .sort({ createdAt: -1 })
+      .limit(limitCount)
+      .lean<Alarm[]>();
+  }
+
+  async findAlarmByUserIdAndLastId(
+    userIdDto: UserIdDto,
+    lastIdDto: PageLastIdDto,
+    limitCount: number,
+  ): Promise<Alarm[]> {
+    console.log(userIdDto);
+    return await this.AlarmModel.find({
+      user: userIdDto.userId,
+      _id: { $lt: lastIdDto.lastId },
+    })
+      .sort({ createdAt: -1 })
+      .limit(limitCount)
+      .lean<Alarm[]>();
   }
 
   async watchOneAlarm(

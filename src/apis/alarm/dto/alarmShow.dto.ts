@@ -1,11 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { ALARM_STORE_TYPE, DEEPLINK_BASEURL } from 'src/common/consts/enum';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
+import { Types } from 'mongoose';
 
 // use for message transfor
 export class AlarmShowDto {
   // 직렬화
+  @ApiProperty({
+    type: String,
+    description: '알림의 고유 아이디 정보',
+  })
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Expose()
+  _id: Types.ObjectId;
 
   @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })

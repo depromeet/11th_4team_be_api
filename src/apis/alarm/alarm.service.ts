@@ -19,6 +19,8 @@ import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 import { AlarmShowDto } from './dto/alarmShow.dto';
 import { plainToInstance } from 'class-transformer';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
+import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
+import { AlarmPaginationShowDto } from './dto/alarmPaginationShow.dto';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -152,15 +154,37 @@ export class AlarmService {
     await this.alarmRepository.watchAllAlarm(userIdDto);
   }
 
-  async getMyAlarms(userIdDto: UserIdDto): Promise<AlarmShowDto[]> {
+  async getMyAlarms(
+    userIdDto: UserIdDto,
+    pageLastIdDto: PageLastIdDto,
+  ): Promise<AlarmPaginationShowDto> {
     console.log(userIdDto);
-    const alarmRawList = await this.alarmRepository.findAlarmByUserId(
-      userIdDto,
-    );
+    let alarmRawList = [];
+    if (!pageLastIdDto.lastId) {
+      alarmRawList = await this.alarmRepository.findAlarmByUserIdFirst(
+        userIdDto,
+        50,
+      );
+    } else {
+      alarmRawList = await this.alarmRepository.findAlarmByUserIdAndLastId(
+        userIdDto,
+        pageLastIdDto,
+        50,
+      );
+    }
 
-    return plainToInstance(AlarmShowDto, alarmRawList, {
+    const alarmList = plainToInstance(AlarmShowDto, alarmRawList, {
       excludeExtraneousValues: true,
     });
+    const isLast = alarmList.length === 50 ? false : true;
+    let lastId;
+    if (alarmList.length === 50) {
+      lastId = alarmList[49]._id.toString();
+    } else {
+      lastId = null;
+    }
+
+    return new AlarmPaginationShowDto(alarmList, isLast, lastId);
   }
 
   // 안읽은 알림 갯수
