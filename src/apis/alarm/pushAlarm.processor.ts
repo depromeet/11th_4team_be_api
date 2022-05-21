@@ -74,6 +74,7 @@ export class PushAlarmProcessor {
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
       .filter((e) =>
         e.appAlarm &&
+        e.chatAlarm &&
         !e._id.equals(chatAlarmSubDto.sender) &&
         e.FCMToken.length === 0
           ? false
