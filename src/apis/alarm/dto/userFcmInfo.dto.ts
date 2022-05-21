@@ -1,9 +1,18 @@
+import { Types } from 'mongoose';
 import { Expose } from 'class-transformer';
 
 // use for message transfor
 
-export const userFcmInfoSelect = { FCMToken: 1, appAlarm: 1, chatAlarm: 1 };
+export const userFcmInfoSelect = {
+  _id: 1,
+  FCMToken: 1,
+  appAlarm: 1,
+  chatAlarm: 1,
+};
 export class UserFcmInfoDto {
+  //   @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
+  _id: Types.ObjectId;
+
   @Expose()
   FCMToken: string;
   @Expose()

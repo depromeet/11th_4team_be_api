@@ -11,6 +11,7 @@ import { SaveAlarmProcessor } from './saveAlarm.processor';
 import { NotiController } from './noti.controller';
 import { FcmModule } from 'src/fcm/fcm.module';
 import * as path from 'path';
+import { RoomsModule } from '../rooms/rooms.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import * as path from 'path';
     FcmModule.forRoot({
       credentialPath: path.join(__dirname, '../../../fcm-admin.json'),
     }),
+    RoomsModule,
   ],
   controllers: [NotiController],
   providers: [
