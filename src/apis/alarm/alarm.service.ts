@@ -125,6 +125,9 @@ export class AlarmService {
     questionIdDto: QuestionIdDto,
   ) {
     // console.log('check', sender);
+    if (sender._id.equals(receiver.userId)) {
+      return;
+    }
     const saveAlarmDto: SaveAlarmDto = {
       nickname: sender.nickname,
       user: receiver.userId.toString(),
