@@ -153,6 +153,7 @@ enum ALARM_STORE_TYPE {
   COMMENT = 'comment',
   // 번개 줬을 떄
   LIGHTNING = 'lightning',
+  LIGHTNING_LEVELUP = 'lightningLevelUp',
 
   // 번개 라이트닝 레벨업?
   // LIGHTNING = 'lightning',
@@ -163,7 +164,10 @@ enum ALARM_STORE_TYPE {
 const PUSH_ALARM = 'pushAlarm';
 const SAVE_ALARM = 'saveAlarm';
 
+const DEEPLINK_BASEURL = 'tiquitaca-app://navigation/';
+
 export {
+  DEEPLINK_BASEURL,
   PUSH_ALARM_TYPE,
   ALARM_STORE_TYPE,
   PUSH_ALARM,

@@ -57,7 +57,6 @@ export class Alarm {
   roomName: string;
 
   @Prop({
-    required: true,
     default: '',
     type: String,
   })
@@ -95,6 +94,11 @@ export class Alarm {
     enum: ALARM_STORE_TYPE,
   })
   alarmType: string;
+
+  @Prop({
+    type: String,
+  })
+  questionId: string;
 }
 
 export const AlarmSchema = SchemaFactory.createForClass(Alarm);

@@ -62,6 +62,7 @@ export class LetterService {
       senderUserInfo,
       new UserIdDto(twoUserList.recevier),
       newLetter,
+      new LetterRoomIdDto(letterRoom._id),
     );
     return new ResLetterDto(
       newLetter,
