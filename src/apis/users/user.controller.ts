@@ -15,6 +15,7 @@ import {
   ClassSerializerInterceptor,
   Query,
   ValidationPipe,
+  Version,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -47,7 +48,6 @@ export class UserController {
     private readonly userService: UserService,
     private readonly alarmService: AlarmService,
   ) {}
-
   @ApiOperation({ summary: '내 정보를 가져온다.' })
   @ApiResponse({
     status: 200,

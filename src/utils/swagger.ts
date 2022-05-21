@@ -19,7 +19,8 @@ export function setupSwagger(app: INestApplication): void {
   const options = new DocumentBuilder()
     .setTitle('티키타카 api')
     .setDescription(swaggerInfo)
-    .setVersion('1.0.0')
+    .setVersion('0.3.0')
+    // .addServer('api/v1')
     .addBearerAuth(
       {
         // I was also testing it without prefix 'Bearer ' before the JWT

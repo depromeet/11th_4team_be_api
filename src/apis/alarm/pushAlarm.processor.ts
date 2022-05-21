@@ -64,6 +64,7 @@ export class PushAlarmProcessor {
   @Process(PUSH_ALARM_TYPE.CHAT)
   async handleChatAlarm(job: Job) {
     // job.data
+    // TODO : 서로 차단된 유저는 알림에서 빼야함.
     console.log('processor  ALARM Comment ', job.data);
 
     const chatAlarmSubDto = plainToInstance(ChatAlarmSubDto, job.data);
@@ -74,6 +75,7 @@ export class PushAlarmProcessor {
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
       .filter((e) =>
         e.appAlarm &&
+        e.chatAlarm &&
         !e._id.equals(chatAlarmSubDto.sender) &&
         e.FCMToken.length === 0
           ? false
