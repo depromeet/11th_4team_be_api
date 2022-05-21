@@ -21,6 +21,8 @@ import { plainToInstance } from 'class-transformer';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
 import { AlarmPaginationShowDto } from './dto/alarmPaginationShow.dto';
+import { FcmService } from 'src/fcm/fcm.service';
+import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -71,12 +73,18 @@ export class AlarmService {
 
   // 나한테 편지가 왔을 때
   // 푸시알림만 해야함
-  async pushLetterAlarm(sender: User, receiver: UserIdDto, letter: Letter) {
+  async pushLetterAlarm(
+    sender: User,
+    receiver: UserIdDto,
+    letter: Letter,
+    letterRoomIdDto: LetterRoomIdDto,
+  ) {
     const sendPushAlarmObj: SendPushAlarmPubDto = {
       nickname: sender.nickname,
       content: letter.message,
       pushAlarmType: PUSH_ALARM_TYPE.LETTER,
       receivers: [receiver.userId],
+      letterRoomId: letterRoomIdDto.letterRoomId.toString(),
     };
     // const redis = await this.pushAlarmQueue.isReady();
     // console.log('check', redis);
@@ -132,6 +140,7 @@ export class AlarmService {
       content: comment,
       receivers: [receiver.userId],
       pushAlarmType: PUSH_ALARM_TYPE.COMMENT,
+      questionId: questionIdDto.questionId.toString(),
     };
     await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.COMMENT, sendPushAlarmObj);
   }
