@@ -14,6 +14,7 @@ import { QuestionsModule } from './apis/questions/questions.module';
 import { AlarmModule } from './apis/alarm/alarm.module';
 import mongooseLeanDefaults from 'mongoose-lean-defaults';
 import { BullModule } from '@nestjs/bull';
+import { FcmModule } from './fcm/fcm.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { BullModule } from '@nestjs/bull';
     LetterModule,
     QuestionsModule,
     AlarmModule,
+    FcmModule,
   ],
   providers: [
     {

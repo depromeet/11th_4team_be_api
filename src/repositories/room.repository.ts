@@ -8,6 +8,10 @@ import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { CoordinatesDto } from 'src/apis/rooms/dto/coordinates.dto';
 import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
+import {
+  UserFcmInfoDto,
+  userFcmInfoSelect,
+} from 'src/apis/alarm/dto/userFcmInfo.dto';
 
 @Injectable()
 export class RoomRepository {
@@ -243,5 +247,21 @@ export class RoomRepository {
     ]);
 
     return rooms;
+  }
+
+  async getUserAlarmInfoInRoom(roomIdDto: RoomIdDto) {
+    const room = await this.roomModel
+      .findOne({
+        _id: roomIdDto.roomId,
+      })
+      .populate({
+        path: 'userList',
+        select: userFcmInfoSelect,
+      })
+      .lean<Room>({ defaults: true });
+    const userFcmInfoList = room.userList
+      ? (room.userList as unknown as UserFcmInfoDto[])
+      : [];
+    return { userFcmInfoList: userFcmInfoList, roomName: room.name };
   }
 }

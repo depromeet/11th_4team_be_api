@@ -2,7 +2,7 @@ import { Chat } from './chat.model';
 import { Room } from './room.model';
 import { IsNotEmpty, IsObject, IsString, IsArray } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { IsObjectId } from 'class-validator-mongo-object-id';
+import { IsMongoId } from 'class-validator';
 import { User } from './user.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
@@ -48,7 +48,7 @@ export class Comment {
     type: Types.ObjectId,
     ref: User.name,
   })
-  @IsObjectId()
+  @IsMongoId()
   @Type(() => UserProfileDto)
   @Expose()
   user: User;
@@ -77,7 +77,7 @@ export class Question {
   _id: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId })
-  @IsObjectId()
+  @IsMongoId()
   @Exclude()
   room: Room;
 
@@ -90,7 +90,7 @@ export class Question {
     type: Types.ObjectId,
     ref: User.name,
   })
-  @IsObjectId()
+  @IsMongoId()
   @Type(() => UserProfileDto)
   @Expose()
   user: User;
@@ -108,7 +108,7 @@ export class Question {
     required: true,
     type: Types.ObjectId,
   })
-  @IsObjectId()
+  @IsMongoId()
   @Exclude()
   chat: Chat;
 

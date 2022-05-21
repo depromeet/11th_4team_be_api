@@ -1,25 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
+import { ALARM_STORE_TYPE, DEEPLINK_BASEURL } from 'src/common/consts/enum';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 import { Types } from 'mongoose';
-import { ALARM_STORE_TYPE } from 'src/common/consts/enum';
 
 // use for message transfor
 export class AlarmShowDto {
   // 직렬화
+  @ApiProperty({
+    type: String,
+    description: '알림의 고유 아이디 정보',
+  })
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Expose()
+  _id: Types.ObjectId;
 
-  @Exclude({ toPlainOnly: false })
+  @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
   roomName?: string;
 
-  @Exclude({ toPlainOnly: false })
+  @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
   nickname: string;
 
-  @Exclude({ toPlainOnly: false })
+  @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
   user: string;
 
-  @Exclude({ toPlainOnly: false })
+  @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
   content?: string;
 
@@ -30,7 +39,18 @@ export class AlarmShowDto {
     description: '딥링크 정보',
   })
   @Expose()
-  deepLink: string;
+  get deepLink(): string {
+    switch (this.alarmType) {
+      case ALARM_STORE_TYPE.LIGHTNING:
+        return DEEPLINK_BASEURL + 'screen-type?mypage';
+      case ALARM_STORE_TYPE.COMMENT:
+        return (
+          DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId
+        );
+      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
+        return DEEPLINK_BASEURL + 'screen-type?mypage';
+    }
+  }
 
   @ApiProperty({
     type: String,
@@ -42,7 +62,11 @@ export class AlarmShowDto {
       case ALARM_STORE_TYPE.LIGHTNING:
         return this.nickname + '님이 번개를 줬어요 ⚡️';
       case ALARM_STORE_TYPE.COMMENT:
-        return this.nickname + `님이 댓글을 남겼어요 "${this.content}"`;
+        return (
+          this.nickname + '님이 댓글을 남겼어요 ' + '“' + this.content + '“'
+        );
+      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
+        return `${this.content}로 레벨업을 했어요 축하드려요!`;
       case ALARM_STORE_TYPE.OFFICIAL:
         return '서비스 공식알림';
     }
@@ -58,6 +82,8 @@ export class AlarmShowDto {
         return this.nickname;
       case ALARM_STORE_TYPE.COMMENT:
         return this.roomName;
+      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
+        return `레벨 업 축하`;
       case ALARM_STORE_TYPE.OFFICIAL:
         return '티키타카 비밀 운영자';
     }
@@ -70,4 +96,22 @@ export class AlarmShowDto {
   })
   @Expose()
   alarmType: ALARM_STORE_TYPE;
+
+  @ApiProperty({
+    type: String,
+    description: '한국시간으로 보정된 시간값',
+  })
+  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  @Expose()
+  createdAt: Date;
+
+  @Exclude({ toPlainOnly: true })
+  @Expose({ toClassOnly: true })
+  questionId?: string;
+  @ApiProperty({
+    type: Boolean,
+    description: '내가 봤는지 ',
+  })
+  @Expose()
+  iWatch: boolean;
 }

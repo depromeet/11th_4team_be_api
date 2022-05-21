@@ -185,6 +185,10 @@ export class QuestionsService {
       commentStringDto,
       questionIdDto,
     );
+    if (!question) {
+      throw new BadRequestException('질문 없음');
+    }
+
     const room = await this.roomsService.findOneByRoomId(
       new RoomIdDto(question.room._id),
     );
@@ -193,6 +197,7 @@ export class QuestionsService {
       new UserIdDto(question.user._id),
       room,
       commentStringDto.comment,
+      questionIdDto,
     );
     return question.commentList;
   }

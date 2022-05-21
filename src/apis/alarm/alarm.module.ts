@@ -8,6 +8,10 @@ import { BullModule } from '@nestjs/bull';
 import { PushAlarmProcessor } from './pushAlarm.processor';
 import { PUSH_ALARM, SAVE_ALARM } from 'src/common/consts/enum';
 import { SaveAlarmProcessor } from './saveAlarm.processor';
+import { NotiController } from './noti.controller';
+import { FcmModule } from 'src/fcm/fcm.module';
+import * as path from 'path';
+import { RoomsModule } from '../rooms/rooms.module';
 
 @Module({
   imports: [
@@ -21,7 +25,12 @@ import { SaveAlarmProcessor } from './saveAlarm.processor';
         name: SAVE_ALARM,
       },
     ),
+    FcmModule.forRoot({
+      credentialPath: path.join(__dirname, '../../../fcm-admin.json'),
+    }),
+    RoomsModule,
   ],
+  controllers: [NotiController],
   providers: [
     AlarmService,
     AlarmRepository,

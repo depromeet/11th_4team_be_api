@@ -16,6 +16,11 @@ import { UpdateProfileReqDto } from 'src/apis/users/dto/updateUserDto.req.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { STATUS_TYPE, USER_LEVEL_TYPE } from 'src/common/consts/enum';
+import {
+  UserFcmInfoDto,
+  userFcmInfoSelect,
+} from 'src/apis/alarm/dto/userFcmInfo.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UserRepository {
@@ -398,5 +403,14 @@ export class UserRepository {
       { level: userlevel },
       { new: true },
     );
+  }
+
+  async findUserFcmToken(
+    userIdArray: Types.ObjectId[],
+  ): Promise<UserFcmInfoDto[]> {
+    return await this.userModel
+      .find({ _id: { $in: userIdArray } })
+      .select(userFcmInfoSelect)
+      .lean<UserFcmInfoDto[]>({ defaults: true });
   }
 }
