@@ -1,11 +1,11 @@
-import { Socket } from 'socket.io';
 import { IsBoolean, IsNotEmpty, IsString, IsEnum } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document, ObjectId, Types } from 'mongoose';
-import { IsMongoId } from 'class-validator';
-import * as mongoose from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { IsObjectId } from 'class-validator-mongo-object-id';
 import { CHAT_TYPE } from 'src/common/consts/enum';
-import { Room } from './room.model';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
+import { Transform, Type } from 'class-transformer';
+import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 
 const options: SchemaOptions = {
   collection: 'chat',
@@ -13,20 +13,18 @@ const options: SchemaOptions = {
 };
 
 @Schema(options)
-export class Chat extends Document {
-  @Prop({
-    type: {
-      _id: { type: Types.ObjectId, required: true, ref: 'sockets' },
-      id: { type: String },
-      username: { type: String, required: true },
-    },
-  })
-  @IsNotEmpty()
-  sender: Socket;
+export class Chat {
+  @TransformObjectIdToString({ toClassOnly: true })
+  @Type(() => Types.ObjectId)
+  _id: Types.ObjectId;
 
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'room' })
-  @IsMongoId()
-  room: Room;
+  @Prop({ required: true, type: Types.ObjectId, ref: 'room' })
+  @IsObjectId()
+  room: Types.ObjectId;
+
+  @Prop({ required: true, type: Types.ObjectId, ref: 'user' })
+  @IsObjectId()
+  sender: Types.ObjectId;
 
   @Prop({
     required: true,
@@ -48,6 +46,12 @@ export class Chat extends Document {
   @IsNotEmpty()
   @IsString()
   message: string;
+
+  // @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  // @Expose()
+  createdAt: Date;
 }
 
 export const ChatSchema = SchemaFactory.createForClass(Chat);
+
+// ChatSchema.index({ createdAt: 1 }, { expireAfterSeconds: 604800 });

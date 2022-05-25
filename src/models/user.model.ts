@@ -196,6 +196,8 @@ export class User {
   })
   @Expose()
   level: number;
+
+  lastChat: Types.ObjectId;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);

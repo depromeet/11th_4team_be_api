@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Type } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
+import { ChatService } from 'src/chat/chat.service';
 import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
 import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
@@ -21,13 +22,13 @@ import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 import { LeftRoomResultResDto } from './dto/leftRoomResult.res.dto';
 import { MyRoomInfoDto } from './dto/myRoomInfo.res.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomsService {
   constructor(
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
+    private readonly chatService: ChatService,
   ) {}
 
   private filterRemoveBlockedUserFromUserList(
@@ -260,15 +261,19 @@ export class RoomsService {
   //   return send;
   // }
   @returnValueToDto(MyRoomInfoDto)
-  async getMyRoomInfo(userId: UserIdDto) {
+  async getMyRoomInfo(userId: UserIdDto, user: User) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
-    console.log(roomInfo);
-
+    console.log('asdfasdfas', roomInfo);
+    if (!roomInfo) {
+      return null;
+    }
     //TODO : 채팅 정보 추가해야함
     // if (!roomInfo) {
     //   throw new BadRequestException('MyRoom does not exist');
     // }
-    return roomInfo;
+    const recentChatInfo = await this.chatService.makeRecentChatInfo(user);
+    const myRoomInfoDto = { ...roomInfo, ...recentChatInfo };
+    return myRoomInfoDto;
   }
   @returnValueToDto(ResShortCutRoomDto)
   async getMyFavorite(userId: UserIdDto) {

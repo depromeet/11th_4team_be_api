@@ -7,28 +7,18 @@ import {
   Param,
   Delete,
   Query,
-  UsePipes,
-  SerializeOptions,
   UseGuards,
-  UseInterceptors,
-  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
-  ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { FindRoomDto } from './dto/find-room.dto';
-import { MongoId } from 'src/common/dtos/MongoId.dto';
-import { ObjectIdValidationPipe } from 'src/common/pipes/ObjectIdCheck.pipe';
-import { ObjectId } from 'mongoose';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
@@ -37,11 +27,11 @@ import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { User } from 'src/models/user.model';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { ResChatAlarmToggleDto } from './dto/chatAlarmToggle.res.dto';
 import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { Room } from 'src/models/room.model';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
+import { MyRoomInfoDto } from './dto/myRoomInfo.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -84,7 +74,7 @@ export class RoomsController {
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
-    type: ResShortCutRoomDto,
+    type: MyRoomInfoDto,
   })
   @ApiResponse({
     status: 200,
@@ -94,7 +84,7 @@ export class RoomsController {
   getMyRoomShortCutInfo(@ReqUser() user: User) {
     // console.log(FindRoomDto);
     // 경도lng 위도lat
-    return this.roomsService.getMyRoomShortCutInfo(user.userIdDto);
+    return this.roomsService.getMyRoomInfo(user.userIdDto, user);
   }
 
   @ApiOperation({ summary: '(채팅탭용)내가 즐겨찾기한 채팅방 뽑아옴' })

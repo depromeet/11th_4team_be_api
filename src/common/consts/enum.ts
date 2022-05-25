@@ -43,11 +43,6 @@ enum FIND_ROOM_FILTER_TYPE {
   // HAN_RIVER_PRAk,
 }
 
-enum CHAT_TYPE {
-  CHAT = 1,
-  QUESTION,
-}
-
 enum EVENT_TYPE {
   CHAT = 1,
   QUESTION,
@@ -166,7 +161,13 @@ const SAVE_ALARM = 'saveAlarm';
 
 const DEEPLINK_BASEURL = 'tiquitaca-app://navigation/';
 
+enum CHAT_TYPE {
+  NORMAL = 0,
+  QUERY = 1,
+}
+
 export {
+  CHAT_TYPE,
   DEEPLINK_BASEURL,
   PUSH_ALARM_TYPE,
   ALARM_STORE_TYPE,
@@ -189,7 +190,6 @@ export {
   NOTIFICATION_POST_TYPE,
   STATUS_TYPE,
   CATEGORY_TYPE,
-  CHAT_TYPE,
   EVENT_TYPE,
   FIND_ROOM_FILTER_TYPE,
 };

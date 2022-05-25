@@ -30,26 +30,33 @@ export class MyRoomInfoDto {
   //추가됨
   @ApiProperty({
     description: '아직 읽지 않은 채팅 숫자 0이면 표시안하시면 됩니다.',
+    default: 0,
   })
   @Expose()
-  notReadchatCount: number;
+  notReadChatCount: number;
   // 추가됨
   @ApiProperty({
     description:
       '마지막 채팅 메시지 채팅이 아예없는 경우에는 아직 아무도 채팅을 치지 않았어요 로 보내드립니다.',
     type: String,
-    nullable: true,
     default: '아직 아무도 채팅을 치지 않았어요',
   })
   @Expose()
-  lastChatMessage = '아직 아무도 채팅을 치지 않았어요';
+  lastChatMessage: string;
 
   @ApiProperty({
     type: String,
     description:
       '한국시간으로 보정된 시간값 , 최신 채팅의 값 , 최신 채팅이 없으면 null 값으로 보내드립니다.',
+    nullable: true,
   })
-  @Transform(({ value }) => toKRTimeZone(value), { toClassOnly: true })
+  @Transform(
+    ({ value }) => {
+      if (value === null) return null;
+      else return toKRTimeZone(value);
+    },
+    { toClassOnly: true },
+  )
   @Expose()
-  lastChatTime: Date;
+  lastChatTime: Date | null;
 }
