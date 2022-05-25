@@ -28,7 +28,7 @@ export class RoomRepository {
    * @param createRoomDto
    * @returns Room
    */
-  async createRoom(createRoomDto: CreateRoomDto): Promise<Room | null> {
+  async createRoom(createRoomDto: CreateRoomDto): Promise<Room> {
     const room = new this.roomModel({
       ...createRoomDto,
       geometry: {

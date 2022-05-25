@@ -8,6 +8,7 @@ export const ReqUser = createParamDecorator(
     // console.log('asdfasdfasd');
 
     const userObj = request.user;
+    // console.log('check null', userObj.blockedUsers);
     userObj.blockedUserDto = new BlockedUserDto(userObj.blockedUsers);
     userObj.userIdDto = new UserIdDto(userObj._id);
     // console.log(userObj);

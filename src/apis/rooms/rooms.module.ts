@@ -6,6 +6,7 @@ import { Room, RoomSchema } from 'src/models/room.model';
 import { RoomRepository } from 'src/repositories/room.repository';
 import { User, UserSchema } from 'src/models/user.model';
 import { UserModule } from '../users/user.module';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserModule } from '../users/user.module';
       { name: User.name, schema: UserSchema },
     ]),
     forwardRef(() => UserModule),
+    ChatModule,
   ],
   controllers: [RoomsController],
   providers: [RoomsService, RoomRepository],

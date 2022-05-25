@@ -121,6 +121,9 @@ export class LetterService {
       letterRoomIdDto,
       myUserId,
     );
+    if (!leavedRoomInfo) {
+      throw new BadRequestException('방정보 없음');
+    }
     if (leavedRoomInfo.leftUserList.length === 2) {
       // 길이가 2가되면 두명다 나간거므로 삭제 진행
       await this.deleteRoomAndLetters(letterRoomIdDto);

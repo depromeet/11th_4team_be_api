@@ -34,6 +34,7 @@ import { AlarmShowDto } from './dto/alarmShow.dto';
 import { ReqUser } from 'src/common/decorators/user.decorator';
 import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
 import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
+import { AlarmPaginationShowDto } from './dto/alarmPaginationShow.dto';
 
 @ApiTags('notis')
 @Controller('notis')
@@ -49,7 +50,7 @@ export class NotiController {
   @ApiResponse({
     status: 201,
     description: '요청 성공시',
-    type: [AlarmShowDto],
+    type: [AlarmPaginationShowDto],
   })
   getMyAllAlarm(@ReqUser() user: User, @Query() pageLastIdDto: PageLastIdDto) {
     console.log('asdfasdfasdf', pageLastIdDto);

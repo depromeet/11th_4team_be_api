@@ -97,6 +97,11 @@ export class User {
   @Exclude()
   status: STATUS_TYPE;
 
+  @ApiProperty({
+    default: '',
+    type: String,
+    description: 'fcm 토큰정보',
+  })
   @Prop({
     default: '',
   })
@@ -118,7 +123,7 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: 'Room' })
   @IsMongoId()
   @Expose()
-  myRoom: Room;
+  myRoom: Room | null;
 
   @ApiProperty({
     type: Boolean,
@@ -196,6 +201,8 @@ export class User {
   })
   @Expose()
   level: number;
+
+  lastChat: Types.ObjectId | null;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);

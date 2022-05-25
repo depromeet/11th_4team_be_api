@@ -13,7 +13,7 @@ export class AlarmPaginationShowDto {
   }
   // 직렬화
   @ApiProperty({
-    type: String,
+    type: [AlarmShowDto],
     description: '알림 리스트',
   })
   @Expose()
