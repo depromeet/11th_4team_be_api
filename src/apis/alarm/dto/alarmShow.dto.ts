@@ -47,7 +47,6 @@ export class AlarmShowDto {
         return (
           DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId
         );
-      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
         return DEEPLINK_BASEURL + 'screen-type?mypage';
     }
   }
@@ -65,8 +64,6 @@ export class AlarmShowDto {
         return (
           this.nickname + '님이 댓글을 남겼어요 ' + '“' + this.content + '“'
         );
-      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
-        return `${this.content}로 레벨업을 했어요 축하드려요!`;
       case ALARM_STORE_TYPE.OFFICIAL:
         return '서비스 공식알림';
     }
@@ -82,8 +79,6 @@ export class AlarmShowDto {
         return this.nickname;
       case ALARM_STORE_TYPE.COMMENT:
         return this.roomName;
-      case ALARM_STORE_TYPE.LIGHTNING_LEVELUP:
-        return `레벨 업 축하`;
       case ALARM_STORE_TYPE.OFFICIAL:
         return '티키타카 비밀 운영자';
     }

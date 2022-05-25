@@ -7,10 +7,10 @@ export class SendPushAlarmSubDto {
   @Expose()
   roomName?: string;
   @Expose()
-  nickname: string;
+  nickname?: string;
 
   @Expose()
-  content: string;
+  content?: string;
 
   @Expose()
   pushAlarmType: PUSH_ALARM_TYPE;
@@ -45,6 +45,8 @@ export class SendPushAlarmSubDto {
         return (
           DEEPLINK_BASEURL + 'letter-room?letter-room_id=' + this.letterRoomId
         );
+      case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
+        return DEEPLINK_BASEURL + 'screen-type?mypage';
     }
   }
 
@@ -57,12 +59,19 @@ export class SendPushAlarmSubDto {
         return '내 질문에 새로운 댓글이 달렸어요';
       case PUSH_ALARM_TYPE.LETTER:
         return '쪽지가 도착했어요';
+      case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
+        return '등급이 업그레이드 되었어요!';
     }
   }
 
   @Expose()
   get body(): string {
-    return this.nickname + ' : ' + this.content;
+    switch (this.pushAlarmType) {
+      case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
+        return '티키타카에서 새로 받은 아이템을 확인해보세요';
+      default:
+        return this.nickname + ' : ' + this.content;
+    }
   }
 
   @Expose()

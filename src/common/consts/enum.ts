@@ -137,6 +137,7 @@ enum PUSH_ALARM_TYPE {
   COMMENT = 'comment',
   LETTER = 'letter',
   CHAT = 'chat',
+  LIGHTNING_LEVELUP = 'lightningLevelUp',
 }
 
 // enum ALARM_TYPE {
@@ -153,7 +154,6 @@ enum ALARM_STORE_TYPE {
   COMMENT = 'comment',
   // 번개 줬을 떄
   LIGHTNING = 'lightning',
-  LIGHTNING_LEVELUP = 'lightningLevelUp',
 
   // 번개 라이트닝 레벨업?
   // LIGHTNING = 'lightning',
