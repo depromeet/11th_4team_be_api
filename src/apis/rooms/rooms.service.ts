@@ -20,6 +20,7 @@ import { FindRoomDto } from './dto/find-room.dto';
 import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 import { LeftRoomResultResDto } from './dto/leftRoomResult.res.dto';
+import { MyRoomInfoDto } from './dto/myRoomInfo.res.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
@@ -258,10 +259,12 @@ export class RoomsService {
 
   //   return send;
   // }
-  @returnValueToDto(ResShortCutRoomDto)
-  async getMyRoomShortCutInfo(userId: UserIdDto) {
+  @returnValueToDto(MyRoomInfoDto)
+  async getMyRoomInfo(userId: UserIdDto) {
     const roomInfo = await this.userRepository.getMyRoom(userId);
     console.log(roomInfo);
+
+    //TODO : 채팅 정보 추가해야함
     // if (!roomInfo) {
     //   throw new BadRequestException('MyRoom does not exist');
     // }
