@@ -97,6 +97,11 @@ export class User {
   @Exclude()
   status: STATUS_TYPE;
 
+  @ApiProperty({
+    default: '',
+    type: String,
+    description: 'fcm 토큰정보',
+  })
   @Prop({
     default: '',
   })
@@ -197,7 +202,7 @@ export class User {
   @Expose()
   level: number;
 
-  lastChat: Types.ObjectId;
+  lastChat: Types.ObjectId | null;
 }
 
 export const _UserSchema = SchemaFactory.createForClass(User);
