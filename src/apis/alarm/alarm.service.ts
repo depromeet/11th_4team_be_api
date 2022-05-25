@@ -23,6 +23,7 @@ import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
 import { AlarmPaginationShowDto } from './dto/alarmPaginationShow.dto';
 import { FcmService } from 'src/fcm/fcm.service';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
+import { Alarm } from 'src/models/alarm.model';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -180,7 +181,7 @@ export class AlarmService {
     pageLastIdDto: PageLastIdDto,
   ): Promise<AlarmPaginationShowDto> {
     console.log(userIdDto);
-    let alarmRawList = [];
+    let alarmRawList: Alarm[] = [];
     if (!pageLastIdDto.lastId) {
       alarmRawList = await this.alarmRepository.findAlarmByUserIdFirst(
         userIdDto,
