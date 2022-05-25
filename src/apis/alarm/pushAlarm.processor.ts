@@ -100,4 +100,11 @@ export class PushAlarmProcessor {
       console.log(result);
     }
   }
+
+  @Process(PUSH_ALARM_TYPE.LIGHTNING_LEVELUP)
+  async handleLightningLevelUpSaveAlarm(job: Job) {
+    // job.data
+    const sendPushAlarmDto = plainToInstance(SendPushAlarmSubDto, job.data);
+    await this.sendPushAlarm(sendPushAlarmDto);
+  }
 }
