@@ -51,11 +51,16 @@ import * as Joi from 'joi';
         REDIS_PORT: Joi.number(),
       }),
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI, {
-      connectionFactory: (connection) => {
-        connection.plugin(mongooseLeanDefaults);
-        return connection;
-      },
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+        connectionFactory: (connection) => {
+          connection.plugin(mongooseLeanDefaults);
+          return connection;
+        },
+      }),
+      inject: [ConfigService],
     }),
     UserModule,
     AuthModule,

@@ -52,7 +52,7 @@ export class FcmService {
       },
     };
 
-    let result = null;
+    let result;
     try {
       result = await this.fcmAdmin.messaging().sendMulticast(fcmPushMessage);
       //   console.log(result);

@@ -22,7 +22,7 @@ export class PushAlarmProcessor {
 
   private async sendPushAlarm(sendPushAlarmDto: SendPushAlarmSubDto) {
     const findUserFcmToken = await this.userRepository.findUserFcmToken(
-      sendPushAlarmDto.receivers,
+      sendPushAlarmDto.receivers ? sendPushAlarmDto.receivers : [],
     );
     console.log(findUserFcmToken);
 

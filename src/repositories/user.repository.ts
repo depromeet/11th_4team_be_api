@@ -186,11 +186,11 @@ export class UserRepository {
 
   // app 전채의 알람을 끄고 킬 수 있음
   async toggleApptAlarm(userIdDto: UserIdDto): Promise<boolean> {
-    const user = await this.userModel.findOneAndUpdate(
+    const user = (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       [{ $set: { appAlarm: { $eq: [false, '$appAlarm'] } } }],
       { new: true },
-    );
+    )) as User;
     return user.appAlarm;
   }
 
@@ -390,19 +390,19 @@ export class UserRepository {
   }
 
   async addUserLigthningScore(userIdDto: UserIdDto): Promise<User> {
-    return await this.userModel.findOneAndUpdate(
+    return (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       { $inc: { lightningScore: 1 } },
       { new: true },
-    );
+    )) as User;
   }
 
   async levelUpUser(userIdDto: UserIdDto, userlevel: number): Promise<User> {
-    return await this.userModel.findOneAndUpdate(
+    return (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       { level: userlevel },
       { new: true },
-    );
+    )) as User;
   }
 
   async findUserFcmToken(

@@ -79,7 +79,6 @@ export class RoomsController {
   @ApiResponse({
     status: 200,
     description: '내 방이없으면',
-    type: null,
   })
   getMyRoomShortCutInfo(@ReqUser() user: User) {
     // console.log(FindRoomDto);

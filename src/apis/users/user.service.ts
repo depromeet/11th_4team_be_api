@@ -4,6 +4,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 import { User } from 'src/models/user.model';
@@ -47,7 +48,11 @@ export class UserService {
   @returnValueToDto(User)
   async getUserInfo(userIdDto: UserIdDto): Promise<User> {
     // auto 시리얼 라이징
-    return await this.userRepository.findOneByUserId(userIdDto);
+    const user = await this.userRepository.findOneByUserId(userIdDto);
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
+    return user;
   }
 
   @returnValueToDto(UserProfileDto)
@@ -57,7 +62,11 @@ export class UserService {
   ): Promise<UserProfileDto> {
     this.checkBlocked(userIdDto, blockedUserDto);
     // auto 시리얼 라이징
-    return await this.userRepository.findOneByUserId(userIdDto);
+    const user = await this.userRepository.findOneByUserId(userIdDto);
+    if (!user) {
+      throw new BadRequestException('유저 없음');
+    }
+    return user;
   }
 
   @returnValueToDto(User)
@@ -241,7 +250,9 @@ export class UserService {
   async getMyBlockUser(myUserIdDto: UserIdDto) {
     console.log('check');
     const user = await this.userRepository.findOneByUserId(myUserIdDto);
-    console.log(user);
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
 
     return user.iBlockUsers;
   }

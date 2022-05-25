@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Type } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Type,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
 import { ChatService } from 'src/chat/chat.service';
@@ -67,13 +72,16 @@ export class RoomsService {
   async findRoom(
     findRoomDto: FindRoomDto,
     userId: UserIdDto,
-  ): Promise<ResFindRoomDto[] | []> {
+  ): Promise<ResFindRoomDto[]> {
     //
     const isCATEGORY_TYPE = Object.values<string>(CATEGORY_TYPE).includes(
       findRoomDto.filter,
     );
     const user = await this.userRepository.findOneByUserId(userId);
-    let rooms = [];
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
+    let rooms;
     if (isCATEGORY_TYPE) {
       // 카테고리 타입인 경우
       rooms = await this.roomRepository.findRoomsByCoordinatesWithFilter(
@@ -96,7 +104,13 @@ export class RoomsService {
       )
         ? true
         : false;
-      const iJoin = element._id.equals(user.myRoom._id);
+      let iJoin: boolean;
+      if (!user.myRoom) {
+        iJoin = false;
+      } else {
+        iJoin = element._id.equals(user.myRoom._id);
+      }
+
       return { ...element, iFavorite, iJoin };
     });
     //필터링 룸
@@ -107,7 +121,7 @@ export class RoomsService {
     // });
     return plainToInstance(ResFindRoomDto, result, {
       excludeExtraneousValues: true,
-    });
+    }) as unknown as Array<ResFindRoomDto>;
   }
 
   /**
@@ -125,6 +139,9 @@ export class RoomsService {
   ): Promise<ResFindOneRoomDto> {
     // 이전 룸에서 빼주는 로직 추가해야함
     const user = await this.userRepository.findOneByUserId(userIdDto);
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
     // 유저가현재 들어가있는 방이있으면
     // safe 어프로치 populate 안때려도 가상으로 데려감 몽고디비 Document 형식이면
     // console.log(typeof roomIdDto.roomId, roomIdDto.roomId, user.myRoom._id);
@@ -132,10 +149,11 @@ export class RoomsService {
 
     if (user.myRoom) {
       // 유저가 들어간 채팅방이 있을경우
-      if (roomIdDto.roomId.equals(user.myRoom._id)) {
+      const myRoomId = user.myRoom._id;
+      if (roomIdDto.roomId.equals(myRoomId)) {
         // 룸이 같을경우 룸의 정보를 리턴
         const iFavorite = user.favoriteRoomList.find((room) =>
-          room._id.equals(user.myRoom._id),
+          room._id.equals(myRoomId),
         )
           ? true
           : false;
@@ -220,6 +238,9 @@ export class RoomsService {
     userIdDto: UserIdDto,
   ): Promise<ResFavoriteToggleDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto);
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
     const isFavoritRoom = user.favoriteRoomList.find((room) =>
       roomIdDto.roomId.equals(room._id),
     );

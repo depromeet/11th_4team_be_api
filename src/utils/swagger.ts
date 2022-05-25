@@ -4,12 +4,14 @@ import * as fs from 'fs';
 import * as basicAuth from 'express-basic-auth';
 
 export function setupSwagger(app: INestApplication): void {
+  const SWAGGER_USER = process.env.SWAGGER_USER as string;
+
   app.use(
     ['/api-docs'],
     basicAuth({
       challenge: true,
       users: {
-        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
+        [SWAGGER_USER]: process.env.SWAGGER_PASSWORD as string,
       },
     }),
   );

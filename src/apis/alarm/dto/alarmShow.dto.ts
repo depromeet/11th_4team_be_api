@@ -47,7 +47,8 @@ export class AlarmShowDto {
         return (
           DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId
         );
-        return DEEPLINK_BASEURL + 'screen-type?mypage';
+      default:
+        return '';
     }
   }
 
@@ -78,7 +79,7 @@ export class AlarmShowDto {
       case ALARM_STORE_TYPE.LIGHTNING:
         return this.nickname;
       case ALARM_STORE_TYPE.COMMENT:
-        return this.roomName;
+        return this.roomName ? this.roomName : '방이름';
       case ALARM_STORE_TYPE.OFFICIAL:
         return '티키타카 비밀 운영자';
     }

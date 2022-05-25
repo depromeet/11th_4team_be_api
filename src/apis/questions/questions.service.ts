@@ -42,6 +42,9 @@ export class QuestionsService {
   // always should check if i join the room.
   private async checkMyRoom(userIdDto: UserIdDto): Promise<RoomIdDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto);
+    if (!user) {
+      throw new BadRequestException('유저 정보 없음');
+    }
     if (!user.myRoom) {
       throw new BadRequestException('들어간 방이 없습니다.');
     }
@@ -56,7 +59,7 @@ export class QuestionsService {
   ): Promise<QuestionListShowDto[]> {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const myRoomIdDto = await this.checkMyRoom(userIdDto);
-    let result = [];
+    let result;
     switch (questionFindRequestDto.filter) {
       case QUESTION_FIND_FILTER_TYPE.NOTANSWERED:
         result = await this.questionRepository.getQuestionsByRoomIdNotAnswerd(
@@ -128,6 +131,10 @@ export class QuestionsService {
     const question = await this.questionRepository.getQuestionByQuestionId(
       questionIdDto,
     );
+
+    if (!question) {
+      throw new BadRequestException('질문없음');
+    }
     if (!question.user._id.equals(userIdDto.userId)) {
       throw new BadRequestException('권한없음');
     }
@@ -146,6 +153,9 @@ export class QuestionsService {
     const question = await this.questionRepository.getQuestionByQuestionId(
       questionIdDto,
     );
+    if (!question) {
+      throw new BadRequestException('질문없음');
+    }
     const checkILiked = question.likes.find((user) =>
       user._id.equals(userIdDto.userId),
     );
@@ -214,6 +224,9 @@ export class QuestionsService {
       questionIdDto,
     );
     console.log(question);
+    if (!question) {
+      throw new BadRequestException('질문없음');
+    }
     if (
       !question.commentList.find(
         (comment) =>

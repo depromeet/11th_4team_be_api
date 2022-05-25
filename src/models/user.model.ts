@@ -118,7 +118,7 @@ export class User {
   @Prop({ type: Types.ObjectId, ref: 'Room' })
   @IsMongoId()
   @Expose()
-  myRoom: Room;
+  myRoom: Room | null;
 
   @ApiProperty({
     type: Boolean,

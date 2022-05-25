@@ -103,7 +103,7 @@ export class QuestionRepository {
 
   async deleteQuestionsByQuestionId(
     questionIdDto: QuestionIdDto,
-  ): Promise<Question | null> {
+  ): Promise<Question> {
     return await this.questionModel
       .deleteOne({ _id: questionIdDto.questionId })
       .lean<Question>({ defaults: true });
@@ -113,7 +113,7 @@ export class QuestionRepository {
   async pushUserToQuestionLikes(
     userIdDto: UserIdDto,
     questionIdDto: QuestionIdDto,
-  ): Promise<Question | null> {
+  ): Promise<Question> {
     return await this.questionModel
       .findOneAndUpdate(
         {
@@ -133,7 +133,7 @@ export class QuestionRepository {
   async pullUserToQuestionLikes(
     userIdDto: UserIdDto,
     questionIdDto: QuestionIdDto,
-  ): Promise<Question | null> {
+  ): Promise<Question> {
     return await this.questionModel
       .findOneAndUpdate(
         {
@@ -182,7 +182,7 @@ export class QuestionRepository {
   async pullCommentToQuestion(
     commentIdDto: CommentIdDto,
     questionIdDto: QuestionIdDto,
-  ): Promise<Question | null> {
+  ): Promise<Question> {
     return await this.questionModel
       .findOneAndUpdate(
         {
