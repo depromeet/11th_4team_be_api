@@ -104,14 +104,23 @@ export class AlarmService {
   // 내 레벨이 올랐을 때 (기획 기달려야함)
 
   async handleLevelUpAlarm(receiver: UserIdDto, level: string) {
-    const saveAlarmDto: SaveAlarmDto = {
-      user: receiver.userId.toString(),
-      content: level,
-      alarmType: ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
+    // const saveAlarmDto: SaveAlarmDto = {
+    //   user: receiver.userId.toString(),
+    //   content: level,
+    //   alarmType: ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
+    // };
+    // await this.saveAlarmQueue.add(
+    //   ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
+    //   saveAlarmDto,
+    // );
+
+    const sendPushAlarmObj: SendPushAlarmPubDto = {
+      receivers: [receiver.userId],
+      pushAlarmType: PUSH_ALARM_TYPE.LIGHTNING_LEVELUP,
     };
-    await this.saveAlarmQueue.add(
-      ALARM_STORE_TYPE.LIGHTNING_LEVELUP,
-      saveAlarmDto,
+    await this.pushAlarmQueue.add(
+      PUSH_ALARM_TYPE.LIGHTNING_LEVELUP,
+      sendPushAlarmObj,
     );
   }
 
