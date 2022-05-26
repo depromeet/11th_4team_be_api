@@ -68,7 +68,6 @@ export class RoomsController {
     // 경도lng 위도lat
     return this.roomsService.findRoom(FindRoomDto, user.userIdDto);
   }
-  //TODO : 안읽은 채팅 갯수 ?
   @ApiOperation({ summary: '(채팅탭용)내 룸 정보 가져옴' })
   @Get('/my/room')
   @ApiResponse({

@@ -11,11 +11,6 @@ import {
   Get,
   Patch,
   Delete,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-  Query,
-  ValidationPipe,
-  Version,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -28,16 +23,13 @@ import { UserService } from './user.service';
 import { NicknameDto } from './dto/user.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { UpdateProfileReqDto } from './dto/updateUserDto.req.dto';
-import { SuccessInterceptor } from 'src/common/interceptors/sucess.interceptor';
 import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 import { ReportResultDtoResDto } from './dto/reportResultDto.res.dto';
 import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
-import { AlarmShowDto } from '../alarm/dto/alarmShow.dto';
 import { AlarmService } from '../alarm/alarm.service';
-import { AlarmIdDto } from 'src/common/dtos/AlarmId.dto';
-import { PageLastIdDto } from 'src/common/dtos/PageLastIdDto';
+import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -76,6 +68,23 @@ export class UserController {
       user.userIdDto,
       updateProfileReqDto,
     );
+  }
+
+  @ApiOperation({
+    summary: 'FCM 업데이트하기',
+  })
+  @Patch('fcm')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: FCMUpdateDto,
+  })
+  updateUserFCMToken(
+    @ReqUser() user: User,
+    @Body() fCMUpdateDto: FCMUpdateDto,
+  ) {
+    console.log('asdfasdfasdfas');
+    return this.userService.updateUserFCMToken(user.userIdDto, fCMUpdateDto);
   }
 
   @ApiOperation({ summary: '내 차단유저 목록을 불러온다' })
