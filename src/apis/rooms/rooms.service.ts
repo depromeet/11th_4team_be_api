@@ -288,10 +288,6 @@ export class RoomsService {
     if (!roomInfo) {
       return null;
     }
-    //TODO : 채팅 정보 추가해야함
-    // if (!roomInfo) {
-    //   throw new BadRequestException('MyRoom does not exist');
-    // }
     const recentChatInfo = await this.chatService.makeRecentChatInfo(user);
     const myRoomInfoDto = { ...roomInfo, ...recentChatInfo };
     return myRoomInfoDto;

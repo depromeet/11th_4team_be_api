@@ -127,7 +127,6 @@ export class QuestionsService {
   ) {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     // await this.checkMyRoom(userIdDto);
-    // TODO : 삭제시 채팅 삭제도 필요...
     const question = await this.questionRepository.getQuestionByQuestionId(
       questionIdDto,
     );

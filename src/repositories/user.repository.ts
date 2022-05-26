@@ -6,6 +6,7 @@ import {
   HttpException,
   BadRequestException,
   UseInterceptors,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from 'src/models/user.model';
@@ -21,6 +22,7 @@ import {
   userFcmInfoSelect,
 } from 'src/apis/alarm/dto/userFcmInfo.dto';
 import { Types } from 'mongoose';
+import { FCMUpdateDto } from 'src/apis/users/dto/fcmUpdate.dto';
 
 @Injectable()
 export class UserRepository {
@@ -412,5 +414,21 @@ export class UserRepository {
       .find({ _id: { $in: userIdArray } })
       .select(userFcmInfoSelect)
       .lean<UserFcmInfoDto[]>({ defaults: true });
+  }
+
+  async updateUserFCMToken(
+    myUserIdDto: UserIdDto,
+    FCMTokenDto: FCMUpdateDto,
+  ): Promise<string> {
+    const user = await this.userModel.findOneAndUpdate(
+      { _id: myUserIdDto.userId },
+      { FCMToken: FCMTokenDto.FCMToken },
+      { new: true },
+    );
+    console.log(user);
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
+    return user.FCMToken;
   }
 }

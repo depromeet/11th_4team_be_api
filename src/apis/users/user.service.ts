@@ -26,6 +26,7 @@ import {
   USER_LEVEL_TYPE,
 } from 'src/common/consts/enum';
 import { AlarmService } from '../alarm/alarm.service';
+import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 
 @Injectable()
 export class UserService {
@@ -255,5 +256,22 @@ export class UserService {
     }
 
     return user.iBlockUsers;
+  }
+
+  @returnValueToDto(FCMUpdateDto)
+  async updateUserFCMToken(
+    myUserIdDto: UserIdDto,
+    FCMToken: FCMUpdateDto,
+  ): Promise<FCMUpdateDto> {
+    // console.log('check');
+    console.log(FCMToken);
+
+    const updatedUserFCMToken = await this.userRepository.updateUserFCMToken(
+      myUserIdDto,
+      FCMToken,
+    );
+    console.log('asdfasdfasdfafsdF', updatedUserFCMToken);
+
+    return { FCMToken: updatedUserFCMToken };
   }
 }

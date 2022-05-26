@@ -22,7 +22,6 @@ export class SerializeInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, handler: CallHandler): Observable<any> {
     return handler.handle().pipe(
       map((data) => {
-        //TODO : 클래스 타입에 따라서 분기 처리 하기!!
         console.log(data.constructor);
 
         if (data.constructor === Object || data.constructor === Array) {
