@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
+import { Geometry } from 'src/models/room.model';
 
 export class MyRoomInfoDto {
   @ApiProperty({
@@ -59,4 +60,21 @@ export class MyRoomInfoDto {
   )
   @Expose()
   lastChatTime: Date | null;
+
+  @Type(() => Geometry)
+  @Expose({ toClassOnly: true })
+  @Exclude({ toPlainOnly: true })
+  geometry: Geometry;
+
+  @ApiProperty({ description: '위도 가로선', type: Number })
+  @Expose()
+  get lat(): number {
+    return this.geometry.coordinates[0];
+  }
+
+  @ApiProperty({ description: '경도 세로선', type: Number })
+  @Expose()
+  get lng(): number {
+    return this.geometry.coordinates[1];
+  }
 }

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
-import { Room } from 'src/models/room.model';
+import { Geometry, Room } from 'src/models/room.model';
 import { TransformObjectIdToString } from '../decorators/Expose.decorator';
 
 export class ResShortCutRoomDto {
@@ -26,4 +26,21 @@ export class ResShortCutRoomDto {
   @ApiProperty({ description: '채팅방내 유저숫자' })
   @Expose()
   userCount: number;
+
+  @Type(() => Geometry)
+  @Expose({ toClassOnly: true })
+  @Exclude({ toPlainOnly: true })
+  geometry: Geometry;
+
+  @ApiProperty({ description: '위도 가로선', type: Number })
+  @Expose()
+  get lat(): number {
+    return this.geometry.coordinates[0];
+  }
+
+  @ApiProperty({ description: '경도 세로선', type: Number })
+  @Expose()
+  get lng(): number {
+    return this.geometry.coordinates[1];
+  }
 }
