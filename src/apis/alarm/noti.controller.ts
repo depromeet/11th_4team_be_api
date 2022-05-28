@@ -57,6 +57,18 @@ export class NotiController {
     return this.alarmService.getMyAlarms(user.userIdDto, pageLastIdDto);
   }
 
+  // @ApiOperation({
+  //   summary: 'test',
+  // })
+  // @Get('test')
+  // @ApiResponse({
+  //   status: 200,
+  //   description: '성공 응답만 리턴',
+  // })
+  // testChatAlarm() {
+  //   return this.alarmService.testChatAlarm();
+  // }
+
   @ApiOperation({
     summary: '내 알림을 다 보게끔 한다.',
   })

@@ -11,6 +11,7 @@ import { UserRepository } from 'src/repositories/user.repository';
 import { ChatAlarmSubDto } from './dto/chatAlarm.sub.dto';
 import { SendPushAlarmPubDto } from './dto/sendPushAlarm.pub.dto';
 import { SendPushAlarmSubDto } from './dto/sendPushAlarm.sub.dto';
+import { UserFcmInfoDto } from './dto/userFcmInfo.dto';
 
 @Processor(PUSH_ALARM)
 export class PushAlarmProcessor {
@@ -27,7 +28,11 @@ export class PushAlarmProcessor {
     console.log(findUserFcmToken);
 
     const TokenArray = findUserFcmToken
-      .filter((e) => (e.appAlarm && e.FCMToken.length === 0 ? false : true))
+      .filter((e) => {
+        const checkAppAlarmOn = e.appAlarm;
+        const checkFCMTokenValid = e.FCMToken.length === 0 ? false : true;
+        return checkAppAlarmOn && checkFCMTokenValid;
+      })
       .map((e) => e.FCMToken);
     console.log(TokenArray);
     if (TokenArray.length) {
@@ -68,19 +73,36 @@ export class PushAlarmProcessor {
     console.log('processor  ALARM Comment ', job.data);
 
     const chatAlarmSubDto = plainToInstance(ChatAlarmSubDto, job.data);
-    const roomNameAndUserAlarmInfoArray =
-      await this.roomRepository.getUserAlarmInfoInRoom(
-        new RoomIdDto(chatAlarmSubDto.roomId),
-      );
+    const room = await this.roomRepository.getUserAlarmInfoInRoom(
+      new RoomIdDto(chatAlarmSubDto.roomId),
+    );
+
+    if (!room) {
+      console.log('chat alarm room does not exist');
+      return;
+    }
+
+    const userFcmInfoList = room.userList
+      ? (room.userList as unknown as UserFcmInfoDto[])
+      : [];
+    const roomNameAndUserAlarmInfoArray = {
+      userFcmInfoList,
+      roomName: room.name,
+    };
+
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
-      .filter((e) =>
-        e.appAlarm &&
-        e.chatAlarm &&
-        !e._id.equals(chatAlarmSubDto.sender) &&
-        e.FCMToken.length === 0
-          ? false
-          : true,
-      )
+      .filter((e) => {
+        const checkPushReciverIsSender = e._id.equals(chatAlarmSubDto.sender);
+        const checkAppAlarmOn = e.appAlarm;
+        const checkChatAlarmOn = e.chatAlarm;
+        const checkFCMTokenValid = e.FCMToken.length === 0 ? false : true;
+        return (
+          checkPushReciverIsSender &&
+          checkChatAlarmOn &&
+          checkAppAlarmOn &&
+          checkFCMTokenValid
+        );
+      })
       .map((e) => e.FCMToken);
 
     const sendPushAlarmObj: SendPushAlarmPubDto = {
