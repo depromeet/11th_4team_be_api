@@ -22,13 +22,13 @@ export class ResFindOneRoomDto extends PickType(Room, [
   @ApiProperty({ description: '위도 가로선', type: Number })
   @Expose()
   get lat(): number {
-    return this.geometry.coordinates[0];
+    return this.geometry.coordinates[1];
   }
 
   @ApiProperty({ description: '경도 세로선', type: Number })
   @Expose()
   get lng(): number {
-    return this.geometry.coordinates[1];
+    return this.geometry.coordinates[0];
   }
 
   @ApiProperty({ description: '내가 채팅방 알림 켰는지여부' })
