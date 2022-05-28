@@ -18,7 +18,9 @@ export class SendPushAlarmSubDto {
   @Expose()
   // @Transform((value) => value.obj.receivers, { toClassOnly: true })
   @Transform(
-    (value) => value.obj.receivers.map((e: string) => new Types.ObjectId(e)),
+    (value) =>
+      value.obj.receivers &&
+      value.obj.receivers.map((e: string) => new Types.ObjectId(e)),
     {
       toClassOnly: true,
     },

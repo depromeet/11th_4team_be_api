@@ -24,6 +24,7 @@ import { AlarmPaginationShowDto } from './dto/alarmPaginationShow.dto';
 import { FcmService } from 'src/fcm/fcm.service';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 import { Alarm } from 'src/models/alarm.model';
+import { ChatAlarmSubDto } from './dto/chatAlarm.sub.dto';
 @Injectable()
 export class AlarmService {
   constructor(
@@ -90,6 +91,8 @@ export class AlarmService {
     // const redis = await this.pushAlarmQueue.isReady();
     // console.log('check', redis);
     await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.LETTER, sendPushAlarmObj);
+
+    // await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.CHAT, sendPushAlarmObj);
   }
 
   // 다른사람이 나한테 번개를 줬을 때
@@ -126,7 +129,7 @@ export class AlarmService {
   }
 
   // 내 질문에 댓글 달렸을 때 ( 내 댓글이면 제외 시켜야함. (이또한 책임을 알람 서비스로 넘김 ))
-
+  //TODO : 댓글알림시에는 댓글 알림 id 도 필드에 보내줘야함...
   async handleCommentAlarm(
     sender: User,
     receiver: UserIdDto,
@@ -209,6 +212,17 @@ export class AlarmService {
     return new AlarmPaginationShowDto(alarmList, isLast, lastId);
   }
 
+  async testChatAlarm() {
+    const sendPushAlarmObj: ChatAlarmSubDto = {
+      nickname: '테스트 찬진',
+      roomId: '626d0c3f3cb6e9dce6cb9ad6',
+      chatId: '626d0c3f3cb6e9dce6cb9ad6',
+      sender: '62663d718fc11f0eeb47dba3',
+      content: 'asdfasdfadsf',
+    };
+
+    await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.CHAT, sendPushAlarmObj);
+  }
   // 안읽은 알림 갯수
 
   ///--------------------------------------------- 푸시알림

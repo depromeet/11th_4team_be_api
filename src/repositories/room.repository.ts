@@ -249,7 +249,7 @@ export class RoomRepository {
     return rooms;
   }
 
-  async getUserAlarmInfoInRoom(roomIdDto: RoomIdDto) {
+  async getUserAlarmInfoInRoom(roomIdDto: RoomIdDto): Promise<Room | null> {
     const room = await this.roomModel
       .findOne({
         _id: roomIdDto.roomId,
@@ -259,9 +259,7 @@ export class RoomRepository {
         select: userFcmInfoSelect,
       })
       .lean<Room>({ defaults: true });
-    const userFcmInfoList = room.userList
-      ? (room.userList as unknown as UserFcmInfoDto[])
-      : [];
-    return { userFcmInfoList: userFcmInfoList, roomName: room.name };
+
+    return room;
   }
 }
