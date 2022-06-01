@@ -32,6 +32,7 @@ import { ResFavoriteToggleDto } from './dto/FavoriteToggle.res.dto';
 import { Room } from 'src/models/room.model';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { MyRoomInfoDto } from './dto/myRoomInfo.res.dto';
+import { RoomUserListDto } from './dto/roomUserList.res.dto';
 
 @ApiTags('rooms')
 @Controller('rooms')
@@ -135,6 +136,25 @@ export class RoomsController {
     return this.roomsService.pullUserFromRoom(roomId, user.userIdDto);
   }
 
+  @ApiOperation({
+    summary: '채팅방 내부에서 사이드바를 열었을때 불러오는 유저 리스트',
+  })
+  @Get(':roomId/userList')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: RoomUserListDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      '유저가 들어간 방 정보 없음 ,유저가 들어간 방정보와 파라미터가 일치하지 않음',
+  })
+  getRoomUserList(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
+    // 조인 룸시에 다른 룸에서 자동으로 나가져야함
+    return this.roomsService.findRoomInUserList(roomId, user);
+  }
+
   @ApiOperation({ summary: '유저가 룸을 즐겨찾기에서 빼고넣는다' })
   @ApiResponse({
     status: 200,
@@ -162,10 +182,4 @@ export class RoomsController {
   turnOnChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
     return this.roomsService.toggleChatAlarm(user.userIdDto);
   }
-
-  // @ApiOperation({ summary: '유저가 채팅 알림을 끈다' })
-  // @Delete(':roomId/alarm')
-  // turnOffChatAlarm(@Param() roomId: RoomIdDto, @ReqUser() user: User) {
-  //   return this.roomsService.turnOffChatAlarm(user.userIdDto);
-  // }
 }
