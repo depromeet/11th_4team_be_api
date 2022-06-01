@@ -27,6 +27,7 @@ import { ResFindRoomDto } from './dto/find-room.res.dto copy';
 import { ResFindOneRoomDto } from './dto/findOne-room.res.dto';
 import { LeftRoomResultResDto } from './dto/leftRoomResult.res.dto';
 import { MyRoomInfoDto } from './dto/myRoomInfo.res.dto';
+import { RoomUserListDto } from './dto/roomUserList.res.dto';
 
 @Injectable()
 export class RoomsService {
@@ -309,5 +310,29 @@ export class RoomsService {
   async getPopularRooms() {
     console.log('asdfasdfa');
     return await this.roomRepository.getPopularRooms();
+  }
+
+  @returnValueToDto(RoomUserListDto)
+  async findRoomInUserList(
+    roomIdDto: RoomIdDto,
+    user: User,
+    // userIdDto: UserIdDto,
+    // blockUserListDto: BlockedUserDto,
+  ) {
+    if (user.myRoom == null) {
+      throw new BadRequestException('유저가 들어간 방 정보 없음');
+    }
+    if (!user.myRoom._id.equals(roomIdDto.roomId)) {
+      throw new BadRequestException(
+        '유저가 들어간 방정보와 파라미터가 일치하지 않음',
+      );
+    }
+    const room = await this.roomRepository.findOneByRoomId(roomIdDto);
+
+    const filteredUserList = this.filterRemoveBlockedUserFromUserList(
+      room.userList,
+      user.blockedUserDto,
+    );
+    return { userList: filteredUserList, userCount: filteredUserList.length };
   }
 }

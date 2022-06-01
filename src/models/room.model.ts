@@ -96,6 +96,10 @@ export class Room {
     required: true,
     type: [{ type: Types.ObjectId, ref: 'User' }],
   })
+  @ApiProperty({
+    type: [UserProfileDto],
+    title: '방에들어간 유저 리스트 정보',
+  })
   @IsNotEmpty()
   @IsArray()
   @Transform((value) => value.obj.userList, { toClassOnly: true })
