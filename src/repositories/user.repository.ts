@@ -57,6 +57,7 @@ export class UserRepository {
           _id: 1,
           name: 1,
           category: 1,
+          geometry: 1,
           userCount: { $size: '$userList' },
         },
       })

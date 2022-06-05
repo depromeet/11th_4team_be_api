@@ -53,6 +53,7 @@ export class UserService {
     if (!user) {
       throw new InternalServerErrorException('잘못된 접근');
     }
+    console.log(user);
     return user;
   }
 
