@@ -9,6 +9,7 @@ import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import { CommentStringDto } from 'src/apis/questions/dto/CommentString.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
+import { ChatIdDto } from 'src/common/dtos/ChatId.dto';
 
 @Injectable()
 export class QuestionRepository {
@@ -90,6 +91,20 @@ export class QuestionRepository {
   ): Promise<Question | null> {
     return await this.questionModel
       .findOne({ _id: questionIdDto.questionId })
+      .populate({
+        path: 'user',
+        select: UserProfileSelect,
+      })
+      .populate({
+        path: 'commentList.user',
+        select: UserProfileSelect,
+      })
+      .lean<Question>({ defaults: true });
+  }
+
+  async getQuestionByChatId(chatIdDto: ChatIdDto): Promise<Question | null> {
+    return await this.questionModel
+      .findOne({ chat: chatIdDto.chatId })
       .populate({
         path: 'user',
         select: UserProfileSelect,

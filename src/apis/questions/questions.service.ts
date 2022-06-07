@@ -3,6 +3,7 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import { QUESTION_FIND_FILTER_TYPE } from 'src/common/consts/enum';
 import { returnValueToDto } from 'src/common/decorators/returnValueToDto.decorator';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
+import { ChatIdDto } from 'src/common/dtos/ChatId.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
@@ -106,6 +107,29 @@ export class QuestionsService {
     await this.checkMyRoom(userIdDto);
     const question = await this.questionRepository.getQuestionByQuestionId(
       questionIdDto,
+    );
+    if (!question) {
+      throw new BadRequestException('질문 없음');
+    }
+
+    question.myUserId = userIdDto.userId;
+    question.commentList = this.filterRemoveBlockedUserFromCommentList(
+      question.commentList,
+      blockUserListDto,
+    );
+    return question;
+  }
+
+  @returnValueToDto(QuestionShowDto)
+  async findQuestionByChatId(
+    userIdDto: UserIdDto,
+    chatIdDto: ChatIdDto,
+    blockUserListDto: BlockedUserDto,
+  ) {
+    // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
+    await this.checkMyRoom(userIdDto);
+    const question = await this.questionRepository.getQuestionByChatId(
+      chatIdDto,
     );
     if (!question) {
       throw new BadRequestException('질문 없음');
