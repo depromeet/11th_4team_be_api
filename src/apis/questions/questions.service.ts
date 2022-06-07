@@ -60,7 +60,7 @@ export class QuestionsService {
   ): Promise<QuestionListShowDto[]> {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const myRoomIdDto = await this.checkMyRoom(userIdDto);
-    let result;
+    let result: Question[];
     switch (questionFindRequestDto.filter) {
       case QUESTION_FIND_FILTER_TYPE.NOTANSWERED:
         result = await this.questionRepository.getQuestionsByRoomIdNotAnswerd(
@@ -93,8 +93,19 @@ export class QuestionsService {
     result.forEach(function (element) {
       element.myUserId = userIdDto.userId;
     });
+    // return result as unknown as QuestionListShowDto[];
 
-    return result;
+    const filterBlockedUserCommentFromCommentList = result.map(
+      (oneQuestion) => {
+        oneQuestion.commentList = this.filterRemoveBlockedUserFromCommentList(
+          oneQuestion.commentList,
+          blockUserListDto,
+        );
+        return oneQuestion;
+      },
+    );
+
+    return filterBlockedUserCommentFromCommentList as unknown as QuestionListShowDto[];
   }
 
   @returnValueToDto(QuestionShowDto)
