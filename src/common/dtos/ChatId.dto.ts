@@ -15,8 +15,8 @@ export class ChatIdDto {
   }
   @ApiProperty({
     type: String,
-    title: '룸 아이디',
-    description: '몽고아이디 형식입니다. (홍익대학교 룸 예시 )',
+    title: '챗 아이디',
+    description: '찾고 싶은 질문을 챗  아이디로 찾습니다.',
     example: '62596e8c4e22b2180fe2a902',
   })
   @MongoIdValidationTransfrom({ toClassOnly: true })

@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { ReqUser } from 'src/common/decorators/user.decorator';
+import { ChatIdDto } from 'src/common/dtos/ChatId.dto';
 import { CommentIdDto } from 'src/common/dtos/CommentId.dto';
 import { QuestionIdDto } from 'src/common/dtos/QuestionId.dto';
 import { MongooseClassSerializerInterceptor } from 'src/common/interceptors/mongooseClassSerializer.interceptor';
@@ -74,6 +75,27 @@ export class QuestionsController {
   //   // await this.userService.updateProfile(user._id, updateProfileData);
   //   return '';
   // }
+
+  @ApiOperation({
+    summary:
+      '찾고 싶은 질문을 챗  아이디로 찾습니다. 질문의 세부정보를 가져온다. 댓글 목록 포함',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: QuestionShowDto,
+  })
+  @Get('byChatId/:chatId')
+  async findQuestionByChatId(
+    @Param() chatIdDto: ChatIdDto,
+    @ReqUser() user: User,
+  ): Promise<any> {
+    return await this.questionService.findQuestionByChatId(
+      user.userIdDto,
+      chatIdDto,
+      user.blockedUserDto,
+    );
+  }
 
   @ApiOperation({ summary: '질문의 세부정보를 가져온다. 댓글 목록 포함' })
   @ApiResponse({
