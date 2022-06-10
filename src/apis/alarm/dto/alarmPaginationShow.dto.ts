@@ -9,7 +9,7 @@ export class AlarmPaginationShowDto {
   constructor(noti_list: AlarmShowDto[], isLast: boolean, lastId: string) {
     this.isLast = isLast;
     this.lastId = lastId;
-    this.noti_list = noti_list;
+    this.list = noti_list;
   }
   // 직렬화
   @ApiProperty({
@@ -18,7 +18,7 @@ export class AlarmPaginationShowDto {
   })
   @Expose()
   @Type(() => AlarmShowDto)
-  noti_list: AlarmShowDto[];
+  list: AlarmShowDto[];
 
   @ApiProperty({
     type: String,
