@@ -4,9 +4,8 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
-  Query,
+  Param,
   UsePipes,
   SerializeOptions,
   UseGuards,
@@ -58,7 +57,7 @@ export class LetterController {
   })
   @Post(':userId')
   sendLetterToReciever(
-    @Query() receiver: UserIdDto,
+    @Param() receiver: UserIdDto,
     @ReqUser() user: User,
     @Body() messageStringDto: MessageStringDto,
   ) {
@@ -80,7 +79,7 @@ export class LetterController {
   })
   @Get(':letterRoomId')
   getRoomInLetters(
-    @Query() letterRoomIdDto: LetterRoomIdDto,
+    @Param() letterRoomIdDto: LetterRoomIdDto,
     @ReqUser() user: User,
   ) {
     return this.letterService.getLettersByRoomId(
@@ -113,7 +112,7 @@ export class LetterController {
   })
   @Delete(':letterRoomId')
   deleteLetterRooms(
-    @Query() letterRoomIdDto: LetterRoomIdDto,
+    @Param() letterRoomIdDto: LetterRoomIdDto,
     @ReqUser() user: User,
   ) {
     return this.letterService.leaveLetterRoomByRoomId(
