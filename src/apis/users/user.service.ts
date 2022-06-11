@@ -216,8 +216,11 @@ export class UserService {
     }
 
     const expireAt = new Date();
-    // utc 한국시간 기준으로 자정으로 설정
+    expireAt.setUTCDate(expireAt.getUTCDate() + 1);
     expireAt.setUTCHours(15, 0, 0, 0);
+
+    // TODO : // 번개 방식 버그발견
+    // utc 한국시간 기준으로 자정으로 설정
     // expireAt.setHours()
     const [_1, addUserScore, _2] = await Promise.all([
       this.lightnignRepository.saveLighting(sender, receive, expireAt),
