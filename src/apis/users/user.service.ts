@@ -216,7 +216,9 @@ export class UserService {
     }
 
     const expireAt = new Date();
-    expireAt.setUTCDate(expireAt.getUTCDate() + 1);
+    if (expireAt.getUTCHours() >= 15) {
+      expireAt.setUTCDate(expireAt.getUTCDate() + 1);
+    }
     expireAt.setUTCHours(15, 0, 0, 0);
 
     // TODO : // 번개 방식 버그발견
