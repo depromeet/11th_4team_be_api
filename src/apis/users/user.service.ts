@@ -62,7 +62,8 @@ export class UserService {
     userIdDto: UserIdDto,
     blockedUserDto: BlockedUserDto,
   ): Promise<UserProfileDto> {
-    this.checkBlocked(userIdDto, blockedUserDto);
+    // 유저 차단해도 프로필 조회가능 --> 채팅 로그 내부에서
+    // this.checkBlocked(userIdDto, blockedUserDto);
     // auto 시리얼 라이징
     const user = await this.userRepository.findOneByUserId(userIdDto);
     if (!user) {
@@ -134,13 +135,14 @@ export class UserService {
 
     //TODO : 테스트 끝나면 밑에 로직 넣기.
 
-    // const checkUser = await this.reportRepository.checkMyReportToOther(
-    //   reporter,
-    //   reportedUser,
-    // );
-    // if (checkUser) {
-    //   throw new BadRequestException('이미 신고한 유저입니다.');
-    // }
+    const checkUser = await this.reportRepository.checkMyReportToOther(
+      reporterIdDto,
+      reportedIdDto,
+    );
+    if (checkUser) {
+      // 이미 신고한 경우 한번이상
+      return new ReportResultDtoResDto(false);
+    }
 
     const reportedUserReportCount = await this.reportRepository.getReports(
       reportedIdDto,

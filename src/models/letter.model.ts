@@ -21,6 +21,7 @@ export class Letter extends Document {
   letterRoom: Types.ObjectId;
 
   //보낸 사람
+  // 체크 ...
   @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
   @IsMongoId()
   sender: User;
