@@ -61,7 +61,6 @@ export class User {
   })
   @Prop({
     required: true,
-    unique: true,
   })
   @IsPhoneNumber('KR')
   @IsNotEmpty()
