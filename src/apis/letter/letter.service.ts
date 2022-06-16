@@ -52,6 +52,9 @@ export class LetterService {
       throw new BadRequestException('수신자가 존재하지 않음');
     }
 
+    //TODO : 400 번대
+    // 보낼 수  없는 사용자 추가
+
     const letterRoom = await this.upsertUserListToLetterRoom(twoUserList);
     const newLetter = await this.letterRepository.sendLetterToReciever(
       new LetterRoomIdDto(letterRoom._id),
