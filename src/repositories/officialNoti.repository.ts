@@ -15,7 +15,10 @@ export class OfficialNotiRepository {
   ) {}
 
   async getOfficialNotis(): Promise<OfficialNoti[]> {
-    const notis = await this.officialNotiModel.find().lean<OfficialNoti[]>();
+    const notis = await this.officialNotiModel
+      .find()
+      .sort({ _id: -1 })
+      .lean<OfficialNoti[]>();
     return notis;
   }
 }
