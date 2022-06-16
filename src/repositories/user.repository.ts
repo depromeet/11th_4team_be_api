@@ -44,6 +44,18 @@ export class UserRepository {
     );
   }
 
+  async signOutUser(userIdDto: UserIdDto) {
+    return await this.userModel.findOneAndUpdate(
+      { _id: userIdDto.userId },
+      {
+        status: STATUS_TYPE.SIGNOUT,
+        phoneNumber: null,
+        nickname: '(탈퇴한 사용자)',
+        FCMToken: '',
+      },
+    );
+  }
+
   async findOneByUserId(userIdDto: UserIdDto): Promise<User | null> {
     const user = await this.userModel
       .findOne({ _id: userIdDto.userId })

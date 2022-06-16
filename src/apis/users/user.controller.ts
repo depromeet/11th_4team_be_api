@@ -30,6 +30,7 @@ import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
 import { AlarmService } from '../alarm/alarm.service';
 import { FCMUpdateDto } from './dto/fcmUpdate.dto';
+import { UserProfileClickDto } from './dto/UserProfileClick.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -70,6 +71,18 @@ export class UserController {
     );
   }
 
+  @ApiOperation({ summary: '유저 탈퇴를 한다.' })
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+  })
+  @Delete('')
+  async singOut(@ReqUser() user: User) {
+    // findOneByUserId
+    await this.userService.signOutUser(user);
+    return;
+  }
+
   @ApiOperation({
     summary: 'FCM 업데이트하기',
   })
@@ -103,7 +116,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: '요청 성공시',
-    type: UserProfileDto,
+    type: UserProfileClickDto,
   })
   @ApiResponse({
     status: 400,
@@ -112,10 +125,7 @@ export class UserController {
   @Get(':userId')
   async getOtherUserInfo(@Param() UserIdDto: UserIdDto, @ReqUser() user: User) {
     // findOneByUserId
-    return await this.userService.getOtherUserInfo(
-      UserIdDto,
-      user.blockedUserDto,
-    );
+    return await this.userService.getOtherUserInfo(UserIdDto, user);
   }
 
   @ApiOperation({ summary: '상대방 유저를 차단한다' })

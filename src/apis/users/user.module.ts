@@ -8,6 +8,7 @@ import { LightningRepository } from 'src/repositories/lightning.repository';
 import { ReportRepository } from 'src/repositories/report.repository';
 import { UserRepository } from 'src/repositories/user.repository';
 import { AlarmModule } from '../alarm/alarm.module';
+import { RoomsModule } from '../rooms/rooms.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
@@ -20,6 +21,7 @@ import { UserService } from './user.service';
     ]),
     forwardRef(() => AuthModule),
     forwardRef(() => AlarmModule),
+    forwardRef(() => RoomsModule),
   ],
   controllers: [UserController],
   providers: [

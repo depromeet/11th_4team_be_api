@@ -13,6 +13,7 @@ function getEnumTypeValues(enumType) {
 enum STATUS_TYPE {
   NORMAL = 'normal',
   FORBIDDEN = 'forbidden',
+  SIGNOUT = 'signOut',
 }
 
 //카테고리 타입 한글로

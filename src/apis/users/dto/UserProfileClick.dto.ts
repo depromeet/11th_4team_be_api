@@ -2,17 +2,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { Profile, User } from 'src/models/user.model';
 import { Types } from 'mongoose';
-import { TransformObjectIdToString } from '../decorators/Expose.decorator';
-import { STATUS_TYPE } from '../consts/enum';
+import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
+import { STATUS_TYPE } from 'src/common/consts/enum';
 
-export class UserProfileDto {
+export class UserProfileClickDto {
   constructor(user: User) {
     if (user) {
       this._id = user._id;
       this.nickname = user.nickname;
       this.profile = user.profile;
       this.level = user.level;
-      this.status = user.status;
     }
   }
   @ApiProperty({ type: String, example: '626cf238b51596721c21289b' })
@@ -44,12 +43,11 @@ export class UserProfileDto {
   })
   @Expose()
   status: string;
-}
 
-export const UserProfileSelect = {
-  _id: 1,
-  nickname: 1,
-  profile: 1,
-  level: 1,
-  status: 1,
-};
+  @ApiProperty({
+    type: Boolean,
+    description: '내가 차단한 유저인지에 대한 정보 제공',
+  })
+  @Expose()
+  iBlock: boolean;
+}
