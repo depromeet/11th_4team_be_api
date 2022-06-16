@@ -1,6 +1,10 @@
 import { BadRequestException, Injectable, Type } from '@nestjs/common';
 import { ObjectId, Types } from 'mongoose';
-import { CATEGORY_TYPE, FIND_ROOM_FILTER_TYPE } from 'src/common/consts/enum';
+import {
+  CATEGORY_TYPE,
+  FIND_ROOM_FILTER_TYPE,
+  STATUS_TYPE,
+} from 'src/common/consts/enum';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
 import { LetterRoomIdDto } from 'src/common/dtos/LetterRoomId.dto';
 import { MongoId } from 'src/common/dtos/MongoId.dto';
@@ -50,6 +54,10 @@ export class LetterService {
     );
     if (!receiverExist) {
       throw new BadRequestException('수신자가 존재하지 않음');
+    }
+
+    if (receiverExist.status === STATUS_TYPE.SIGNOUT) {
+      throw new BadRequestException('탈퇴한 유저');
     }
 
     //TODO : 400 번대

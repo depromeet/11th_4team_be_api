@@ -54,7 +54,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
           );
         }
       } else if (user.status === STATUS_TYPE.SIGNOUT) {
-        throw new UnauthorizedException('탈퇴한 유저');
+        throw new ForbiddenException('탈퇴한 유저');
       }
       return user;
     } else {
