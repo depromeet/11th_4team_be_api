@@ -30,6 +30,8 @@ import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 import { RoomsService } from '../rooms/rooms.service';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserProfileClickDto } from './dto/UserProfileClick.dto';
+import { OfficialNotiRepository } from 'src/repositories/officialNoti.repository';
+import { OfficialNoti } from 'src/models/officialNoti';
 
 @Injectable()
 export class UserService {
@@ -41,6 +43,7 @@ export class UserService {
     private lightnignRepository: LightningRepository,
     private alarmService: AlarmService,
     private roomService: RoomsService,
+    private OfficialNotiRepository: OfficialNotiRepository,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -90,6 +93,10 @@ export class UserService {
 
     await this.userRepository.signOutUser(user.userIdDto, user);
     return user;
+  }
+  @returnValueToDto(OfficialNoti)
+  async getOfficialNoti() {
+    return await this.OfficialNotiRepository.getOfficialNotis();
   }
 
   @returnValueToDto(User)
