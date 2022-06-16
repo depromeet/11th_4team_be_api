@@ -53,6 +53,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             )} 까지 정지된 유저입니다. 문의사항은 고객센터로 연락주세요.`,
           );
         }
+      } else if (user.status === STATUS_TYPE.SIGNOUT) {
+        throw new UnauthorizedException('탈퇴한 유저');
       }
       return user;
     } else {

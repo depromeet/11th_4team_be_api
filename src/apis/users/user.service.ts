@@ -27,6 +27,9 @@ import {
 } from 'src/common/consts/enum';
 import { AlarmService } from '../alarm/alarm.service';
 import { FCMUpdateDto } from './dto/fcmUpdate.dto';
+import { RoomsService } from '../rooms/rooms.service';
+import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
+import { UserProfileClickDto } from './dto/UserProfileClick.dto';
 
 @Injectable()
 export class UserService {
@@ -37,6 +40,7 @@ export class UserService {
     private authService: AuthService,
     private lightnignRepository: LightningRepository,
     private alarmService: AlarmService,
+    private roomService: RoomsService,
   ) {}
 
   private checkBlocked(userIdDto: UserIdDto, blockedUserDto: BlockedUserDto) {
@@ -57,18 +61,34 @@ export class UserService {
     return user;
   }
 
-  @returnValueToDto(UserProfileDto)
+  @returnValueToDto(UserProfileClickDto)
   async getOtherUserInfo(
     userIdDto: UserIdDto,
-    blockedUserDto: BlockedUserDto,
-  ): Promise<UserProfileDto> {
-    // 유저 차단해도 프로필 조회가능 --> 채팅 로그 내부에서
-    // this.checkBlocked(userIdDto, blockedUserDto);
-    // auto 시리얼 라이징
+    myUser: User,
+  ): Promise<UserProfileClickDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto);
     if (!user) {
       throw new BadRequestException('유저 없음');
     }
+    const iBlock = myUser.iBlockUsers.find((e) =>
+      e._id.equals(userIdDto.userId),
+    )
+      ? true
+      : false;
+    return { ...user, iBlock: iBlock };
+  }
+
+  // @returnValueToDto(UserProfileDto)
+  async signOutUser(user: User) {
+    if (user.myRoom) {
+      //유저가 들어간 방이있으면
+      await this.roomService.pullUserFromRoom(
+        new RoomIdDto(user.myRoom._id),
+        user.userIdDto,
+      );
+    }
+
+    await this.userRepository.signOutUser(user.userIdDto);
     return user;
   }
 
