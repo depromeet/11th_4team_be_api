@@ -88,7 +88,7 @@ export class UserService {
       );
     }
 
-    await this.userRepository.signOutUser(user.userIdDto);
+    await this.userRepository.signOutUser(user.userIdDto, user);
     return user;
   }
 

@@ -44,12 +44,12 @@ export class UserRepository {
     );
   }
 
-  async signOutUser(userIdDto: UserIdDto) {
+  async signOutUser(userIdDto: UserIdDto, user: User) {
     return await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       {
         status: STATUS_TYPE.SIGNOUT,
-        phoneNumber: null,
+        phoneNumber: 'signOut:' + user.phoneNumber,
         nickname: '(탈퇴한 사용자)',
         FCMToken: '',
       },
