@@ -8,7 +8,7 @@ export const userFcmInfoSelect = {
   FCMToken: 1,
   appAlarm: 1,
   chatAlarm: 1,
-  iJoin: 1,
+  isJoin: 1,
 };
 export class UserFcmInfoDto {
   //   @Transform(({ value }) => new Types.ObjectId(value), { toClassOnly: true })
