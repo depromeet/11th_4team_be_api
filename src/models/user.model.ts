@@ -201,6 +201,13 @@ export class User {
   @Expose()
   level: number;
 
+  @Prop({
+    type: Boolean,
+    default: false,
+  })
+  @Expose()
+  isJoin: boolean;
+
   lastChat: Types.ObjectId | null;
 }
 
