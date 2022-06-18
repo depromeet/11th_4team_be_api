@@ -163,7 +163,10 @@ export class User {
   @Expose()
   iBlockUsers: UserProfileDto[];
 
-  // @Transform(({ value }) => value || [], { toClassOnly: true })
+  @Prop({
+    type: [{ type: Types.ObjectId, ref: User.name }],
+  })
+  opBlockedUsers: Types.ObjectId[];
 
   // only for 내부용
   @Exclude()

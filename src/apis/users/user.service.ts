@@ -136,7 +136,7 @@ export class UserService {
       myUserIdDto,
       otherUserIdDto,
     );
-    console.log('asdfasdfasdfasdfasdf', returnUser);
+
     // auto 시리얼 라이징
     return returnUser.iBlockUsers;
   }
