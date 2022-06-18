@@ -90,6 +90,16 @@ export class PushAlarmProcessor {
       return;
     }
 
+    if (!userInfo) {
+      return;
+    }
+
+    // 차집합
+
+    const sendToOnlyBlockedUser = userInfo.blockedUsers.filter(
+      (x) => !userInfo.iBlockUsers.find((user) => user._id.equals(x._id)),
+    );
+
     const userFcmInfoList = room.userList
       ? (room.userList as unknown as UserFcmInfoDto[])
       : [];
@@ -100,7 +110,7 @@ export class PushAlarmProcessor {
 
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
       .filter((e) => {
-        const checkIfIBlockUser = userInfo?.iBlockUsers.find((user) =>
+        const checkIfIBlockUser = sendToOnlyBlockedUser.find((user) =>
           user._id.equals(e._id),
         )
           ? false
