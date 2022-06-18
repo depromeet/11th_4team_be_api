@@ -12,7 +12,7 @@ export class ChatService {
 
   async makeRecentChatInfo(user: User): Promise<RecentChatInfoDto> {
     if (!user.myRoom) {
-      return new RecentChatInfoDto();
+      return new RecentChatInfoDto(0, null);
     }
     // 유저에 lastChat 정보가 없을때
     if (!user.lastChat) {
@@ -21,13 +21,9 @@ export class ChatService {
         new RoomIdDto(user.myRoom._id),
       );
       if (!messages.length) {
-        return new RecentChatInfoDto();
+        return new RecentChatInfoDto(0, null);
       }
-      return new RecentChatInfoDto(
-        messages.length,
-        messages[0].message,
-        messages[0].createdAt,
-      );
+      return new RecentChatInfoDto(messages.length, messages[0]);
     } else {
       // 유저에 lastChat 정보가 있을때 커서기반
 
@@ -37,24 +33,18 @@ export class ChatService {
       );
       // 오래지나서 채팅이 다 삭제되었을 때
       if (!messages.length) {
-        return new RecentChatInfoDto();
+        return new RecentChatInfoDto(0, null);
       }
       // 내가 마지막으로 읽은 채팅이 최신 채팅일 때
-      console.log(messages);
       if (messages.length == 1) {
-        return new RecentChatInfoDto(
-          0,
-          messages[0].message,
-          messages[0].createdAt,
-        );
+        return new RecentChatInfoDto(0, messages[0]);
       }
       // remove first index
+
+      console.log(messages);
+
       messages.pop();
-      return new RecentChatInfoDto(
-        messages.length,
-        messages[0].message,
-        messages[0].createdAt,
-      );
+      return new RecentChatInfoDto(messages.length, messages[0]);
     }
     // message 길이가 0이면
   }
