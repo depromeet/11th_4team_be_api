@@ -43,6 +43,7 @@ export class PushAlarmProcessor {
       console.log(result);
     }
   }
+
   @OnQueueFailed()
   errorhandler(job: Job, err: Error) {
     console.log(err);
@@ -95,8 +96,10 @@ export class PushAlarmProcessor {
         const checkPushReciverIsSender = !e._id.equals(chatAlarmSubDto.sender);
         const checkAppAlarmOn = e.appAlarm;
         const checkChatAlarmOn = e.chatAlarm;
+        const checkRoomJoin = !e.isJoin;
         const checkFCMTokenValid = e.FCMToken.length === 0 ? false : true;
         return (
+          checkRoomJoin &&
           checkPushReciverIsSender &&
           checkChatAlarmOn &&
           checkAppAlarmOn &&
