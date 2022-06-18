@@ -31,6 +31,7 @@ import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.d
 import { AlarmService } from '../alarm/alarm.service';
 import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 import { UserProfileClickDto } from './dto/UserProfileClick.dto';
+import { OfficialNoti } from 'src/models/officialNoti';
 
 @ApiTags('user')
 @Controller('user')
@@ -109,6 +110,17 @@ export class UserController {
   })
   getMyBlockUser(@ReqUser() user: User) {
     return this.userService.getMyBlockUser(user.userIdDto);
+  }
+
+  @ApiOperation({ summary: '공지사항 불러옴' })
+  @Get('/officialNoti')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: [OfficialNoti],
+  })
+  getOfficialNoti() {
+    return this.userService.getOfficialNoti();
   }
 
   //
