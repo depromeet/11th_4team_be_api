@@ -34,6 +34,16 @@ export class QuestionRepository {
       .lean<Question[]>({ defaults: true });
   }
 
+  async getQuestionsCountsByRoomId(
+    roomIdDto: RoomIdDto,
+    blockUserListDto: BlockedUserDto,
+  ): Promise<number> {
+    return await this.questionModel.countDocuments({
+      room: roomIdDto.roomId,
+      user: { $nin: blockUserListDto.blockedUsers },
+    });
+  }
+
   async getQuestionsByRoomIdNewOrder(
     roomIdDto: RoomIdDto,
     blockUserListDto: BlockedUserDto,
