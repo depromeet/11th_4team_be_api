@@ -18,6 +18,7 @@ import { CommentStringDto } from './dto/CommentString.dto';
 import { IlikeResDto } from './dto/Ilike.res.dto';
 import { QuestionShowDto } from './dto/Question.res.dto';
 import { QuestionListShowDto } from './dto/QuestionList.res.dto';
+import { QuestionListTotalDto } from './dto/QuestionListTotal.dto';
 import { QuestionFindRequestDto } from './dto/QuestionsList.req.dto';
 
 @Injectable()
@@ -52,15 +53,17 @@ export class QuestionsService {
     return new RoomIdDto(user.myRoom._id);
   }
 
-  @returnValueToDto(QuestionListShowDto)
+  @returnValueToDto(QuestionListTotalDto)
   async findQuestions(
     userIdDto: UserIdDto,
     questionFindRequestDto: QuestionFindRequestDto,
     blockUserListDto: BlockedUserDto,
-  ): Promise<QuestionListShowDto[]> {
+  ) {
     // 내 아이디 정보를 넣어서 비교로직 추가가 필요함.
     const myRoomIdDto = await this.checkMyRoom(userIdDto);
     let result: Question[];
+    let countDocuments = 0;
+
     switch (questionFindRequestDto.filter) {
       case QUESTION_FIND_FILTER_TYPE.NOTANSWERED:
         result = await this.questionRepository.getQuestionsByRoomIdNotAnswerd(
@@ -82,11 +85,16 @@ export class QuestionsService {
 
         break;
       case QUESTION_FIND_FILTER_TYPE.RECENT:
-        result = await this.questionRepository.getRecent2Questions(
-          myRoomIdDto,
-          blockUserListDto,
-        );
-
+        [result, countDocuments] = await Promise.all([
+          this.questionRepository.getRecent2Questions(
+            myRoomIdDto,
+            blockUserListDto,
+          ),
+          this.questionRepository.getQuestionsCountsByRoomId(
+            myRoomIdDto,
+            blockUserListDto,
+          ),
+        ]);
         break;
     }
 
@@ -105,7 +113,10 @@ export class QuestionsService {
       },
     );
 
-    return filterBlockedUserCommentFromCommentList as unknown as QuestionListShowDto[];
+    return new QuestionListTotalDto(
+      filterBlockedUserCommentFromCommentList as unknown as QuestionListShowDto[],
+      countDocuments === 0 ? undefined : countDocuments,
+    );
   }
 
   @returnValueToDto(QuestionShowDto)

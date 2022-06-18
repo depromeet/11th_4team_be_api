@@ -74,6 +74,7 @@ export class PushAlarmProcessor {
     console.log('processor  ALARM Comment ', job.data);
 
     const chatAlarmSubDto = plainToInstance(ChatAlarmSubDto, job.data);
+
     const room = await this.roomRepository.getUserAlarmInfoInRoom(
       new RoomIdDto(chatAlarmSubDto.roomId),
     );
