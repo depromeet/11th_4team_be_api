@@ -129,6 +129,7 @@ export class UserRepository {
       {
         $addToSet: {
           blockedUsers: myUserIdDto.userId,
+          opBlockedUsers: myUserIdDto.userId,
         },
       },
       { new: true },
@@ -155,13 +156,55 @@ export class UserRepository {
           _id: 1,
           name: 1,
           geometry: 1,
-
           category: 1,
           userCount: { $size: '$userList' },
         },
       })
       .lean<User>({ defaults: true });
   }
+
+  // async oppositeBlockUser(
+  //   myUserIdDto: UserIdDto,
+  //   otherUserIdDto: UserIdDto,
+  // ): Promise<User> {
+  //   // 상대방은 보여지면 안되는 부분에서 나를 추가
+  //   await this.userModel.findOneAndUpdate(
+  //     { _id: myUserIdDto.userId },
+  //     {
+  //       $addToSet: {
+  //         blockedUsers: myUserIdDto.userId,
+  //       },
+  //     },
+  //     { new: true },
+  //   );
+  //   // 내부분은 보여지면 안되는 부분 , 내 차단목록에 추가
+  //   return await this.userModel
+  //     .findOneAndUpdate(
+  //       { _id: myUserIdDto.userId },
+  //       {
+  //         $addToSet: {
+  //           blockedUsers: otherUserIdDto.userId,
+  //           iBlockUsers: otherUserIdDto.userId,
+  //         },
+  //       },
+  //       { new: true },
+  //     )
+  //     .populate({
+  //       path: 'iBlockUsers',
+  //       select: UserProfileSelect,
+  //     })
+  //     .populate({
+  //       path: 'myRoom',
+  //       select: {
+  //         _id: 1,
+  //         name: 1,
+  //         geometry: 1,
+  //         category: 1,
+  //         userCount: { $size: '$userList' },
+  //       },
+  //     })
+  //     .lean<User>({ defaults: true });
+  // }
 
   async unBlockUser(
     myUserIdDto: UserIdDto,
@@ -172,6 +215,7 @@ export class UserRepository {
       {
         $pull: {
           blockedUsers: myUserIdDto.userId,
+          opBlockedUsers: myUserIdDto.userId,
         },
       },
       { new: true },
@@ -198,7 +242,6 @@ export class UserRepository {
           name: 1,
           category: 1,
           geometry: 1,
-
           userCount: { $size: '$userList' },
         },
       })
