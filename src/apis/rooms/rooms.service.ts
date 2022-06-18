@@ -290,8 +290,20 @@ export class RoomsService {
       return null;
     }
     const recentChatInfo = await this.chatService.makeRecentChatInfo(user);
-    const myRoomInfoDto = { ...roomInfo, ...recentChatInfo };
-    return myRoomInfoDto;
+    if (recentChatInfo.lastChat) {
+      const recentChatSenderId = recentChatInfo.lastChat.sender._id;
+      let iBlock = false;
+      if (user.iBlockUsers.find((e) => e._id.equals(recentChatSenderId))) {
+        iBlock = true;
+      }
+
+      recentChatInfo.lastChat.iBlock = iBlock;
+      const myRoomInfoDto = { ...roomInfo, ...recentChatInfo };
+      return myRoomInfoDto;
+    } else {
+      const myRoomInfoDto = { ...roomInfo, ...recentChatInfo };
+      return myRoomInfoDto;
+    }
   }
   @returnValueToDto(ResShortCutRoomDto)
   async getMyFavorite(userId: UserIdDto) {

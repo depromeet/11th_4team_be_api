@@ -4,6 +4,7 @@ import { Job } from 'bull';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { PUSH_ALARM, PUSH_ALARM_TYPE } from 'src/common/consts/enum';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
+import { UserIdDto } from 'src/common/dtos/UserId.dto';
 import { FcmService } from 'src/fcm/fcm.service';
 import { FCM_ADMIN } from 'src/fcm/fcmAdminProvider';
 import { RoomRepository } from 'src/repositories/room.repository';
@@ -75,9 +76,14 @@ export class PushAlarmProcessor {
 
     const chatAlarmSubDto = plainToInstance(ChatAlarmSubDto, job.data);
 
-    const room = await this.roomRepository.getUserAlarmInfoInRoom(
-      new RoomIdDto(chatAlarmSubDto.roomId),
-    );
+    const [room, userInfo] = await Promise.all([
+      this.roomRepository.getUserAlarmInfoInRoom(
+        new RoomIdDto(chatAlarmSubDto.roomId),
+      ),
+      this.userRepository.findOneByUserId(
+        new UserIdDto(chatAlarmSubDto.sender),
+      ),
+    ]);
 
     if (!room) {
       console.log('chat alarm room does not exist');
@@ -94,12 +100,18 @@ export class PushAlarmProcessor {
 
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
       .filter((e) => {
+        const checkIfIBlockUser = userInfo?.iBlockUsers.find((user) =>
+          user._id.equals(e._id),
+        )
+          ? false
+          : true;
         const checkPushReciverIsSender = !e._id.equals(chatAlarmSubDto.sender);
         const checkAppAlarmOn = e.appAlarm;
         const checkChatAlarmOn = e.chatAlarm;
         const checkRoomJoin = !e.isJoin;
         const checkFCMTokenValid = e.FCMToken.length === 0 ? false : true;
         return (
+          checkIfIBlockUser &&
           checkRoomJoin &&
           checkPushReciverIsSender &&
           checkChatAlarmOn &&

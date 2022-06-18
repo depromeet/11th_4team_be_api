@@ -40,7 +40,7 @@ export class Comment {
   comment: string;
 
   @ApiProperty({
-    description: '댓글 작성자',
+    description: '질문 작성자',
     type: UserProfileDto,
   })
   @Prop({

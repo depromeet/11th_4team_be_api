@@ -4,6 +4,7 @@ import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
+import { Chat } from 'src/models/chat.model';
 import { Geometry } from 'src/models/room.model';
 
 export class MyRoomInfoDto {
@@ -37,29 +38,14 @@ export class MyRoomInfoDto {
   notReadChatCount: number;
   // 추가됨
   @ApiProperty({
-    description:
-      '마지막 채팅 메시지 채팅이 아예없는 경우에는 아직 아무도 채팅을 치지 않았어요 로 보내드립니다.',
-    type: String,
-    default: '아직 아무도 채팅을 치지 않았어요',
-  })
-  @Expose()
-  lastChatMessage: string;
-
-  @ApiProperty({
-    type: String,
-    description:
-      '한국시간으로 보정된 시간값 , 최신 채팅의 값 , 최신 채팅이 없으면 null 값으로 보내드립니다.',
+    description: '최신 채팅 정보 채팅 dto로 하나 또는 null',
+    type: Chat,
     nullable: true,
+    default: null,
   })
-  @Transform(
-    ({ value }) => {
-      if (value === null) return null;
-      else return toKRTimeZone(value);
-    },
-    { toClassOnly: true },
-  )
+  @Type(() => Chat)
   @Expose()
-  lastChatTime: Date | null;
+  lastChat: Chat | null;
 
   @Type(() => Geometry)
   @Expose({ toClassOnly: true })
