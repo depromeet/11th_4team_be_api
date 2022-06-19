@@ -57,6 +57,11 @@ export class Alarm {
   roomName: string;
 
   @Prop({
+    type: String,
+  })
+  roomId: string;
+
+  @Prop({
     default: '',
     type: String,
   })

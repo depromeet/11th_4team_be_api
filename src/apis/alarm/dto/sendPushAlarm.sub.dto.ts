@@ -41,7 +41,11 @@ export class SendPushAlarmSubDto {
         );
       case PUSH_ALARM_TYPE.COMMENT:
         return (
-          DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId
+          DEEPLINK_BASEURL +
+          'question-detail?question_id=' +
+          this.questionId +
+          '&chat-room_id=' +
+          this.roomId
         );
       case PUSH_ALARM_TYPE.LETTER:
         return (

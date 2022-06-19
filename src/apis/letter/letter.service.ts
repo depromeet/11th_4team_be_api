@@ -60,7 +60,6 @@ export class LetterService {
       throw new BadRequestException('탈퇴한 유저');
     }
 
-    //TODO : 400 번대
     // 보낼 수  없는 사용자 추가
 
     const letterRoom = await this.upsertUserListToLetterRoom(twoUserList);
