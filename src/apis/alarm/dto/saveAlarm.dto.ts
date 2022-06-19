@@ -20,6 +20,9 @@ export class SaveAlarmDto {
   @Expose()
   questionId?: string;
 
+  @Expose()
+  roomId?: string;
+
   //need to be updated 딥링크 양식 정의 필요 ( 클라와 함께)
   // @Expose()
   // get deepLink(): string {

@@ -146,15 +146,18 @@ export class AlarmService {
       user: receiver.userId.toString(),
       content: comment,
       roomName: room.name,
+      roomId: room._id.toString(),
       alarmType: ALARM_STORE_TYPE.COMMENT,
       questionId: questionIdDto.questionId.toString(),
     };
+    // console.log(saveAlarmDto);
     await this.saveAlarmQueue.add(ALARM_STORE_TYPE.COMMENT, saveAlarmDto);
 
     const sendPushAlarmObj: SendPushAlarmPubDto = {
       nickname: sender.nickname,
       content: comment,
       receivers: [receiver.userId],
+      roomId: room._id.toString(),
       pushAlarmType: PUSH_ALARM_TYPE.COMMENT,
       questionId: questionIdDto.questionId.toString(),
     };

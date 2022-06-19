@@ -22,6 +22,10 @@ export class AlarmShowDto {
 
   @Exclude({ toPlainOnly: true })
   @Expose({ toClassOnly: true })
+  roomId?: string;
+
+  @Exclude({ toPlainOnly: true })
+  @Expose({ toClassOnly: true })
   nickname: string;
 
   @Exclude({ toPlainOnly: true })
@@ -44,9 +48,13 @@ export class AlarmShowDto {
       case ALARM_STORE_TYPE.LIGHTNING:
         return DEEPLINK_BASEURL + 'screen-type?mypage';
       case ALARM_STORE_TYPE.COMMENT:
-        return (
-          DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId
-        );
+        const link =
+          DEEPLINK_BASEURL + 'question-detail?question_id=' + this.questionId;
+        if (this.roomId) {
+          return link + '&chat-room_id=' + this.roomId;
+        } else {
+          return link;
+        }
       default:
         return '';
     }
