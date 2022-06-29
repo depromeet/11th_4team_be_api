@@ -111,8 +111,8 @@ export class UserController {
     description: '요청 성공시',
     type: FlagInfoDto,
   })
-  updateUserFlagInfo(@ReqUser() user: User, @Body() flagInfoDto: FlagInfoDto) {
-    return this.userService.updateUserFlagInfo(user.userIdDto, flagInfoDto);
+  updateUserFlagInfo(@ReqUser() user: User) {
+    return this.userService.updateUserFlagInfo(user.userIdDto);
   }
 
   @ApiOperation({
