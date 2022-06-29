@@ -26,12 +26,13 @@ import {
   USER_LEVEL_TYPE,
 } from 'src/common/consts/enum';
 import { AlarmService } from '../alarm/alarm.service';
-import { FCMUpdateDto } from './dto/fcmUpdate.dto';
+import { FlagInfoDto } from './dto/flagInfo.dto';
 import { RoomsService } from '../rooms/rooms.service';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserProfileClickDto } from './dto/UserProfileClick.dto';
 import { OfficialNotiRepository } from 'src/repositories/officialNoti.repository';
 import { OfficialNoti } from 'src/models/officialNoti';
+import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 
 @Injectable()
 export class UserService {
@@ -308,5 +309,29 @@ export class UserService {
     console.log('asdfasdfasdfafsdF', updatedUserFCMToken);
 
     return { FCMToken: updatedUserFCMToken };
+  }
+
+  @returnValueToDto(FlagInfoDto)
+  async updateUserFlagInfo(
+    myUserIdDto: UserIdDto,
+    flagInfoDto: FlagInfoDto,
+  ): Promise<FlagInfoDto> {
+    const updatedUserFlagInfo = await this.userRepository.updateUserFlagInfo(
+      myUserIdDto,
+      flagInfoDto,
+    );
+    console.log('asdfasdfasdfafsdF', updatedUserFlagInfo);
+
+    return { flagInfo: updatedUserFlagInfo };
+  }
+
+  @returnValueToDto(FlagInfoDto)
+  async getUserFlagInfo(myUserIdDto: UserIdDto): Promise<FlagInfoDto> {
+    const getUserFlagInfo = await this.userRepository.getUserFlagInfo(
+      myUserIdDto,
+    );
+    console.log('asdfasdfasdfafsdF', getUserFlagInfo);
+
+    return { flagInfo: getUserFlagInfo };
   }
 }

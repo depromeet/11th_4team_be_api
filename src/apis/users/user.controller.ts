@@ -29,9 +29,10 @@ import { CanChangeNicknameResDto } from './dto/canChangeNickname.res.dto';
 import { NewAlarmStateResDto } from './dto/newAlarmState.res.dto';
 import { SendLightningSuccessDtoResDto } from './dto/sendLigningSuccessDto.res.dto';
 import { AlarmService } from '../alarm/alarm.service';
-import { FCMUpdateDto } from './dto/fcmUpdate.dto';
+import { FlagInfoDto } from './dto/flagInfo.dto';
 import { UserProfileClickDto } from './dto/UserProfileClick.dto';
 import { OfficialNoti } from 'src/models/officialNoti';
+import { FCMUpdateDto } from './dto/fcmUpdate.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -99,6 +100,32 @@ export class UserController {
   ) {
     console.log('asdfasdfasdfas');
     return this.userService.updateUserFCMToken(user.userIdDto, fCMUpdateDto);
+  }
+
+  @ApiOperation({
+    summary: 'flagInfo 업데이트하기',
+  })
+  @Patch('flagInfo')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: FlagInfoDto,
+  })
+  updateUserFlagInfo(@ReqUser() user: User, @Body() flagInfoDto: FlagInfoDto) {
+    return this.userService.updateUserFlagInfo(user.userIdDto, flagInfoDto);
+  }
+
+  @ApiOperation({
+    summary: 'flagInfo 정보 가져오기',
+  })
+  @Get('flagInfo')
+  @ApiResponse({
+    status: 200,
+    description: '요청 성공시',
+    type: FlagInfoDto,
+  })
+  getUserFlagInfo(@ReqUser() user: User) {
+    return this.userService.getUserFlagInfo(user.userIdDto);
   }
 
   @ApiOperation({ summary: '내 차단유저 목록을 불러온다' })
