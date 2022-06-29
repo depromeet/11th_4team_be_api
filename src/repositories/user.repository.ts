@@ -497,10 +497,7 @@ export class UserRepository {
     return user.FCMToken;
   }
 
-  async updateUserFlagInfo(
-    myUserIdDto: UserIdDto,
-    flagInfoDto: FlagInfoDto,
-  ): Promise<boolean> {
+  async updateUserFlagInfo(myUserIdDto: UserIdDto): Promise<boolean> {
     const user = await this.userModel
       .findOneAndUpdate(
         { _id: myUserIdDto.userId },
