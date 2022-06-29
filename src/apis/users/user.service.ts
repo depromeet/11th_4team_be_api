@@ -312,15 +312,10 @@ export class UserService {
   }
 
   @returnValueToDto(FlagInfoDto)
-  async updateUserFlagInfo(
-    myUserIdDto: UserIdDto,
-    flagInfoDto: FlagInfoDto,
-  ): Promise<FlagInfoDto> {
+  async updateUserFlagInfo(myUserIdDto: UserIdDto): Promise<FlagInfoDto> {
     const updatedUserFlagInfo = await this.userRepository.updateUserFlagInfo(
       myUserIdDto,
-      flagInfoDto,
     );
-    console.log('asdfasdfasdfafsdF', updatedUserFlagInfo);
 
     return { flagInfo: updatedUserFlagInfo };
   }
@@ -330,7 +325,6 @@ export class UserService {
     const getUserFlagInfo = await this.userRepository.getUserFlagInfo(
       myUserIdDto,
     );
-    console.log('asdfasdfasdfafsdF', getUserFlagInfo);
 
     return { flagInfo: getUserFlagInfo };
   }
