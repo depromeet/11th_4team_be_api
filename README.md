@@ -8,7 +8,7 @@
 ![github_img2](https://user-images.githubusercontent.com/13329304/176240116-90cccb5f-e0b4-4437-94d2-523e6ac2150b.png)
 
 <div align="center">한강공원에 사람이 얼마나 있을까? 대학교 앞 카페에 공부할 자리가 있으려나?   <br>   
-👀 지금 이 순간 당신이 원하는 장소에 대해 정보를 공유하고 싶을 때 티키타카를 이용해보세요.<br>  스팟 채팅방, 질의응답 그리고 쪽지를 통해 사람들과 감정을 교류할 수 있어요. </div>
+👀지금 이 순간 당신이 원하는 장소에 대해 정보를 공유하고 싶을 때 티키타카를 이용해보세요.<br>  스팟 채팅방, 질의응답 그리고 쪽지를 통해 사람들과 감정을 교류할 수 있어요. </div>
 <br>
 
 ![github_img3](https://user-images.githubusercontent.com/13329304/176240134-1b8045d9-b3b3-4175-b787-1909200fe4fd.png)
@@ -38,6 +38,7 @@
 <div align="center">⚡️ 같이 티키타카할 준비가 됐다면 망설이지 말고 놀러오세요:)⚡️</div>
 
 <br>
+<div align="center"><a href="https://apps.apple.com/kr/app/%ED%8B%B0%ED%82%A4%ED%83%80%EC%B9%B4-tikitaka/id1617831823"><img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/ko-kr?size=250x83&amp;releaseDate=1654300800&h=dd4ccd7fb22c609cf9132f37bf23c390" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;"></a></div>
 
 ---
 
