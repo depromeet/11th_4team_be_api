@@ -41,17 +41,17 @@ import { RoomUserListDto } from './dto/roomUserList.res.dto';
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @ApiOperation({ summary: '룸을 생성할수 있음' })
-  @ApiBody({ type: CreateRoomDto })
-  @ApiResponse({
-    status: 201,
-    description: '요청 성공시',
-    type: Room,
-  })
-  @Post()
-  create(@Body() createRoomDto: CreateRoomDto) {
-    return this.roomsService.createRoom(createRoomDto);
-  }
+  // @ApiOperation({ summary: '룸을 생성할수 있음' })
+  // @ApiBody({ type: CreateRoomDto })
+  // @ApiResponse({
+  //   status: 201,
+  //   description: '요청 성공시',
+  //   type: Room,
+  // })
+  // @Post()
+  // create(@Body() createRoomDto: CreateRoomDto) {
+  //   return this.roomsService.createRoom(createRoomDto);
+  // }
 
   @ApiOperation({
     summary:

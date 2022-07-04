@@ -22,6 +22,7 @@ import {
   userFcmInfoSelect,
 } from 'src/apis/alarm/dto/userFcmInfo.dto';
 import { Types } from 'mongoose';
+import { FlagInfoDto } from 'src/apis/users/dto/flagInfo.dto';
 import { FCMUpdateDto } from 'src/apis/users/dto/fcmUpdate.dto';
 
 @Injectable()
@@ -494,5 +495,29 @@ export class UserRepository {
       throw new InternalServerErrorException('잘못된 접근');
     }
     return user.FCMToken;
+  }
+
+  async updateUserFlagInfo(myUserIdDto: UserIdDto): Promise<boolean> {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { _id: myUserIdDto.userId },
+        [{ $set: { flagInfo: { $eq: [false, '$flagInfo'] } } }],
+        { new: true },
+      )
+      .lean<User>({ defaults: true });
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
+    return user.flagInfo;
+  }
+
+  async getUserFlagInfo(myUserIdDto: UserIdDto): Promise<boolean> {
+    const user = await this.userModel
+      .findOne({ _id: myUserIdDto.userId })
+      .lean<User>({ defaults: true });
+    if (!user) {
+      throw new InternalServerErrorException('잘못된 접근');
+    }
+    return user.flagInfo;
   }
 }

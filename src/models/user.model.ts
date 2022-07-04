@@ -22,6 +22,7 @@ import { toKRTimeZone } from 'src/common/funcs/toKRTimezone';
 import { TransformObjectIdToString } from 'src/common/decorators/Expose.decorator';
 import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { BlockedUserDto } from 'src/common/dtos/BlockedUserList.dto';
+import { animationFrameScheduler } from 'rxjs';
 
 const options: SchemaOptions = {
   id: false,
@@ -210,6 +211,18 @@ export class User {
   })
   @Expose()
   isJoin: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    description: '유저 깃발정보 동의 여부',
+  })
+  @Prop({
+    type: Boolean,
+    default: true,
+  })
+  @Expose()
+  @IsBoolean()
+  flagInfo: boolean;
 
   lastChat: Types.ObjectId | null;
 }
