@@ -53,6 +53,9 @@ export class SendPushAlarmSubDto {
         );
       case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
         return DEEPLINK_BASEURL + 'screen-type?mypage';
+      case PUSH_ALARM_TYPE.LIGHTNING:
+        // 변경 요망 딥링크 관련
+        return DEEPLINK_BASEURL + 'screen-type?mypage';
     }
   }
 
@@ -67,6 +70,8 @@ export class SendPushAlarmSubDto {
         return '쪽지가 도착했어요';
       case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
         return '등급이 업그레이드 되었어요!';
+      case PUSH_ALARM_TYPE.LIGHTNING:
+        return '파지지직..⚡️';
     }
   }
 
@@ -75,6 +80,8 @@ export class SendPushAlarmSubDto {
     switch (this.pushAlarmType) {
       case PUSH_ALARM_TYPE.LIGHTNING_LEVELUP:
         return '티키타카에서 새로 받은 아이템을 확인해보세요';
+      case PUSH_ALARM_TYPE.LIGHTNING:
+        return this.nickname + '님이 번개를 줬어요';
       default:
         return this.nickname + ' : ' + this.content;
     }
