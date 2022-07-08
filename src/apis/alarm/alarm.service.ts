@@ -103,7 +103,14 @@ export class AlarmService {
       user: receiver.userId.toString(),
       alarmType: ALARM_STORE_TYPE.LIGHTNING,
     };
+
+    const sendPushAlarmObj: SendPushAlarmPubDto = {
+      nickname: sender.nickname,
+      pushAlarmType: PUSH_ALARM_TYPE.LIGHTNING,
+      receivers: [receiver.userId],
+    };
     await this.saveAlarmQueue.add(ALARM_STORE_TYPE.LIGHTNING, saveAlarmDto);
+    await this.pushAlarmQueue.add(PUSH_ALARM_TYPE.LIGHTNING, sendPushAlarmObj);
   }
   // 내 레벨이 올랐을 때 (기획 기달려야함)
 

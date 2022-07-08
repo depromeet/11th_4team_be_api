@@ -133,6 +133,7 @@ enum PUSH_ALARM_TYPE {
   LETTER = 'letter',
   CHAT = 'chat',
   LIGHTNING_LEVELUP = 'lightningLevelUp',
+  LIGHTNING = 'lightning',
 }
 
 // enum ALARM_TYPE {

@@ -154,4 +154,11 @@ export class PushAlarmProcessor {
     const sendPushAlarmDto = plainToInstance(SendPushAlarmSubDto, job.data);
     await this.sendPushAlarm(sendPushAlarmDto);
   }
+
+  @Process(PUSH_ALARM_TYPE.LIGHTNING)
+  async handleLightningAlarm(job: Job) {
+    // job.data
+    const sendPushAlarmDto = plainToInstance(SendPushAlarmSubDto, job.data);
+    await this.sendPushAlarm(sendPushAlarmDto);
+  }
 }
