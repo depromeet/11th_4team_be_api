@@ -26,15 +26,15 @@ import * as Joi from 'joi';
         redis: {
           host: configService.get('REDIS_HOST'),
           port: Number(configService.get('REDIS_PORT')),
-          retryStrategy: (times) => {
+          retryStrategy: times => {
             // check connection
             console.log('could not connect to redis!');
             process.exit(1);
-          },
-        },
+          }
+        }
       }),
 
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -48,19 +48,19 @@ import * as Joi from 'joi';
         SWAGGER_USER: Joi.string(),
         SWAGGER_PASSWORD: Joi.string(),
         REDIS_HOST: Joi.string(),
-        REDIS_PORT: Joi.number(),
-      }),
+        REDIS_PORT: Joi.number()
+      })
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
-        connectionFactory: (connection) => {
+        connectionFactory: connection => {
           connection.plugin(mongooseLeanDefaults);
           return connection;
-        },
+        }
       }),
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
     UserModule,
     AuthModule,
@@ -69,14 +69,14 @@ import * as Joi from 'joi';
     QuestionsModule,
     AlarmModule,
     FcmModule,
-    ChatModule,
+    ChatModule
   ],
   providers: [
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-  ],
+      useClass: AllExceptionsFilter
+    }
+  ]
 })
 export class AppModule implements NestModule {
   private readonly isDev: boolean =

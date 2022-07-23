@@ -19,24 +19,24 @@ import { RoomsModule } from '../rooms/rooms.module';
     forwardRef(() => UserModule),
     BullModule.registerQueue(
       {
-        name: PUSH_ALARM,
+        name: PUSH_ALARM
       },
       {
-        name: SAVE_ALARM,
-      },
+        name: SAVE_ALARM
+      }
     ),
     FcmModule.forRoot({
-      credentialPath: path.join(__dirname, '../../../fcm-admin.json'),
+      credentialPath: path.join(__dirname, '../../../fcm-admin.json')
     }),
-    RoomsModule,
+    RoomsModule
   ],
   controllers: [NotiController],
   providers: [
     AlarmService,
     AlarmRepository,
     PushAlarmProcessor,
-    SaveAlarmProcessor,
+    SaveAlarmProcessor
   ],
-  exports: [AlarmService, AlarmRepository],
+  exports: [AlarmService, AlarmRepository]
 })
 export class AlarmModule {}
