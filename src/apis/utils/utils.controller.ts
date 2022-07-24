@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -22,18 +23,27 @@ import { UtilsService } from './utils.service';
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) { }
 
+  @ApiOperation({
+    summary: '카테고리 정보',
+  })
   @Get('category')
-  getCategory() {
-    return this.utilsService.findAllCategory()
+  async getCategory() {
+    return await this.utilsService.findAllCategory()
   }
 
+  @ApiOperation({
+    summary: '카테고리 추가',
+  })
   @Post('category')
-  createCategory(@Body() categoryDto: CategoryDto): Promise<CategoryDto> {
-    return this.utilsService.createCategory(categoryDto)
+  async createCategory(@Body() categoryDto: CategoryDto): Promise<void> {
+    return await this.utilsService.createCategory(categoryDto)
   }
 
+  @ApiOperation({
+    summary: '카테고리 삭제',
+  })
   @Delete('category')
-  deleteCategory(@Body() categoryIdDto: CategoryIdDto) {
-    return this.utilsService.deleteCategory(categoryIdDto)
+  async deleteCategory(@Body() categoryIdDto: CategoryIdDto) {
+    return await this.utilsService.deleteCategory(categoryIdDto)
   }
 }

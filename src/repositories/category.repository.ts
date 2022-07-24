@@ -11,8 +11,8 @@ import { CategoryIdDto } from 'src/common/dtos/CategoryId.dto';
 export class CategoryRepository {
   constructor(@InjectModel(Category.name) private readonly categoryModel: Model<Category>) { }
 
-  async create(categoryDto: CategoryDto): Promise<CategoryDto> {
-    return await this.categoryModel.create(categoryDto);
+  async create(categoryDto: CategoryDto): Promise<void> {
+    await this.categoryModel.create(categoryDto)
   }
 
   async delete(categoryIdDto: CategoryIdDto): Promise<void> {

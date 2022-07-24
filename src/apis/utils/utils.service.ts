@@ -9,8 +9,8 @@ export class UtilsService {
     private categoryRepository: CategoryRepository,
   ) { }
 
-  async createCategory(categoryDto: CategoryDto): Promise<CategoryDto> {
-    return await this.categoryRepository.create(categoryDto);
+  async createCategory(categoryDto: CategoryDto): Promise<void> {
+    await this.categoryRepository.create(categoryDto);
   }
 
   async deleteCategory(categoryIdDto: CategoryIdDto): Promise<void> {

@@ -1,7 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-/**
- * mongoId 용 DTO
- */
 export class CategoryIdDto {
   @ApiProperty({
     type: String,

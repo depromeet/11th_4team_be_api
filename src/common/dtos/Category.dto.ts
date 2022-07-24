@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prop } from '@nestjs/mongoose';
 
 import { IsNumber, IsString } from 'class-validator';
 import { Expose } from 'class-transformer';
-
-
 export class CategoryDto {
   @ApiProperty({
     description: '카테고리 아이디',
