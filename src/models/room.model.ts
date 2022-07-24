@@ -129,6 +129,13 @@ export class Room {
   @ApiProperty({ description: '유저 숫자' })
   @Expose()
   userCount: number;
+
+  @ApiProperty({ description: '채팅방 부제목' })
+  @Prop({ required: false, type: String, default: "" })
+  @IsNotEmpty()
+  @IsString()
+  @Expose()
+  subtitle: string
 }
 
 const _RoomSchema = SchemaFactory.createForClass(Room);

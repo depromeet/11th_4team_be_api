@@ -17,6 +17,7 @@ import { BullModule } from '@nestjs/bull';
 import { FcmModule } from './fcm/fcm.module';
 import { ChatModule } from './chat/chat.module';
 import * as Joi from 'joi';
+import { UtilsModule } from './apis/utils/utils.module';
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import * as Joi from 'joi';
     QuestionsModule,
     AlarmModule,
     FcmModule,
-    ChatModule
+    ChatModule,
+    UtilsModule
   ],
   providers: [
     {
