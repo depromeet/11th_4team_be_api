@@ -17,7 +17,7 @@ export function MongooseClassSerializerInterceptor(dto: any) {
 }
 
 export class SerializeInterceptor implements NestInterceptor {
-  constructor(private dto: any) {}
+  constructor(private dto: any) { }
 
   intercept(context: ExecutionContext, handler: CallHandler): Observable<any> {
     return handler.handle().pipe(
