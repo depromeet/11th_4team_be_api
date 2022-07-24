@@ -1,6 +1,5 @@
 import {
   ClassSerializerInterceptor,
-  ConsoleLogger,
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
