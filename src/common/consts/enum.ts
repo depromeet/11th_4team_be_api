@@ -25,10 +25,11 @@ enum CATEGORY_TYPE {
   EXHIBITION = 'EXHIBITION', //박람회 전시회
   AMUSEMENT = 'AMUSEMENT', // 놀이공원
   DEPARTMENT_STORE = 'SHOP', //백화점
-  // AMUSEMENT,
-  // HAN_RIVER_PRAk,
 }
+
 enum FIND_ROOM_FILTER_TYPE {
+  ALL = 'ALL',
+  FAVORITE = 'FAVORITE',
   UNIVERSITY = 'UNIVERSITY', //대학교
   CONCERT = 'CONCERT', //공연장
   PARK = 'PARK', //한강공원
@@ -36,11 +37,6 @@ enum FIND_ROOM_FILTER_TYPE {
   EXHIBITION = 'EXHIBITION', //박람회 전시회
   AMUSEMENT = 'AMUSEMENT', // 놀이공원
   DEPARTMENT_STORE = 'SHOP', //백화점
-
-  ALL = 'ALL',
-  FAVORITE = 'FAVORITE',
-  // AMUSEMENT,
-  // HAN_RIVER_PRAk,
 }
 
 enum EVENT_TYPE {
