@@ -5,6 +5,7 @@ import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { PUSH_ALARM, PUSH_ALARM_TYPE } from 'src/common/consts/enum';
 import { RoomIdDto } from 'src/common/dtos/RoomId.dto';
 import { UserIdDto } from 'src/common/dtos/UserId.dto';
+import { chunksArray } from 'src/common/funcs/chunkArray';
 import { FcmService } from 'src/fcm/fcm.service';
 import { FCM_ADMIN } from 'src/fcm/fcmAdminProvider';
 import { RoomRepository } from 'src/repositories/room.repository';
@@ -19,27 +20,27 @@ export class PushAlarmProcessor {
   constructor(
     private fcmService: FcmService,
     private userRepository: UserRepository,
-    private roomRepository: RoomRepository,
+    private roomRepository: RoomRepository
   ) {}
 
   private async sendPushAlarm(sendPushAlarmDto: SendPushAlarmSubDto) {
     const findUserFcmToken = await this.userRepository.findUserFcmToken(
-      sendPushAlarmDto.receivers ? sendPushAlarmDto.receivers : [],
+      sendPushAlarmDto.receivers ? sendPushAlarmDto.receivers : []
     );
     console.log(findUserFcmToken);
 
     const TokenArray = findUserFcmToken
-      .filter((e) => {
+      .filter(e => {
         const checkAppAlarmOn = e.appAlarm;
         const checkFCMTokenValid = e.FCMToken.length === 0 ? false : true;
         return checkAppAlarmOn && checkFCMTokenValid;
       })
-      .map((e) => e.FCMToken);
+      .map(e => e.FCMToken);
     console.log(TokenArray);
     if (TokenArray.length) {
       const result = await this.fcmService.sendNotification(
         TokenArray,
-        sendPushAlarmDto,
+        sendPushAlarmDto
       );
       console.log(result);
     }
@@ -77,11 +78,9 @@ export class PushAlarmProcessor {
 
     const [room, userInfo] = await Promise.all([
       this.roomRepository.getUserAlarmInfoInRoom(
-        new RoomIdDto(chatAlarmSubDto.roomId),
+        new RoomIdDto(chatAlarmSubDto.roomId)
       ),
-      this.userRepository.findOneByUserId(
-        new UserIdDto(chatAlarmSubDto.sender),
-      ),
+      this.userRepository.findOneByUserId(new UserIdDto(chatAlarmSubDto.sender))
     ]);
 
     if (!room) {
@@ -104,13 +103,13 @@ export class PushAlarmProcessor {
       : [];
     const roomNameAndUserAlarmInfoArray = {
       userFcmInfoList,
-      roomName: room.name,
+      roomName: room.name
     };
 
     const TokenArray = roomNameAndUserAlarmInfoArray.userFcmInfoList
-      .filter((e) => {
-        const checkIfIBlockUser = userInfo.opBlockedUsers.find((user) =>
-          user._id.equals(e._id),
+      .filter(e => {
+        const checkIfIBlockUser = userInfo.opBlockedUsers.find(user =>
+          user._id.equals(e._id)
         )
           ? false
           : true;
@@ -128,7 +127,7 @@ export class PushAlarmProcessor {
           checkFCMTokenValid
         );
       })
-      .map((e) => e.FCMToken);
+      .map(e => e.FCMToken);
 
     const sendPushAlarmObj: SendPushAlarmPubDto = {
       nickname: chatAlarmSubDto.nickname,
@@ -136,15 +135,19 @@ export class PushAlarmProcessor {
       pushAlarmType: PUSH_ALARM_TYPE.CHAT,
       chatId: chatAlarmSubDto.chatId,
       roomId: chatAlarmSubDto.roomId.toString(),
-      roomName: roomNameAndUserAlarmInfoArray.roomName,
+      roomName: roomNameAndUserAlarmInfoArray.roomName
     };
 
     if (TokenArray.length) {
-      const result = await this.fcmService.sendNotification(
-        TokenArray,
-        plainToInstance(SendPushAlarmSubDto, sendPushAlarmObj),
+      const chunckedArray = chunksArray<string>(TokenArray, 400);
+      await Promise.all(
+        [...chunckedArray].map(() => {
+          return this.fcmService.sendNotification(
+            TokenArray,
+            plainToInstance(SendPushAlarmSubDto, sendPushAlarmObj)
+          );
+        })
       );
-      console.log(result);
     }
   }
 

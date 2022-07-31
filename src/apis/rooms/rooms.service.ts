@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  Type,
+  Type
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { ObjectId, Types } from 'mongoose';
@@ -34,15 +34,15 @@ export class RoomsService {
   constructor(
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
-    private readonly chatService: ChatService,
+    private readonly chatService: ChatService
   ) {}
 
   private filterRemoveBlockedUserFromUserList(
     userList: UserProfileDto[],
-    blockedUserDto: BlockedUserDto,
+    blockedUserDto: BlockedUserDto
   ) {
     return userList.filter(
-      (user) => !blockedUserDto.blockedUsers.find((e) => e.equals(user._id)),
+      user => !blockedUserDto.blockedUsers.find(e => e.equals(user._id))
     );
   }
 
@@ -72,11 +72,11 @@ export class RoomsService {
   // @returnValueToDto(ResFindRoomDto)
   async findRoom(
     findRoomDto: FindRoomDto,
-    userId: UserIdDto,
+    userId: UserIdDto
   ): Promise<ResFindRoomDto[]> {
     //
     const isCATEGORY_TYPE = Object.values<string>(CATEGORY_TYPE).includes(
-      findRoomDto.filter,
+      findRoomDto.filter
     );
     const user = await this.userRepository.findOneByUserId(userId);
     if (!user) {
@@ -86,7 +86,7 @@ export class RoomsService {
     if (isCATEGORY_TYPE) {
       // 카테고리 타입인 경우
       rooms = await this.roomRepository.findRoomsByCoordinatesWithFilter(
-        findRoomDto,
+        findRoomDto
       );
     } else if (findRoomDto.filter === FIND_ROOM_FILTER_TYPE.ALL) {
       //전체 찾기 인경우
@@ -95,13 +95,13 @@ export class RoomsService {
       // 내가 즐겨 찾기 한경우
       rooms = await this.roomRepository.findFavoirteRoomsByCoordinates(
         findRoomDto,
-        user.favoriteRoomList,
+        user.favoriteRoomList
       );
     }
 
     const result = rooms.map((element: Room) => {
-      const iFavorite = user.favoriteRoomList.find((room) =>
-        room._id.equals(element._id),
+      const iFavorite = user.favoriteRoomList.find(room =>
+        room._id.equals(element._id)
       )
         ? true
         : false;
@@ -121,7 +121,7 @@ export class RoomsService {
     //   return new ResFindRoomDto(room, iFavorite, iJoin);
     // });
     return plainToInstance(ResFindRoomDto, result, {
-      excludeExtraneousValues: true,
+      excludeExtraneousValues: true
     }) as unknown as Array<ResFindRoomDto>;
   }
 
@@ -136,7 +136,7 @@ export class RoomsService {
   async addUserToRoom(
     roomIdDto: RoomIdDto,
     userIdDto: UserIdDto,
-    blockUserListDto: BlockedUserDto,
+    blockUserListDto: BlockedUserDto
   ): Promise<ResFindOneRoomDto> {
     // 이전 룸에서 빼주는 로직 추가해야함
     const user = await this.userRepository.findOneByUserId(userIdDto);
@@ -153,8 +153,8 @@ export class RoomsService {
       const myRoomId = user.myRoom._id;
       if (roomIdDto.roomId.equals(myRoomId)) {
         // 룸이 같을경우 룸의 정보를 리턴
-        const iFavorite = user.favoriteRoomList.find((room) =>
-          room._id.equals(myRoomId),
+        const iFavorite = user.favoriteRoomList.find(room =>
+          room._id.equals(myRoomId)
         )
           ? true
           : false;
@@ -163,40 +163,40 @@ export class RoomsService {
         // 차단 유저아웃
         room.userList = this.filterRemoveBlockedUserFromUserList(
           room.userList,
-          blockUserListDto,
+          blockUserListDto
         );
         const result = { ...room, iFavorite, iAlarm: user.chatAlarm };
 
         return plainToInstance(ResFindOneRoomDto, result, {
-          excludeExtraneousValues: true,
+          excludeExtraneousValues: true
         });
       } else {
         // 다른 룸일 경우 다른룸에서 해당 유저를 빼줌
         // 300명인지 체크하는 로직추가
-        if (room.userCount >= 300) {
-          throw new BadRequestException('유저수가 300명이 넘었습니다.');
-        }
+        // if (room.userCount >= 300) {
+        //   throw new BadRequestException('유저수가 300명이 넘었습니다.');
+        // }
 
         await this.roomRepository.pullUserFromRoom(
           new RoomIdDto(user.myRoom._id),
-          userIdDto,
+          userIdDto
         );
       }
     }
     // 300명인지 체크하는 로직추가
-    if (room.userCount >= 300) {
-      throw new BadRequestException('유저수가 300명이 넘었습니다.');
-    }
+    // if (room.userCount >= 300) {
+    //   throw new BadRequestException('유저수가 300명이 넘었습니다.');
+    // }
     // 룸에 새로 들어갈때,,,?
     await this.userRepository.setMyRoom(userIdDto, roomIdDto);
     await this.userRepository.turnOnChatAlarm(userIdDto);
     const newRoom = await this.roomRepository.addUserToRoom(
       roomIdDto,
-      userIdDto,
+      userIdDto
     );
     //check
-    const iFavorite = user.favoriteRoomList.find((room) =>
-      room._id.equals(roomIdDto.roomId),
+    const iFavorite = user.favoriteRoomList.find(room =>
+      room._id.equals(roomIdDto.roomId)
     )
       ? true
       : false;
@@ -204,25 +204,25 @@ export class RoomsService {
     // 차단 유저아웃
     newRoom.userList = this.filterRemoveBlockedUserFromUserList(
       newRoom.userList,
-      blockUserListDto,
+      blockUserListDto
     );
 
     const result = { ...newRoom, iFavorite, iAlarm: true };
     // console.log(result);
     return plainToInstance(ResFindOneRoomDto, result, {
-      excludeExtraneousValues: true,
+      excludeExtraneousValues: true
     });
   }
 
   @returnValueToDto(LeftRoomResultResDto)
   async pullUserFromRoom(
     roomIdDto: RoomIdDto,
-    userIdDto: UserIdDto,
+    userIdDto: UserIdDto
   ): Promise<LeftRoomResultResDto> {
     await this.userRepository.setMyRoom(userIdDto, null);
     const result = await this.roomRepository.pullUserFromRoom(
       roomIdDto,
-      userIdDto,
+      userIdDto
     );
     return { leftSuccess: result ? true : false };
   }
@@ -236,14 +236,14 @@ export class RoomsService {
 
   async toggleRoomToUserFavoriteList(
     roomIdDto: RoomIdDto,
-    userIdDto: UserIdDto,
+    userIdDto: UserIdDto
   ): Promise<ResFavoriteToggleDto> {
     const user = await this.userRepository.findOneByUserId(userIdDto);
     if (!user) {
       throw new InternalServerErrorException('잘못된 접근');
     }
-    const isFavoritRoom = user.favoriteRoomList.find((room) =>
-      roomIdDto.roomId.equals(room._id),
+    const isFavoritRoom = user.favoriteRoomList.find(room =>
+      roomIdDto.roomId.equals(room._id)
     );
     console.log('asdfasdf', isFavoritRoom);
     let iFavoritRoom: boolean;
@@ -251,7 +251,7 @@ export class RoomsService {
       //내가 이미 즐겨찾기해놨으면
       iFavoritRoom = await this.userRepository.pullRoomToFavoriteList(
         userIdDto,
-        roomIdDto,
+        roomIdDto
       );
     } else {
       // 즐겨찾기 안해놨으면
@@ -260,11 +260,11 @@ export class RoomsService {
       }
       iFavoritRoom = await this.userRepository.pushRoomToFavoriteList(
         userIdDto,
-        roomIdDto,
+        roomIdDto
       );
     }
     return plainToInstance(ResFavoriteToggleDto, {
-      iFavoritRoom: iFavoritRoom,
+      iFavoritRoom: iFavoritRoom
     });
   }
 
@@ -293,7 +293,7 @@ export class RoomsService {
     if (recentChatInfo.lastChat) {
       const recentChatSenderId = recentChatInfo.lastChat.sender._id;
       let iBlock = false;
-      if (user.iBlockUsers.find((e) => e._id.equals(recentChatSenderId))) {
+      if (user.iBlockUsers.find(e => e._id.equals(recentChatSenderId))) {
         iBlock = true;
       }
 
@@ -314,7 +314,7 @@ export class RoomsService {
     const isChatAlarmOn = await this.userRepository.toggleChatAlarm(userId);
 
     return plainToInstance(ResChatAlarmToggleDto, {
-      isChatAlarmOn: isChatAlarmOn,
+      isChatAlarmOn: isChatAlarmOn
     });
   }
 
@@ -327,7 +327,7 @@ export class RoomsService {
   @returnValueToDto(RoomUserListDto)
   async findRoomInUserList(
     roomIdDto: RoomIdDto,
-    user: User,
+    user: User
     // userIdDto: UserIdDto,
     // blockUserListDto: BlockedUserDto,
   ) {
@@ -336,14 +336,14 @@ export class RoomsService {
     }
     if (!user.myRoom._id.equals(roomIdDto.roomId)) {
       throw new BadRequestException(
-        '유저가 들어간 방정보와 파라미터가 일치하지 않음',
+        '유저가 들어간 방정보와 파라미터가 일치하지 않음'
       );
     }
     const room = await this.roomRepository.findOneByRoomId(roomIdDto);
 
     const filteredUserList = this.filterRemoveBlockedUserFromUserList(
       room.userList,
-      user.blockedUserDto,
+      user.blockedUserDto
     );
     return { userList: filteredUserList, userCount: filteredUserList.length };
   }

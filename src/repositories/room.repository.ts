@@ -10,13 +10,13 @@ import { FindRoomDto } from 'src/apis/rooms/dto/find-room.dto';
 import { UserProfileSelect } from 'src/common/dtos/UserProfile.dto';
 import {
   UserFcmInfoDto,
-  userFcmInfoSelect,
+  userFcmInfoSelect
 } from 'src/apis/alarm/dto/userFcmInfo.dto';
 
 @Injectable()
 export class RoomRepository {
   constructor(
-    @InjectModel(Room.name) private readonly roomModel: Model<Room>,
+    @InjectModel(Room.name) private readonly roomModel: Model<Room>
   ) {}
 
   async isRoomExist(roomIdDto: RoomIdDto): Promise<any> {
@@ -33,8 +33,8 @@ export class RoomRepository {
       ...createRoomDto,
       geometry: {
         type: 'Point',
-        coordinates: [createRoomDto.lng, createRoomDto.lat],
-      },
+        coordinates: [createRoomDto.lng, createRoomDto.lat]
+      }
     });
     return await room.save();
   }
@@ -46,12 +46,12 @@ export class RoomRepository {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
+            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)]
           },
           maxDistance: findRoomDto.radius,
           distanceField: 'distance',
-          key: 'geometry',
-        },
+          key: 'geometry'
+        }
       },
       {
         $project: {
@@ -61,9 +61,9 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1,
-        },
-      },
+          geometry: 1
+        }
+      }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
@@ -72,7 +72,7 @@ export class RoomRepository {
   }
 
   async findRoomsByCoordinatesWithFilter(
-    findRoomDto: FindRoomDto,
+    findRoomDto: FindRoomDto
   ): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
@@ -80,19 +80,19 @@ export class RoomRepository {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
+            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)]
           },
 
           maxDistance: findRoomDto.radius,
           // 거리 자동계산해서 distance 필드로 리턴
           distanceField: 'distance',
-          key: 'geometry',
-        },
+          key: 'geometry'
+        }
       },
       {
         $match: {
-          category: findRoomDto.filter,
-        },
+          category: findRoomDto.filter
+        }
       },
       {
         $project: {
@@ -102,9 +102,9 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1,
-        },
-      },
+          geometry: 1
+        }
+      }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
@@ -114,7 +114,7 @@ export class RoomRepository {
 
   async findFavoirteRoomsByCoordinates(
     findRoomDto: FindRoomDto,
-    listOfMyFavorite: Room[],
+    listOfMyFavorite: Room[]
   ): Promise<Room[] | []> {
     const room = await this.roomModel.aggregate([
       {
@@ -122,18 +122,18 @@ export class RoomRepository {
           spherical: true,
           near: {
             type: 'Point',
-            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)],
+            coordinates: [Number(findRoomDto.lng), Number(findRoomDto.lat)]
           },
           maxDistance: findRoomDto.radius,
           // 거리 자동계산해서 distance 필드로 리턴
           distanceField: 'distance',
-          key: 'geometry',
-        },
+          key: 'geometry'
+        }
       },
       {
         $match: {
-          _id: { $in: listOfMyFavorite },
-        },
+          _id: { $in: listOfMyFavorite }
+        }
       },
       {
         $project: {
@@ -143,9 +143,9 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1,
-        },
-      },
+          geometry: 1
+        }
+      }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
       //   { $limit: 1 },
     ]);
@@ -154,24 +154,24 @@ export class RoomRepository {
   }
   async addUserToRoom(
     roomIdDto: RoomIdDto,
-    userIdDto: UserIdDto,
+    userIdDto: UserIdDto
   ): Promise<Room> {
     console.log('repo', JSON.stringify(roomIdDto));
     const room = await this.roomModel
       .findOneAndUpdate(
         {
-          _id: roomIdDto.roomId,
+          _id: roomIdDto.roomId
         },
         {
           $addToSet: {
-            userList: userIdDto.userId,
-          },
+            userList: userIdDto.userId
+          }
         },
-        { new: true },
+        { new: true }
       )
       .populate({
         path: 'userList',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .lean<Room>({ defaults: true });
     if (!room) {
@@ -183,20 +183,20 @@ export class RoomRepository {
 
   async pullUserFromRoom(
     roomIdDto: RoomIdDto,
-    userIdDto: UserIdDto,
+    userIdDto: UserIdDto
   ): Promise<Room> {
     console.log(roomIdDto);
     const room = await this.roomModel
       .findOneAndUpdate(
         {
-          _id: roomIdDto.roomId,
+          _id: roomIdDto.roomId
         },
         {
           $pull: {
-            userList: userIdDto.userId,
-          },
+            userList: userIdDto.userId
+          }
         },
-        { new: true },
+        { new: true }
       )
       .lean<Room>({ defaults: true });
 
@@ -210,11 +210,11 @@ export class RoomRepository {
   async findOneByRoomId(roomIdDto: RoomIdDto): Promise<Room> {
     const room = await this.roomModel
       .findOne({
-        _id: roomIdDto.roomId,
+        _id: roomIdDto.roomId
       })
       .populate({
         path: 'userList',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .lean<Room>({ defaults: true });
 
@@ -234,17 +234,17 @@ export class RoomRepository {
           name: 1,
           category: 1,
           geometry: 1,
-          userCount: { $size: '$userList' },
-        },
+          userCount: { $size: '$userList' }
+        }
       },
       {
         $sort: {
-          userCount: -1,
-        },
+          userCount: -1
+        }
       },
       {
-        $limit: 10,
-      },
+        $limit: 10
+      }
     ]);
 
     return rooms;
@@ -253,11 +253,11 @@ export class RoomRepository {
   async getUserAlarmInfoInRoom(roomIdDto: RoomIdDto): Promise<Room | null> {
     const room = await this.roomModel
       .findOne({
-        _id: roomIdDto.roomId,
+        _id: roomIdDto.roomId
       })
       .populate({
         path: 'userList',
-        select: userFcmInfoSelect,
+        select: userFcmInfoSelect
       })
       .lean<Room>({ defaults: true });
 
