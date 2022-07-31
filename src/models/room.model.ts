@@ -5,7 +5,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsObject,
-  IsString,
+  IsString
 } from 'class-validator';
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { CATEGORY_TYPE } from 'src/common/consts/enum';
@@ -18,7 +18,7 @@ import { UserProfileDto } from 'src/common/dtos/UserProfile.dto';
 const options: SchemaOptions = {
   // rooms default 로 s 붙여지는데 디폴트로가는게 좋을것 같아요! (이찬진)
   collection: 'room',
-  timestamps: true,
+  timestamps: true
 };
 
 @Schema({ _id: false })
@@ -40,24 +40,24 @@ export class Geometry {
 export class Room {
   @ApiProperty({
     description: '유저의 고유아이디',
-    type: String,
+    type: String
   })
   // 시리얼 라이제이션 할때 사용
   @TransformObjectIdToString({ toPlainOnly: true })
-  @Transform((value) => value.obj._id, { toClassOnly: true })
+  @Transform(value => value.obj._id, { toClassOnly: true })
   @Type(() => Types.ObjectId)
   @Expose()
   _id: Types.ObjectId;
 
   @Prop({
     required: true,
-    type: String,
+    type: String
   })
   @ApiProperty({
     type: String,
     title: '채팅방 이름',
     description: '채팅방의 이름입니다',
-    example: '홍익대학교',
+    example: '홍익대학교'
   })
   @IsNotEmpty()
   @IsString()
@@ -66,14 +66,14 @@ export class Room {
 
   @Prop({
     required: true,
-    enum: CATEGORY_TYPE,
+    enum: CATEGORY_TYPE
   })
   @ApiProperty({
     enum: CATEGORY_TYPE,
     title: '카테고리',
     description:
       '카테고리를 나타내는 상태입니다. 기획안 따라 지속적으로 추가할 예정입니다.',
-    example: 'UNIVERCITY',
+    example: 'UNIVERCITY'
   })
   @IsNotEmpty()
   @IsEnum(CATEGORY_TYPE)
@@ -85,7 +85,7 @@ export class Room {
     type: Number,
     title: '반경정보',
     description: '미터 단위의 반경정보입니다',
-    example: 2000,
+    example: 2000
   })
   @IsNotEmpty()
   @IsNumber()
@@ -94,15 +94,15 @@ export class Room {
 
   @Prop({
     required: true,
-    type: [{ type: Types.ObjectId, ref: 'User' }],
+    type: [{ type: Types.ObjectId, ref: 'User' }]
   })
   @ApiProperty({
     type: [UserProfileDto],
-    title: '방에들어간 유저 리스트 정보',
+    title: '방에들어간 유저 리스트 정보'
   })
   @IsNotEmpty()
   @IsArray()
-  @Transform((value) => value.obj.userList, { toClassOnly: true })
+  @Transform(value => value.obj.userList, { toClassOnly: true })
   @Type(() => UserProfileDto)
   @Expose()
   userList: UserProfileDto[];
@@ -115,7 +115,7 @@ export class Room {
   @IsObject()
   @Prop({
     type: Geometry,
-    index: '2dsphere',
+    index: '2dsphere'
   })
   @Type(() => Geometry)
   @Expose({ toClassOnly: true })
@@ -130,12 +130,15 @@ export class Room {
   @Expose()
   userCount: number;
 
-  @ApiProperty({ description: '채팅방 부제목' })
-  @Prop({ required: false, type: String, default: "" })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({
+    description: '채팅방 부제목',
+    type: String,
+    nullable: true,
+    default: null
+  })
+  @Prop({ required: false, type: String, default: null })
   @Expose()
-  subtitle: string
+  subtitle: string;
 }
 
 const _RoomSchema = SchemaFactory.createForClass(Room);
