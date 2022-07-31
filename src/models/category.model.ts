@@ -46,5 +46,10 @@ export class Category {
   @IsNumber()
   @Expose()
   priority: Number;
+
+  @Prop({ type: Number, required: true, default: '' })
+  @IsNumber()
+  @Expose()
+  subtitle: Number;
 }
 export const CategorySchema = SchemaFactory.createForClass(Category);

@@ -26,6 +26,7 @@ export class CategoryRepository {
         id: 1,
         name: 1,
         imageUrl: 1,
+        subtitle: 1,
       })
       .lean() || {}
   }

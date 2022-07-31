@@ -34,4 +34,12 @@ export class CategoryDto {
   @IsNumber()
   @Expose()
   priority: Number;
+
+  @ApiProperty({
+    description: '서브타이틀',
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  subtitle: string;
 }
