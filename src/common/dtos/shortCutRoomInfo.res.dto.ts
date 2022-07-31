@@ -8,9 +8,9 @@ import { TransformObjectIdToString } from '../decorators/Expose.decorator';
 export class ResShortCutRoomDto {
   @ApiProperty({
     description: '방의 고유 아이디',
-    type: String,
+    type: String
   })
-  @Transform((value) => value.obj._id, { toClassOnly: true })
+  @Transform(value => value.obj._id, { toClassOnly: true })
   @TransformObjectIdToString({ toClassOnly: true })
   @Expose()
   _id: string;
@@ -31,6 +31,15 @@ export class ResShortCutRoomDto {
   @Expose({ toClassOnly: true })
   @Exclude({ toPlainOnly: true })
   geometry: Geometry;
+
+  @ApiProperty({
+    description: '채팅방 부제목',
+    type: String,
+    nullable: true,
+    default: null
+  })
+  @Expose()
+  subtitle: string;
 
   @ApiProperty({ description: '위도 가로선', type: Number })
   @Expose()

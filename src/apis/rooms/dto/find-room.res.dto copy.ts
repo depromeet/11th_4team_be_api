@@ -11,6 +11,7 @@ export class ResFindRoomDto extends PickType(Room, [
   'userList',
   'geometry',
   'userCount',
+  'subtitle'
 ] as const) {
   @Expose({ toClassOnly: true })
   @Exclude({ toPlainOnly: true })

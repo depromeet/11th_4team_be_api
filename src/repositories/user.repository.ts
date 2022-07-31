@@ -6,7 +6,7 @@ import {
   HttpException,
   BadRequestException,
   UseInterceptors,
-  InternalServerErrorException,
+  InternalServerErrorException
 } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User } from 'src/models/user.model';
@@ -19,7 +19,7 @@ import { ResShortCutRoomDto } from 'src/common/dtos/shortCutRoomInfo.res.dto';
 import { STATUS_TYPE, USER_LEVEL_TYPE } from 'src/common/consts/enum';
 import {
   UserFcmInfoDto,
-  userFcmInfoSelect,
+  userFcmInfoSelect
 } from 'src/apis/alarm/dto/userFcmInfo.dto';
 import { Types } from 'mongoose';
 import { FlagInfoDto } from 'src/apis/users/dto/flagInfo.dto';
@@ -28,20 +28,20 @@ import { FCMUpdateDto } from 'src/apis/users/dto/fcmUpdate.dto';
 @Injectable()
 export class UserRepository {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(User.name) private readonly userModel: Model<User>
   ) {}
 
   async banUser(userIdDto: UserIdDto) {
     return await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
-      { status: STATUS_TYPE.FORBIDDEN },
+      { status: STATUS_TYPE.FORBIDDEN }
     );
   }
 
   async unBanuser(userIdDto: UserIdDto) {
     return await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
-      { status: STATUS_TYPE.NORMAL },
+      { status: STATUS_TYPE.NORMAL }
     );
   }
 
@@ -52,8 +52,8 @@ export class UserRepository {
         status: STATUS_TYPE.SIGNOUT,
         phoneNumber: null,
         nickname: '(탈퇴한 사용자)',
-        FCMToken: '',
-      },
+        FCMToken: ''
+      }
     );
   }
 
@@ -62,7 +62,7 @@ export class UserRepository {
       .findOne({ _id: userIdDto.userId })
       .populate({
         path: 'iBlockUsers',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .populate({
         path: 'myRoom',
@@ -71,8 +71,9 @@ export class UserRepository {
           name: 1,
           category: 1,
           geometry: 1,
-          userCount: { $size: '$userList' },
-        },
+          subtitle: 1,
+          userCount: { $size: '$userList' }
+        }
       })
       .lean<User>({ defaults: true });
     return user;
@@ -96,15 +97,15 @@ export class UserRepository {
 
   async updateProfile(
     userIdDto: UserIdDto,
-    updateProfileDto: UpdateProfileReqDto,
+    updateProfileDto: UpdateProfileReqDto
   ): Promise<User> {
     return await this.userModel
       .findOneAndUpdate({ _id: userIdDto.userId }, updateProfileDto, {
-        new: true,
+        new: true
       })
       .populate({
         path: 'iBlockUsers',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .populate({
         path: 'myRoom',
@@ -112,17 +113,17 @@ export class UserRepository {
           _id: 1,
           name: 1,
           geometry: 1,
-
+          subtitle: 1,
           category: 1,
-          userCount: { $size: '$userList' },
-        },
+          userCount: { $size: '$userList' }
+        }
       })
       .lean<User>({ defaults: true });
   }
 
   async blockUser(
     myUserIdDto: UserIdDto,
-    otherUserIdDto: UserIdDto,
+    otherUserIdDto: UserIdDto
   ): Promise<User> {
     // 상대방은 보여지면 안되는 부분에서 나를 추가
     await this.userModel.findOneAndUpdate(
@@ -130,10 +131,10 @@ export class UserRepository {
       {
         $addToSet: {
           blockedUsers: myUserIdDto.userId,
-          opBlockedUsers: myUserIdDto.userId,
-        },
+          opBlockedUsers: myUserIdDto.userId
+        }
       },
-      { new: true },
+      { new: true }
     );
     // 내부분은 보여지면 안되는 부분 , 내 차단목록에 추가
     return await this.userModel
@@ -142,14 +143,14 @@ export class UserRepository {
         {
           $addToSet: {
             blockedUsers: otherUserIdDto.userId,
-            iBlockUsers: otherUserIdDto.userId,
-          },
+            iBlockUsers: otherUserIdDto.userId
+          }
         },
-        { new: true },
+        { new: true }
       )
       .populate({
         path: 'iBlockUsers',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .populate({
         path: 'myRoom',
@@ -158,8 +159,9 @@ export class UserRepository {
           name: 1,
           geometry: 1,
           category: 1,
-          userCount: { $size: '$userList' },
-        },
+          subtitle: 1,
+          userCount: { $size: '$userList' }
+        }
       })
       .lean<User>({ defaults: true });
   }
@@ -209,17 +211,17 @@ export class UserRepository {
 
   async unBlockUser(
     myUserIdDto: UserIdDto,
-    otherUserIdDto: UserIdDto,
+    otherUserIdDto: UserIdDto
   ): Promise<User> {
     await this.userModel.findOneAndUpdate(
       { _id: otherUserIdDto.userId },
       {
         $pull: {
           blockedUsers: myUserIdDto.userId,
-          opBlockedUsers: myUserIdDto.userId,
-        },
+          opBlockedUsers: myUserIdDto.userId
+        }
       },
-      { new: true },
+      { new: true }
     );
     return await this.userModel
       .findOneAndUpdate(
@@ -227,14 +229,14 @@ export class UserRepository {
         {
           $pull: {
             blockedUsers: otherUserIdDto.userId,
-            iBlockUsers: otherUserIdDto.userId,
-          },
+            iBlockUsers: otherUserIdDto.userId
+          }
         },
-        { new: true },
+        { new: true }
       )
       .populate({
         path: 'iBlockUsers',
-        select: UserProfileSelect,
+        select: UserProfileSelect
       })
       .populate({
         path: 'myRoom',
@@ -243,8 +245,9 @@ export class UserRepository {
           name: 1,
           category: 1,
           geometry: 1,
-          userCount: { $size: '$userList' },
-        },
+          subtitle: 1,
+          userCount: { $size: '$userList' }
+        }
       })
       .lean<User>({ defaults: true });
   }
@@ -254,7 +257,7 @@ export class UserRepository {
     const user = (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       [{ $set: { appAlarm: { $eq: [false, '$appAlarm'] } } }],
-      { new: true },
+      { new: true }
     )) as User;
     return user.appAlarm;
   }
@@ -268,18 +271,18 @@ export class UserRepository {
    */
   async pushRoomToFavoriteList(
     userIdDto: UserIdDto,
-    roomIdDto: RoomIdDto,
+    roomIdDto: RoomIdDto
   ): Promise<boolean> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto.userId
       },
       {
         $addToSet: {
-          favoriteRoomList: roomIdDto.roomId,
-        },
+          favoriteRoomList: roomIdDto.roomId
+        }
       },
-      { new: true },
+      { new: true }
     );
     if (!user) {
       throw new BadRequestException('user does not exist');
@@ -296,18 +299,18 @@ export class UserRepository {
    */
   async pullRoomToFavoriteList(
     userIdDto: UserIdDto,
-    roomIdDto: RoomIdDto,
+    roomIdDto: RoomIdDto
   ): Promise<boolean> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto.userId
       },
       {
         $pull: {
-          favoriteRoomList: roomIdDto.roomId,
-        },
+          favoriteRoomList: roomIdDto.roomId
+        }
       },
-      { new: true },
+      { new: true }
     );
     if (!user) {
       throw new BadRequestException('user does not exist');
@@ -325,7 +328,7 @@ export class UserRepository {
     const user = await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       [{ $set: { chatAlarm: { $eq: [false, '$chatAlarm'] } } }],
-      { new: true },
+      { new: true }
     );
 
     if (!user) {
@@ -342,14 +345,14 @@ export class UserRepository {
   async turnOnChatAlarm(userIdDto: UserIdDto): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto.userId
       },
       {
         $set: {
-          chatAlarm: true,
-        },
+          chatAlarm: true
+        }
       },
-      { new: true },
+      { new: true }
     );
     if (!user) {
       throw new BadRequestException('user does not exist');
@@ -359,27 +362,27 @@ export class UserRepository {
   }
 
   async findMyFavoriteRooms(
-    userIdDto: UserIdDto,
+    userIdDto: UserIdDto
   ): Promise<ResShortCutRoomDto[]> {
     const myFavoriteRoomList = await this.userModel.aggregate([
       {
         $match: {
-          _id: userIdDto.userId,
-        },
+          _id: userIdDto.userId
+        }
       },
       {
         $lookup: {
           from: 'room',
           localField: 'favoriteRoomList',
           foreignField: '_id',
-          as: 'favoriteRoomList',
-        },
+          as: 'favoriteRoomList'
+        }
       },
       {
-        $unwind: '$favoriteRoomList',
+        $unwind: '$favoriteRoomList'
       },
       {
-        $replaceRoot: { newRoot: '$favoriteRoomList' },
+        $replaceRoot: { newRoot: '$favoriteRoomList' }
       },
       {
         $project: {
@@ -387,10 +390,11 @@ export class UserRepository {
           name: 1,
           category: 1,
           geometry: 1,
-          userCount: { $size: '$userList' },
-        },
+          subtitle: 1,
+          userCount: { $size: '$userList' }
+        }
       },
-      { $sort: { userCount: -1 } },
+      { $sort: { userCount: -1 } }
     ]);
     // .populate("favoriteRoomList" , {});
 
@@ -399,19 +403,19 @@ export class UserRepository {
 
   async setMyRoom(
     userIdDto: UserIdDto,
-    roomId: RoomIdDto | null,
+    roomId: RoomIdDto | null
   ): Promise<User> {
     const user = await this.userModel.findOneAndUpdate(
       {
-        _id: userIdDto.userId,
+        _id: userIdDto.userId
       },
       {
         $set: {
           // 룸에서 나간경우 Null로 설정
-          myRoom: roomId ? roomId.roomId : null,
-        },
+          myRoom: roomId ? roomId.roomId : null
+        }
       },
-      { new: true },
+      { new: true }
     );
     if (!user) {
       throw new BadRequestException('user does not exist');
@@ -424,22 +428,22 @@ export class UserRepository {
     const roomInfo = await this.userModel.aggregate([
       {
         $match: {
-          _id: userIdDto.userId,
-        },
+          _id: userIdDto.userId
+        }
       },
       {
         $lookup: {
           from: 'room',
           localField: 'myRoom',
           foreignField: '_id',
-          as: 'myRoom',
-        },
+          as: 'myRoom'
+        }
       },
       {
-        $unwind: '$myRoom',
+        $unwind: '$myRoom'
       },
       {
-        $replaceRoot: { newRoot: '$myRoom' },
+        $replaceRoot: { newRoot: '$myRoom' }
       },
       {
         $project: {
@@ -447,9 +451,10 @@ export class UserRepository {
           name: 1,
           category: 1,
           geometry: 1,
-          userCount: { $size: '$userList' },
-        },
-      },
+          subtitle: 1,
+          userCount: { $size: '$userList' }
+        }
+      }
     ]);
     console.log(roomInfo);
 
@@ -460,7 +465,7 @@ export class UserRepository {
     return (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       { $inc: { lightningScore: 1 } },
-      { new: true },
+      { new: true }
     )) as User;
   }
 
@@ -468,12 +473,12 @@ export class UserRepository {
     return (await this.userModel.findOneAndUpdate(
       { _id: userIdDto.userId },
       { level: userlevel },
-      { new: true },
+      { new: true }
     )) as User;
   }
 
   async findUserFcmToken(
-    userIdArray: Types.ObjectId[],
+    userIdArray: Types.ObjectId[]
   ): Promise<UserFcmInfoDto[]> {
     return await this.userModel
       .find({ _id: { $in: userIdArray } })
@@ -483,12 +488,12 @@ export class UserRepository {
 
   async updateUserFCMToken(
     myUserIdDto: UserIdDto,
-    FCMTokenDto: FCMUpdateDto,
+    FCMTokenDto: FCMUpdateDto
   ): Promise<string> {
     const user = await this.userModel.findOneAndUpdate(
       { _id: myUserIdDto.userId },
       { FCMToken: FCMTokenDto.FCMToken },
-      { new: true },
+      { new: true }
     );
     console.log(user);
     if (!user) {
@@ -502,7 +507,7 @@ export class UserRepository {
       .findOneAndUpdate(
         { _id: myUserIdDto.userId },
         [{ $set: { flagInfo: { $eq: [false, '$flagInfo'] } } }],
-        { new: true },
+        { new: true }
       )
       .lean<User>({ defaults: true });
     if (!user) {

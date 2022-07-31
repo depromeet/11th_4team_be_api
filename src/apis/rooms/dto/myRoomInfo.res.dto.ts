@@ -10,9 +10,9 @@ import { Geometry } from 'src/models/room.model';
 export class MyRoomInfoDto {
   @ApiProperty({
     description: '방의 고유 아이디',
-    type: String,
+    type: String
   })
-  @Transform((value) => value.obj._id, { toClassOnly: true })
+  @Transform(value => value.obj._id, { toClassOnly: true })
   @TransformObjectIdToString({ toClassOnly: true })
   @Expose()
   _id: string;
@@ -29,10 +29,19 @@ export class MyRoomInfoDto {
   @Expose()
   userCount: number;
 
+  @ApiProperty({
+    description: '채팅방 부제목',
+    type: String,
+    nullable: true,
+    default: null
+  })
+  @Expose()
+  subtitle: string;
+
   //추가됨
   @ApiProperty({
     description: '아직 읽지 않은 채팅 숫자 0이면 표시안하시면 됩니다.',
-    default: 0,
+    default: 0
   })
   @Expose()
   notReadChatCount: number;
@@ -41,7 +50,7 @@ export class MyRoomInfoDto {
     description: '최신 채팅 정보 채팅 dto로 하나 또는 null',
     type: Chat,
     nullable: true,
-    default: null,
+    default: null
   })
   @Type(() => Chat)
   @Expose()

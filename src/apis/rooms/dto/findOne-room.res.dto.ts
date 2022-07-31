@@ -10,6 +10,7 @@ export class ResFindOneRoomDto extends PickType(Room, [
   'userList',
   'geometry',
   'userCount',
+  'subtitle'
 ] as const) {
   @ApiProperty({ description: '내가 즐겨찾기 했는지', type: Boolean })
   @Expose()
@@ -36,7 +37,7 @@ export class ResFindOneRoomDto extends PickType(Room, [
   iAlarm: boolean;
 
   @ApiProperty({ description: '유저명수' })
-  @Transform((value) => value.obj.userList.length, { toPlainOnly: true })
+  @Transform(value => value.obj.userList.length, { toPlainOnly: true })
   @Expose()
   userCount: number;
   // get userCount(): number {

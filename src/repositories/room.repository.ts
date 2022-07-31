@@ -61,7 +61,8 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1
+          geometry: 1,
+          subtitle: 1
         }
       }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
@@ -102,7 +103,8 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1
+          geometry: 1,
+          subtitle: 1
         }
       }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
@@ -143,7 +145,8 @@ export class RoomRepository {
           userCount: { $size: '$userList' },
           radius: 1,
           distance: 1,
-          geometry: 1
+          geometry: 1,
+          subtitle: 1
         }
       }
       // 몽고디비 디폴트 100개임 최대 100개를 뽑아올수있는데 여기서 조정을 해야함
@@ -234,6 +237,7 @@ export class RoomRepository {
           name: 1,
           category: 1,
           geometry: 1,
+          subtitle: 1,
           userCount: { $size: '$userList' }
         }
       },
